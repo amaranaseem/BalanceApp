@@ -1,0 +1,47 @@
+Balance – A Mental Wellness Mobile App
+Balance is a mobile mental wellness application designed to help users improve their mental health through simple daily routines. 
+The app provides tools such as mood check-ins, journaling, motivational messages, and a guided meditation library — all within a calming, minimalist interface.
+
+Purpose
+To encourage users to reflect on their emotional wellness and build healthier mental habits through journaling, mood tracking, guided meditation, 
+motivational engagement, and pattern recognition — all in a safe and private space.
+
+Goal
+Develop a full-stack mobile application that supports daily emotional engagement and 
+self-care using intuitive and interactive features.
+
+Key Features
+
+- Daily mood tracking  
+- Motivational tips based on moods  
+- Journaling (text or voice recordings)  
+- Guided meditation audio sessions + user audio upload  
+- Mood trend visualization 
+- Gamification via achievement badges (e.g. First Journal, 7-Day Streak)  
+- Daily reminders via push notifications  
+
+Tech Stack
+- Frontend: React Native  
+- Backend/Cloud: Firebase (Authentication, Firestore, Storage, Notifications)
+
+Project Scope
+
+In-Scope:
+- Mood tracking  
+- Journaling (text + voice)  
+- Motivational tips  
+- Meditation player with upload feature  
+- Mood data visualization  
+- Achievement badges  
+- Notifications/reminders  
+- Cross-platform support (iOS & Android)  
+- Secure user authentication
+
+Out of Scope:
+- Clinical diagnosis or therapy  
+- Community/social interaction features  
+- AI/ML sentiment analysis  
+- Subscriptions or in-app purchases  
+
+Project Status
+Initial Planning & Literature Review
