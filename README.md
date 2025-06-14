@@ -1,1 +1,1 @@
-# Computer-Science-Project-Balance-Mental-Wellness-App-
+# Computer-Science-Project-Balance-Mental-Wellness-App
