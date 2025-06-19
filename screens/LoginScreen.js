@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView} from 'react-native'
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -28,9 +28,9 @@ const LoginScreen = () => {
            />
          </View>
 
-         <View style={styles.buttoncontainer} >
-           <TouchableOpacity style={styles.button}>
-           <Text style={styles.buttonText}>Register</Text>
+         <View style={styles.buttoncontainer}>
+           <TouchableOpacity style={styles.button} onPress={()=> navigation.navigate('HomeTabs')}>
+           <Text style={styles.buttonText}>Login</Text>
            </TouchableOpacity>
          </View>
 
