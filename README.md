@@ -20,3 +20,7 @@ Week 3: Authentication & Backend Setup  **(completed)**
 ✅Connected project to GitHub and began structured commits
 
 Week 4: Frontend-setup (In Progress)
+Add navigation (In progress)
+✅Build login, signup, splashs and onbaording screen 
+Create Homescreen components
+Test user registeration flow
