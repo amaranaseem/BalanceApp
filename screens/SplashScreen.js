@@ -1,19 +1,21 @@
 import React from 'react';
+
 import { Text, StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 
-export default function SplashScreen() {
+export default function SplashScreen({ navigation }) {
     
   return (
       <View style={styles.container}>
           <Image 
-            source={require("../assets/logo.png")} 
+            source={require("../assets/logo.jpg")} 
             style={styles.logo} 
             resizeMode="contain" />
           <Text style={styles.logoText}>Balance</Text>
 
-          <TouchableOpacity 
-          style={styles.button}>
-          <Text style={styles.buttonText}>Explore Now</Text>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => navigation.navigate('Login')}>
+          <Text>Explore Now</Text>
         </TouchableOpacity>
 
       </View>
@@ -27,14 +29,16 @@ export default function SplashScreen() {
       justifyContent: 'center',
       alignItems: 'center',
       padding: 20, 
-      backgroundColor: '#ff',
+      backgroundColor: '#FAF9F6',
     },
   
   logo:{
       width: 180, 
       height: 180, 
       borderRadius: 100,
-      marginBottom: 15    
+      marginBottom: 15, 
+      borderWidth: 1,
+      borderColor: "#50483D"  
   },
   
   logoText:{

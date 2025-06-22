@@ -24,9 +24,8 @@ function BottomNavTab() {
           tabBarInactiveTintColor: '#A58E74', 
           tabBarShowLabel: true,
         tabBarStyle: {
-          position: 'absolute',
           backgroundColor: '#FBEDDD',
-          height: 80,
+          height: 60,
           paddingBottom: 30,
           borderRadius: 30,
           elevation: 10,
