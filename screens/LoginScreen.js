@@ -91,8 +91,7 @@ linkcontainer:{
 marginTop: 40,
 },
 
-
-input:{
+inputText:{
  fontSize: 12,
  marginBottom: 20,
  paddingHorizontal: 15,
