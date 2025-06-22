@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "BalanceApp",
-    "slug": "BalanceApp",
+    "name": "BALANCE",
+    "slug": "BALANCE",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.jpg",
@@ -16,7 +16,6 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.amara.balanceapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.jpg",
         "backgroundColor": "#ffffff"
@@ -25,16 +24,6 @@
     },
     "web": {
       "favicon": "./assets/logo.jpg"
-    },
-    "plugins": [
-      [
-        "expo-build-properties"
-      ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "8112f93a-7cf0-40f3-a4f1-80dc803bdeb5"
-      }
     }
   }
 }
