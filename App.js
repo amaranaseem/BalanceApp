@@ -23,7 +23,7 @@ export default function App() {
       <Stack.Screen name="Login" component={LoginScreen}/>
       <Stack.Screen name="Splash" component={SplashScreen}/>
       <Stack.Screen name="Board" component={BoardingScreen}/>
-      <Stack.Screen name="MoodCheckIn" component={MoodcheckInScreen}/>
+      <Stack.Screen name= "MoodCheckIn" component={MoodcheckInScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
