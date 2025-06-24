@@ -28,7 +28,8 @@ function BottomNavTab() {
           height: 60,
           paddingBottom: 30,
           borderRadius: 30,
-          elevation: 10,
+          elevation: 50,
+          marginBottom: 25,
         },
         headerShown: false,
         })}>

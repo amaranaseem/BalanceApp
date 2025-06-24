@@ -27,7 +27,7 @@ export default function SplashScreen({navigation}) {
       justifyContent: 'center',
       alignItems: 'center',
       padding: 20, 
-      backgroundColor: '#ff',
+      backgroundColor: '#D8CAB8',
     },
   
   logo:{
