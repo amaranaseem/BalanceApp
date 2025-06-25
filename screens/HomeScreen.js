@@ -93,7 +93,7 @@ const HomeScreen = ({ navigation }) => {
           <Progress.Bar
             progress={progress}
             color="#FFA177"
-            unfilledColor="#F4E4D6"
+            unfilledColor="#D9D9D9"
             borderWidth={0}
             width={null}
             height={10}
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   welcomecard: {
     backgroundColor: '#FFE2D0',
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 20,
     marginTop: 30,
     flexDirection: 'row',
     justifyContent: 'space-between',
