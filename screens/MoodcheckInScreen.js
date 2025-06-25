@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Platform, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -123,7 +123,7 @@ const handleTagPress = (tag) => {
         <Text style={styles.heading}>Want to jot down what’s on your mind?</Text>
         <TextInput
           style={styles.input}
-          placeholder="What made you smile today?"
+          placeholder="Write about your day..."
           multiline
           maxLength={280}
           value={note}
