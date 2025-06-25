@@ -1,22 +1,28 @@
-import React from 'react';
-import { Text, StyleSheet, View, Image, TouchableOpacity} from 'react-native';
+import React, { useEffect } from 'react';
+import { Text, StyleSheet, View, Image, ImageBackground} from 'react-native';
 
 export default function SplashScreen({navigation}) {
+
+   useEffect(() => {
+    const timeout = setTimeout(() => {
+      navigation.replace('Login'); 
+    }, 4000); 
+  }, []);
     
   return (
+    <ImageBackground
+      source={require('../assets/bkgimage.jpg')}
+      style={styles.background}
+      resizeMode="cover">
+
       <View style={styles.container}>
           <Image 
             source={require("../assets/logo.jpg")} 
             style={styles.logo} 
             resizeMode="contain" />
           <Text style={styles.logoText}>Balance</Text>
-
-          <TouchableOpacity 
-          style={styles.button} onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.buttonText}>Explore Now</Text>
-        </TouchableOpacity>
-
       </View>
+      </ImageBackground>
     );
   }
   
@@ -27,30 +33,31 @@ export default function SplashScreen({navigation}) {
       justifyContent: 'center',
       alignItems: 'center',
       padding: 20, 
-      backgroundColor: '#D8CAB8',
     },
   
   logo:{
       width: 180, 
       height: 180, 
       borderRadius: 100,
-      marginBottom: 15    
+      marginBottom: 15, 
+      borderWidth: 3,
+      borderColor: '#D8CAB8',
   },
   
   logoText:{
-      fontSize: 60,
-      color: '#50483D',
-      alignItems: 'center',
-      fontWeight: 'bold',
+    fontSize: 50,
+    fontWeight: '600', 
+    color: '#4A4A4A', 
+    letterSpacing: 1,
+    fontStyle: 'Bold',
+    textTransform: 'capitalize',
   },
 
-  button:{
-    borderWidth: 1,
-    width: '80%',
-    padding: 10,
-    alignItems:'center',
-    marginTop: 50,
+  background: {
+    flex: 1,
+    justifyContent: 'center',
   },
+  
   
   });
   
