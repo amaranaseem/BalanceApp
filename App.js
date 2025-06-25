@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -7,7 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import SplashScreen from './screens/SplashScreen';
 import BoardingScreen from './screens/BoardingScreen';
 import BottomNavTab from './BottomNavTab';
-import MoodcheckInScreen from './screens/MoodcheckInScreen';
+import MoodCheckInScreen from './screens/MoodCheckInScreen';
 
 
 
@@ -23,7 +22,8 @@ export default function App() {
       <Stack.Screen name="Login" component={LoginScreen}/>
       <Stack.Screen name="Splash" component={SplashScreen}/>
       <Stack.Screen name="Board" component={BoardingScreen}/>
-      <Stack.Screen name= "MoodCheckIn" component={MoodcheckInScreen}/>
+      <Stack.Screen name="BottomNavTab" component={BottomNavTab}/>
+      <Stack.Screen name="MoodCheckIn" component={MoodCheckInScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
