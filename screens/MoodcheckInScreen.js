@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Platform, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -52,8 +52,13 @@ const handleTagPress = (tag) => {
       setTimeout(() => setSaveError(''), 3000);
       return;
     }
-    navigation.navigate('HomeTabs');
-  };
+    Alert.alert("🎉 Well done!", "You've successfully logged your mood.", [
+    {
+      text: "OK",
+      onPress: () => navigation.navigate('HomeTabs'),
+    }
+  ]);
+};
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
