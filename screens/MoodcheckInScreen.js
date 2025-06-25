@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -6,9 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 const moods = [
   { emoji: '😁', label: 'joy', color: '#FFE38E' },
   { emoji: '😞', label: 'sad', color: '#90C3E6' },
-  { emoji: '😡',  label: 'angry', color: '#E94F4F' },
-  { emoji: '😨',  label: 'fear', color: '#C9B8FF' },
-  { emoji: '😌',  label: 'calm', color: '#B8E2DC' },
+  { emoji: '😡', label: 'angry', color: '#E94F4F' },
+  { emoji: '😨', label: 'fear', color: '#C9B8FF' },
+  { emoji: '😌', label: 'calm', color: '#B8E2DC' },
   { emoji: '😐', label: 'neutral', color: '#B7A282' },
   { emoji: '😯', label: 'surprise', color: '#F7C59F' },
   { emoji: '🤢', label: 'disgust', color: '#BFD8A5' },
@@ -16,25 +16,50 @@ const moods = [
 
 ];
 
-const MoodcheckInScreen = () => {
+const defaultTags = [
+  'work', 'family', 'health', 'no sleep', 'social media', 'friends', 'relaxed', 'love'
+];
+
+
+const MoodCheckInScreen = () => {
   const [selectedMood, setSelectedMood] = useState(null);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [note, setNote] = useState('');
+  const [tagError, setTagError ] = useState('');
+  const [saveError, setSaveError ] = useState('');
   const navigation = useNavigation();
 
   const today = new Date().toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
 
+const handleTagPress = (tag) => {
+    setTagError('');
+    if (selectedTags.includes(tag)) {
+      setSelectedTags((prev) => prev.filter((t) => t !== tag));
+    } else if (selectedTags.length < 3) {
+      setSelectedTags((prev) => [...prev, tag]);
+    } else {
+      setTagError('You can select up to 3 tags only.');
+      setTimeout(() => setTagError(''), 3000);
+    }
+  };
 
   const handleSave = () => {
-    // Save logic here
-    navigation.navigate('HomeTabs'); 
+    setSaveError('');
+    if (!selectedMood) {
+      setSaveError('Please select a mood before saving.');
+      setTimeout(() => setSaveError(''), 3000);
+      return;
+    }
+    navigation.navigate('HomeTabs');
   };
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
       <ScrollView contentContainerStyle={styles.container}>
         
-        {/* Header Row */}
+        {/* Header */}
         <View style={styles.topRow}>
           <Text style={styles.headerText}>Mood Check-In</Text>
           <View style={styles.closeCircle}>
@@ -42,7 +67,6 @@ const MoodcheckInScreen = () => {
               <Ionicons name="close" size={22} color="black" />
             </TouchableOpacity>
           </View>
-          
         </View>
 
         {/* Date */}
@@ -57,31 +81,63 @@ const MoodcheckInScreen = () => {
           {moods.map((mood, index) => (
             <TouchableOpacity
               key={index}
-              style={[
-                styles.moodItem,
-                selectedMood?.label === mood.label && {
-                  backgroundColor: mood.color
-                }
-              ]}
-              onPress={() => setSelectedMood(mood)}
-            >
+              style={[styles.moodItem, selectedMood?.label === mood.label && { backgroundColor: mood.color }]}
+              onPress={() => setSelectedMood(mood)}>
               <Text style={styles.emoji}>{mood.emoji}</Text>
               <Text style={styles.moodLabel}>{mood.label}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
+        {/* Error on save */}
+        {saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
+
+
+        {/* Tags */}
+        <Text style={styles.heading}>What makes you feel this way?</Text>
+        <View style={styles.tagcontainer}>
+          {defaultTags.map((tag, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[
+                styles.tag,
+                selectedTags.includes(tag) && styles.selectedTag,
+              ]}
+              onPress={() => handleTagPress(tag)}
+            >
+              <Text style={[styles.tagText, selectedTags.includes(tag) && styles.selectedTagText]}>{tag}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Error on tags */}
+        {tagError !== '' && <Text style={styles.errorText}>{tagError}</Text>}
+
+        
+        {/* Note Input */}
+        <Text style={styles.heading}>Want to jot down what’s on your mind?</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="What made you smile today?"
+          multiline
+          maxLength={280}
+          value={note}
+          onChangeText={setNote}
+        />
+        <Text style={styles.counter}>({note.length}/280)</Text>
+
+
         {/* Save Button */}
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveText}>Save</Text>
         </TouchableOpacity>
 
-           </ScrollView>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-export default MoodcheckInScreen;
+export default MoodCheckInScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -90,7 +146,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     backgroundColor: '#FAF9F6', 
-    
   },
 
   topRow: {
@@ -174,9 +229,9 @@ const styles = StyleSheet.create({
 
   saveBtn: {
     marginTop: 20,
-    backgroundColor: '#A3D7A2',
+    backgroundColor: '#A8D5BA',
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 15,
     alignItems: 'center',
   },
 
@@ -185,4 +240,52 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 
+  tagcontainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+
+  tag: {
+    backgroundColor: '#F0ECE6',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+
+  selectedTag: {
+    backgroundColor: '#A58E74',
+  },
+
+  selectedTagText: {
+    color: '#fff',
+    fontStyle: 'italic',
+    fontWeight: 'bold',
+  },
+
+   input: {
+    height: 100,
+    backgroundColor: '#F4E9DA',
+    borderRadius: 12,
+    padding: 14,
+    textAlignVertical: 'top',
+    marginTop: 8,
+    opacity:0.9,
+  },
+
+  counter: {
+    textAlign: 'right',
+    marginTop: 4,
+    color: '#888',
+    fontSize: 12,
+  },
+
+errorText: {
+    color: '#E94F4F',
+    marginTop: 6,
+    marginBottom: 4,
+    fontSize: 13,
+    fontWeight: '500',
+    fontStyle: 'italic',
+  },
 });
