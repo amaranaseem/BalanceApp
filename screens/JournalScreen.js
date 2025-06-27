@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
-import { Ionicons, Feather } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const journalEntries = [
@@ -16,7 +10,7 @@ const journalEntries = [
     mood: 'joy',
     moodColor: '#FFE38E',
     date: '10-02-25',
-    description: 'Today was a great day...hchbrf...',
+    description: 'Today was a great day. I am soo..',
     hasAudio: true,
     duration: '1:24m',
   },
@@ -58,7 +52,7 @@ const JournalScreen = () => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
 
-      {/* Title + Date */}
+      {/* Title and Date*/}
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardDate}>{item.date}</Text>
@@ -76,7 +70,7 @@ const JournalScreen = () => {
         </Text>
       )}
 
-      {/* Audio & Duration */}
+      {/* Audio */}
       {item.hasAudio && (
         <View style={styles.audio}>
           <Ionicons name="play" size={20} color="black" />
@@ -88,12 +82,13 @@ const JournalScreen = () => {
 
   return (
     <View style={styles.container}>
+
       {/* Header */}
       <View style={styles.topRow}>
         <Text style={styles.headerText}>My Journal</Text>
       </View>
 
-      {/* Entry List */}
+      {/* Entries */}
       <FlatList
         data={journalEntries}
         keyExtractor={(item) => item.id}
@@ -101,7 +96,7 @@ const JournalScreen = () => {
         contentContainerStyle={{ paddingBottom: 100 }}
       />
 
-      {/* Floating Add Button */}
+      {/* Floating Button */}
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('Notepad')}
