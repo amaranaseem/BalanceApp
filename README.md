@@ -19,8 +19,14 @@ Week 3: Authentication & Backend Setup  **(completed)**
 ✅Implemented user authentication (email/password & password reset)
 ✅Connected project to GitHub and began structured commits
 
-Week 4: Frontend-setup **(In Progress)**
-Add navigation (In progress)
+Week 4: Frontend-setup **(Partial Completion)**
+✅Add navigation 
 ✅Build login, signup, splashs and onbaording screen 
-Create Homescreen components
+✅Create Homescreen components
 Test user registeration flow
+
+Week 5: Mood logging & Journaling **(In Progres)**
+✅Create mood logging screen 
+✅Build journal page (text + voice recording option)
+Save enteries to Firebase
+Test the screens
