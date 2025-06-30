@@ -62,6 +62,8 @@ const defaultTags = [
         setTimeout(() => setSaveError(''), 3000);
         return;
       }
+
+      // mood check-in saved on firebase
       try {
             await addDoc(collection(db, 'moodCheckins'), {
               mood: selectedMood.label,
