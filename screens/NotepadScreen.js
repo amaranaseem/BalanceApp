@@ -113,62 +113,53 @@ const NotepadScreen = () => {
   };
 
   {/* Save function */}
+   const handleSave = async () => {
+  console.log("Save button clicked"); // error handling
 
-  const handleSave = async () => {
-    setSaveError('');
+  setSaveError('');
 
-    if (!selectedMood) {
-      setSaveError('Please select a mood before saving.');
-      setTimeout(() => setSaveError(''), 3000);
-      return;
-    }
+  if (!selectedMood) {
+    setSaveError('Please select a mood before saving.');
+    console.log("No mood selected");
+    setTimeout(() => setSaveError(''), 3000);
+    return;
+  }
 
-    if (!note && !audioURI) {
-      setSaveError('Please write something or record audio.');
-      return;
-    }
+  if (!note) {
+    setSaveError('Please write something before saving.');
+    console.log("No note written"); // error handling
+    return;
+  }
 
-    setUploading(true);
+  try {
+    console.log("Saving entry to Firestore..."); // error handling
+    await addDoc(collection(db, 'entries'), {
+      title: title || 'Untitled',
+      mood: selectedMood.label,
+      moodColor: selectedMood.color,
+      note: note,
+      createdAt: serverTimestamp(),
+    });
 
-    try {
-      let audioUrl = null;
+    console.log("Entry saved to Firestore"); // error handling
 
-      if (audioURI) {
-        const response = await fetch(audioURI);
-        const blob = await response.blob();
-        const audioRef = ref(storage, `audioNotes/${Date.now()}.m4a`);
-        await uploadBytes(audioRef, blob);
-        audioUrl = await getDownloadURL(audioRef);
-      }
-
-      await addDoc(collection(db, 'entries'), {
-        title: title || 'Untitled',
-        mood: selectedMood.label,
-        moodColor: selectedMood.color,
-        note: note || '',
-        audioUrl: audioUrl || '',
-        createdAt: serverTimestamp(),
-      });
-
-      Alert.alert("🎉 Saved!", "Your journal entry was saved.", [
-        {
-          text: "OK",
-          onPress: () => {
-            setTitle('');
-            setNote('');
-            setAudioURI(null);
-            setSelectedMood(null);
-            navigation.navigate('BottomNavTab', { screen: 'Journal' });
-          },
+    Alert.alert("🎉 Saved!", "Your journal entry was saved.", [
+      {
+        text: "OK",
+        onPress: () => {
+          setTitle('');
+          setNote('');
+          setSelectedMood(null);
+          navigation.navigate('BottomNavTab', { screen: 'Journal' });
         },
-      ]);
-    } catch (error) {
-      console.error("Save error:", error);
-      setSaveError('Failed to save. Try again.');
-    }
-
-    setUploading(false);
-  };
+      },
+    ]);
+  } catch (error) {
+    // error handling
+    console.error("Firestore save error:", error);
+    setSaveError('Failed to save. Try again.');
+  }
+};
 
   {/* Date */}
   const today = new Date().toLocaleDateString('en-GB', {
