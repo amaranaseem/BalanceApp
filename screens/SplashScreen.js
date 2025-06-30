@@ -27,37 +27,37 @@ export default function SplashScreen({navigation}) {
   }
   
   
-  const styles = StyleSheet.create({
-  container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20, 
-    },
+const styles = StyleSheet.create({
+container: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 20, 
+},
   
-  logo:{
-      width: 180, 
-      height: 180, 
-      borderRadius: 100,
-      marginBottom: 15, 
-      borderWidth: 3,
-      borderColor: '#D8CAB8',
-  },
+logo:{
+  width: 180, 
+  height: 180, 
+  borderRadius: 100,
+  marginBottom: 15, 
+  borderWidth: 1,
+  borderColor: '#D8CAB8',
+},
   
-  logoText:{
-    fontSize: 50,
-    fontWeight: '600', 
-    color: '#4A4A4A', 
-    letterSpacing: 1,
-    fontStyle: 'Bold',
-    textTransform: 'capitalize',
-  },
+logoText:{
+  fontSize: 50,
+  fontWeight: '600', 
+  color: '#4A4A4A', 
+  letterSpacing: 1,
+  fontStyle: 'Bold',
+  textTransform: 'capitalize',
+},
 
-  background: {
-    flex: 1,
-    justifyContent: 'center',
-  },
+background: {
+  flex: 1,
+  justifyContent: 'center',
+},
+ 
   
-  
-  });
+});
   
