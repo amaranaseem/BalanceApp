@@ -1,53 +1,51 @@
-import React from 'react';
+import React, {useState, useCallback} from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import app from '../firebase';
+import { useFocusEffect } from '@react-navigation/native';
+import {query, orderBy} from 'firebase/firestore';
 
-const journalEntries = [
-  {
-    id: '1',
-    title: 'Happiest Day',
-    mood: 'joy',
-    moodColor: '#FFE38E',
-    date: '10-02-25',
-    description: 'Today was a great day. I am soo..',
-    hasAudio: true,
-    duration: '1:24m',
-  },
-  {
-    id: '2',
-    title: 'Okayyy',
-    mood: 'angry',
-    moodColor: '#E94F4F',
-    date: '10-03-25',
-    description: 'Today was the worst day of my life...',
-    hasAudio: true,
-    duration: '1:20m',
-  },
-  {
-    id: '3',
-    title: 'Hmmm',
-    mood: 'Neutral',
-    moodColor: '#B7A282',
-    date: '10-04-25',
-    description: 'Today wasn’t good or bad... I just feel neutral.',
-    hasAudio: false,
-    duration: '1:20m',
-  },
-  {
-    id: '4',
-    title: 'I feel relaxed',
-    mood: 'Calm',
-    moodColor: '#B8E2DC',
-    date: '10-05-25',
-    hasAudio: true,
-    duration: '1:00m',
-  },
-];
+const db = getFirestore(app);
 
 const JournalScreen = () => {
   const navigation = useNavigation();
-  
+  const [entries, setEntries] = useState([]);
+
+  useFocusEffect(
+  useCallback(() => {
+    const fetchEntries = async () => {
+      try {
+        const entriesRef = collection(db, 'entries');
+        const q = query(entriesRef, orderBy('createdAt', 'desc'));  //sorting the entries
+
+        const snapshot = await getDocs(q);
+        const firebaseEntries = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            title: data.title || 'Untitled',
+            mood: data.mood || 'Neutral',
+            moodColor: data.moodColor || '#D8CAB8',
+            date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
+            description: data.note || '',
+            hasAudio: !!data.audioURL,
+            duration: data.duration || '',
+            audioURL: data.audioURL || null,
+          };
+        });
+
+        setEntries(firebaseEntries);
+      } catch (error) {
+        console.error('Error fetching journal entries:', error);
+      }
+    };
+
+    fetchEntries(); 
+  }, [])
+);
+
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -90,7 +88,7 @@ const JournalScreen = () => {
 
       {/* Entries */}
       <FlatList
-        data={journalEntries}
+        data={entries}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 100 }}
