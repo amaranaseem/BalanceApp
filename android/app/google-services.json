@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "944505135387",
+    "project_id": "balanceapp-3df44",
+    "storage_bucket": "balanceapp-3df44.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944505135387:android:f843ca67d403a7c30cf3be",
+        "android_client_info": {
+          "package_name": "com.amara_nasim_24031981.BALANCE"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAVlQNhWEI7gSYtB5U--l7C8hRXUSJ-JM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/logo.jpg",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.amara_nasim_24031981.BALANCE"
     },
     "web": {
       "favicon": "./assets/logo.jpg"
