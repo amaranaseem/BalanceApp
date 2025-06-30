@@ -7,8 +7,7 @@ import SplashScreen from './screens/SplashScreen';
 import BoardingScreen from './screens/BoardingScreen';
 import BottomNavTab from './BottomNavTab';
 import MoodCheckInScreen from './screens/MoodCheckInScreen';
-
-
+import NotepadScreen from './screens/NotepadScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +23,9 @@ export default function App() {
       <Stack.Screen name="Board" component={BoardingScreen}/>
       <Stack.Screen name="BottomNavTab" component={BottomNavTab}/>
       <Stack.Screen name="MoodCheckIn" component={MoodCheckInScreen}/>
+      <Stack.Screen name="Notepad" component={NotepadScreen}/>
+      
+
       </Stack.Navigator>
     </NavigationContainer>
   );
