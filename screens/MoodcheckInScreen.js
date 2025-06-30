@@ -2,6 +2,11 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingV
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';  
+import app from '../firebase'
+
+
+const db = getFirestore(app);
 
 const moods = [
   { emoji: '😁', label: 'joy', color: '#FFE38E' },
@@ -20,44 +25,62 @@ const defaultTags = [
   'work', 'family', 'health', 'no sleep', 'social media', 'friends', 'relaxed', 'love'
 ];
 
+  {/*Mood checkin */}
+  const MoodCheckInScreen = () => {
+    const [selectedMood, setSelectedMood] = useState(null);
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [note, setNote] = useState('');
+    const [tagError, setTagError ] = useState('');
+    const [saveError, setSaveError ] = useState('');
+    const navigation = useNavigation();
 
-const MoodCheckInScreen = () => {
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [note, setNote] = useState('');
-  const [tagError, setTagError ] = useState('');
-  const [saveError, setSaveError ] = useState('');
-  const navigation = useNavigation();
-
+  {/*Mood checkin */}
   const today = new Date().toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
 
-const handleTagPress = (tag) => {
-    setTagError('');
-    if (selectedTags.includes(tag)) {
-      setSelectedTags((prev) => prev.filter((t) => t !== tag));
-    } else if (selectedTags.length < 3) {
-      setSelectedTags((prev) => [...prev, tag]);
-    } else {
-      setTagError('You can select up to 3 tags only.');
-      setTimeout(() => setTagError(''), 3000);
-    }
-  };
 
-  const handleSave = () => {
-    setSaveError('');
-    if (!selectedMood) {
-      setSaveError('Please select a mood before saving.');
-      setTimeout(() => setSaveError(''), 3000);
-      return;
-    }
-    Alert.alert("🎉 Well done!", "You've successfully logged your mood.", [
-    {
-      text: "OK",
-      onPress: () => navigation.navigate('HomeTabs'),
-    }
-  ]);
+  {/*Tags fxn */}
+  const handleTagPress = (tag) => {
+      setTagError('');
+      if (selectedTags.includes(tag)) {
+        setSelectedTags((prev) => prev.filter((t) => t !== tag));
+      } else if (selectedTags.length < 3) {
+        setSelectedTags((prev) => [...prev, tag]);
+      } else {
+        setTagError('You can select up to 3 tags only.');
+        setTimeout(() => setTagError(''), 3000);
+      }
+    };
+
+
+    {/*save btn fxn */}
+    const handleSave = async() => {
+      setSaveError('');
+      if (!selectedMood) {
+        setSaveError('Please select a mood before saving.');
+        setTimeout(() => setSaveError(''), 3000);
+        return;
+      }
+      try {
+            await addDoc(collection(db, 'moodCheckins'), {
+              mood: selectedMood.label,
+              moodColor: selectedMood.color,
+              tags: selectedTags,
+              notes: note,
+              createdAt: serverTimestamp(),
+            });
+
+      Alert.alert("🎉 Well done!", "You've successfully logged your mood.", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate('HomeTabs'),
+        }
+      ]);
+    } catch (error) {
+    console.error("Error saving mood check-in:", error);
+    setSaveError('Something went wrong. Try again.');
+  }
 };
 
   return (
@@ -125,11 +148,11 @@ const handleTagPress = (tag) => {
           style={styles.input}
           placeholder="Write about your day..."
           multiline
-          maxLength={280}
+          maxLength={30}
           value={note}
           onChangeText={setNote}
         />
-        <Text style={styles.counter}>({note.length}/280)</Text>
+        <Text style={styles.counter}>({note.length}/30)</Text>
 
 
         {/* Save Button */}
