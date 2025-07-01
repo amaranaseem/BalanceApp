@@ -8,6 +8,8 @@ import BoardingScreen from './screens/BoardingScreen';
 import BottomNavTab from './BottomNavTab';
 import MoodCheckInScreen from './screens/MoodCheckInScreen';
 import NotepadScreen from './screens/NotepadScreen';
+import HabitandGoalScreen from './screens/HabitandGoalScreen';
+import AddTaskScreen from './screens/AddTaskScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,7 +26,8 @@ export default function App() {
       <Stack.Screen name="BottomNavTab" component={BottomNavTab}/>
       <Stack.Screen name="MoodCheckIn" component={MoodCheckInScreen}/>
       <Stack.Screen name="Notepad" component={NotepadScreen}/>
-      
+      <Stack.Screen name="HabitsandGoals" component={HabitandGoalScreen}/>
+      <Stack.Screen name="AddTask" component={AddTaskScreen}/>
 
       </Stack.Navigator>
     </NavigationContainer>
