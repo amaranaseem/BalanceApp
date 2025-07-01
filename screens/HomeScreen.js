@@ -1,18 +1,12 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Checkbox } from 'react-native-paper';
 import * as Progress from 'react-native-progress';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 
-const tasks = [
-  { id: 1, title: 'Digital Detox', description: 'take a 15min break from your screen', category: 'self-care' },
-  { id: 2, title: 'Journal', description: 'write 3 things you’re grateful for', category: 'self-care' },
-  { id: 3, title: 'Morning Mindfulness', description: '5 min of deep breathing', category: 'self-care' },
-  { id: 4, title: 'Sleep by 10', description: '1/30', category: 'habit' },
-  { id: 5, title: 'Short walk', description: 'take a 10min walk outside', category: 'goal' },
-  { id: 6, title: 'Read a Book', description: 'read for 10 minutes', category: 'goal' },
-];
 
 const categoryColors = {
   'self-care': '#20C997',
@@ -22,6 +16,20 @@ const categoryColors = {
 
 const HomeScreen = ({ navigation }) => {
   const [checkedTasks, setCheckedTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
+
+  {/*getting tasks from firebase */}
+  useEffect(() => {
+  const unsubscribe = onSnapshot(collection(db, 'tasks'), (snapshot) => {
+    const firebaseTasks = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setTasks(firebaseTasks);
+  });
+
+  return unsubscribe; // Clean up on unmount
+}, []);
 
   const toggleTask = (id) => {
     setCheckedTasks((prev) =>
@@ -29,118 +37,109 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  const progress = checkedTasks.length / tasks.length;
+const progress = tasks.length === 0 ? 0 : checkedTasks.length / tasks.length;
 
-  const categoryCounts = tasks.reduce((acc, task) => {
+
+return (
+    
+  <ScrollView style={styles.container}>
+  <View style={styles.topRow}>
+  <View style={styles.notificationCircle}>
+    <Ionicons name="notifications" size={22} color="black"/>
+  </View>
+        
+   </View>
+
+    {/* Welcome card */}
+    <View style={styles.welcomecard}>
+    <View style={styles.textContainer}>
+    <Text style={styles.h2}>Welcome</Text>
+    <Text style={styles.subtitle}>Let's take a mindful pause and see how you're doing today.</Text>
+    </View>
+    <Image source={require('../assets/meditation.jpg')} style={styles.illustration} />
+    </View>
+
+    {/* Mood Tracker Bar */}
+    <View style={styles.moodBar}>
+    {[
+      { day: 'M', color: '#FFE38E' },   
+      { day: 'T', color: '#D9D9D9' },   
+      { day: 'W', color: '#90C3E6' },   
+      { day: 'T', color: '#E94F4F' },    
+      { day: 'F', color: '#BFD8A5' },   
+      { day: 'S', color: '#B8E2DC' },   
+      { day: 'S', color: '#C9B8FF' },   
+
+     ].map((entry, index) => (
+      <View key={index} style={[styles.moodCircle, { backgroundColor: entry.color }]}>
+       <Text style={styles.moodLetter}>{entry.day}</Text>
+      </View>
+    ))}
+    </View>
+
+    {/* Mood Check-In */}
+    <TouchableOpacity style={styles.moodCard} onPress={()=> navigation.navigate('MoodCheckIn')}>
+    <Text style={styles.bodytext}>How are you feeling today?</Text>
+    <Ionicons name="chevron-forward" size={20} color="#A58E74" />
+    </TouchableOpacity>
+
+    {/* Progress */}
+    <View style={styles.progressSection}>
+    <Text style={styles.h3}>Your Progress</Text>
+     <View style={styles.progressCard}>
+      <View style={styles.progressTextRow}>
+       <Text style={styles.h2}>{Math.round(progress * 100)}%</Text>
+       <Text style={styles.progressText}>of today's plan completed</Text>
+       </View>
+     <Progress.Bar
+      progress={progress}
+      color="#FFA177"
+      unfilledColor="#D9D9D9"
+      borderWidth={0}
+      width={null}
+      height={10}
+      style={{ borderRadius: 10 }}
+     />
+
+    {/* Task Legend*/}
+    <View style={styles.legendRow}>
+      {Object.entries(categoryColors).map(([key, color]) => (
+    <View key={key} style={styles.legendItem}>
+    <View style={[styles.legendDot, { backgroundColor: color }]} />
+    <Text style={styles.legendText}>
+    {key.charAt(0).toUpperCase() + key.slice(1)} 
+    </Text>
+    </View>
+    ))}
+    </View>
+    </View>
+    </View>
+
+    {/* Task List */}
+    <View style={styles.taskList}>
+    {tasks.map((task) => {
     const isChecked = checkedTasks.includes(task.id);
-    if (!acc[task.category]) acc[task.category] = { total: 0, done: 0 };
-    acc[task.category].total += 1;
-    if (isChecked) acc[task.category].done += 1;
-    return acc;
-  }, {});
-
+     const borderColor = categoryColors[task.category];
 
   return (
-    
-    <ScrollView style={styles.container}>
-      <View style={styles.topRow}>
-        <View style={styles.notificationCircle}>
-          <Ionicons name="notifications" size={22} color="black"/>
-        </View>
-        
-      </View>
-
-      {/* Welcome card */}
-      <View style={styles.welcomecard}>
-        <View style={styles.textContainer}>
-          <Text style={styles.h2}>Welcome</Text>
-          <Text style={styles.subtitle}>Let's take a mindful pause and see how you're doing today.</Text>
-        </View>
-        <Image source={require('../assets/meditation.jpg')} style={styles.illustration} />
-      </View>
-
-      {/* Mood Tracker Bar */}
-      <View style={styles.moodBar}>
-        {[
-          { day: 'M', color: '#FFE38E' },   // joy
-          { day: 'T', color: '#D9D9D9' },   // no check-in
-          { day: 'W', color: '#90C3E6' },   // sad
-          { day: 'T', color: '#E94F4F' },   // angry 
-          { day: 'F', color: '#BFD8A5' },   // disgust
-          { day: 'S', color: '#B8E2DC' },   // calm
-          { day: 'S', color: '#C9B8FF' },   // fear
-        ].map((entry, index) => (
-          <View key={index} style={[styles.moodCircle, { backgroundColor: entry.color }]}>
-            <Text style={styles.moodLetter}>{entry.day}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Mood Check-In */}
-      <TouchableOpacity style={styles.moodCard} onPress={()=> navigation.navigate('MoodCheckIn')}>
-        <Text style={styles.bodytext}>How are you feeling today?</Text>
-        <Ionicons name="chevron-forward" size={20} color="#A58E74" />
-      </TouchableOpacity>
-
-      {/* Progress */}
-      <View style={styles.progressSection}>
-        <Text style={styles.h3}>Your Progress</Text>
-        <View style={styles.progressCard}>
-          <View style={styles.progressTextRow}>
-            <Text style={styles.h2}>{Math.round(progress * 100)}%</Text>
-            <Text style={styles.progressText}>of today's plan completed</Text>
-          </View>
-          <Progress.Bar
-            progress={progress}
-            color="#FFA177"
-            unfilledColor="#D9D9D9"
-            borderWidth={0}
-            width={null}
-            height={10}
-            style={{ borderRadius: 10 }}
-          />
-
-          {/* Task Legend*/}
-          <View style={styles.legendRow}>
-            {Object.entries(categoryColors).map(([key, color]) => (
-              <View key={key} style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: color }]} />
-                <Text style={styles.legendText}>
-                  {key.charAt(0).toUpperCase() + key.slice(1)} (
-                  {categoryCounts[key]?.done || 0}/{categoryCounts[key]?.total || 0})
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      </View>
-
-      {/* Task List */}
-      <View style={styles.taskList}>
-        {tasks.map((task) => {
-          const isChecked = checkedTasks.includes(task.id);
-          const borderColor = categoryColors[task.category];
-
-          return (
-            <TouchableOpacity
-              key={task.id}
-              style={[styles.taskItem, { borderColor }]}
-              onPress={() => toggleTask(task.id)}
-            >
-              <Checkbox
-                status={isChecked ? 'checked' : 'unchecked'}
-                onPress={() => toggleTask(task.id)}
-                color={borderColor}
-              />
-              <View style={styles.taskTextContainer}>
-                <Text style={styles.taskTitle}>{task.title}</Text>
-                <Text style={styles.taskSubtitle}>{task.description}</Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-        <View style={{ height: 100 }} />
-      </View>
+    <TouchableOpacity
+      key={task.id}
+      style={[styles.taskItem, { borderColor }]}
+      onPress={() => toggleTask(task.id)}
+    >
+    <Checkbox
+    status={isChecked ? 'checked' : 'unchecked'}
+    onPress={() => toggleTask(task.id)}
+    color={borderColor}
+    />
+    <View style={styles.taskTextContainer}>
+    <Text style={styles.taskTitle}>{task.title}</Text>
+    </View>
+    </TouchableOpacity>
+    );
+    })}
+    <View style={{ height: 100 }} />
+    </View>
     </ScrollView>
   );
 };
@@ -200,8 +199,8 @@ const styles = StyleSheet.create({
   },
 
   illustration: {
-    width: 110,
-    height: 115,
+    width: 100,
+    height: 100,
     alignSelf: 'flex-end',
     marginTop: -40,
   },
@@ -308,10 +307,6 @@ moodLetter: {
     color: '#00',
   },
 
-  taskSubtitle: {
-    color: 'black',
-    fontSize: 13,
-  },
 
   legendRow: {
   flexDirection: 'row',
