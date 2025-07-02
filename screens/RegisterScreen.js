@@ -1,10 +1,49 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image} from 'react-native'
+import { auth } from '../firebase';
+import { createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
+import Toast from 'react-native-toast-message';
+
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+
+{/*User Authentication with error handling for password*/}
+const handleRegister = async () => {
+  if (!username || !email || !password) {
+    alert('All fields are required');
+    return;
+  }
+
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters');
+    return;
+  }
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+    await updateProfile(userCredential.user, { displayName: username });
+    console.log('Username set as:', username);
+
+    Toast.show({
+    type: 'success',
+    text1: `Welcome ${username} to Balance!`,
+    });
+
+    navigation.navigate('HomeTabs');
+  } catch (error) {
+    console.log('Registration error:', error);
+
+    if (error.code === 'auth/weak-password') {
+      alert('Password should be 6 character long');
+    } else {
+      alert(error.message);
+    }
+  }
+};
 
 
 
@@ -26,7 +65,7 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.inputText}
-            placeholder="John Deo"
+            placeholder="tester"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
@@ -59,13 +98,14 @@ const RegisterScreen = ({ navigation }) => {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              
             />
         </View>
         </View>
 
         {/* Register Button */}  
          <View style={styles.buttoncontainer}>
-           <TouchableOpacity style={styles.button} onPress={()=> navigation.navigate('Board')}>
+           <TouchableOpacity style={styles.button} onPress={handleRegister}>
               <Text style={styles.buttonText}>Continue</Text>
            </TouchableOpacity>
          </View>

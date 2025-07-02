@@ -11,11 +11,15 @@ import NotepadScreen from './screens/NotepadScreen';
 import HabitandGoalScreen from './screens/HabitandGoalScreen';
 import AddTaskScreen from './screens/AddTaskScreen';
 
+import Toast from 'react-native-toast-message';
+
+
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
   return (
+    <>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash" screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeTabs" component={BottomNavTab}/>  
@@ -30,6 +34,8 @@ export default function App() {
       <Stack.Screen name="AddTask" component={AddTaskScreen}/>
 
       </Stack.Navigator>
+      <Toast/>
     </NavigationContainer>
+    </>
   );
 }

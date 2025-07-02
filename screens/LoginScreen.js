@@ -1,9 +1,80 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image} from 'react-native'
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import Toast from 'react-native-toast-message';
+
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+
+{/*User Authentication with error handling*/}
+const handleLogin = async () => {
+  if (!email || !password) {
+    alert('Please enter both email and password');
+    return;
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    const name = user.displayName || 'User';
+
+    console.log('User logged in:', user.email);
+
+    Toast.show({
+      type: 'success',
+      text1: `Welcome back, ${name}!`,
+    });
+
+
+    navigation.navigate('HomeTabs');
+  } catch (error) {
+    console.log('Login error:', error);
+
+    if (error.code === 'auth/user-not-found') {
+      alert('No account found with this email');
+    } else if (error.code === 'auth/wrong-password') {
+      alert('Incorrect password');
+    } else {
+      alert(error.message);
+    }
+  }
+};
+
+
+{/* Password reset  */}
+const handlePasswordReset = async () => {
+  if (!email) {
+    alert('Please enter your email');
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    console.log('Password reset email sent to:', email);
+  } catch (error) {
+    console.log('Password reset error:', error);
+
+    if (error.code === 'auth/user-not-found') {
+      alert('No account found with this email');
+    } else if (error.code === 'auth/invalid-email') {
+      alert('Invalid email address');
+    } else {
+      alert(error.message);
+    }
+  }
+  
+  Toast.show({
+  type: 'info',
+  text1: 'Password reset link sent!',
+  text2: `Check your inbox: ${email}`,
+});
+};
+
 
 
   return (
@@ -39,7 +110,7 @@ const LoginScreen = ({ navigation }) => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.inputText}
-              placeholder="******"
+              placeholder="*******"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -47,14 +118,14 @@ const LoginScreen = ({ navigation }) => {
 
         {/* Forgot Password Link */}
         </View>
-          <TouchableOpacity style={styles.forgotTextContainer}>
+          <TouchableOpacity style={styles.forgotTextContainer} onPress={handlePasswordReset}>
            <Text style={styles.forgotText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
 
         {/* Login Button */}  
          <View style={styles.buttoncontainer}>
-           <TouchableOpacity style={styles.button} onPress={()=> navigation.navigate('HomeTabs')}>
+           <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Login</Text>
            </TouchableOpacity>
          </View>
