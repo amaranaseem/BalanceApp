@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { getAuth } from 'firebase/auth';
 
 const categoryColors = {
   'self-care': '#20C997',
@@ -15,19 +16,29 @@ const AddTaskScreen = ({ closeModal }) => {
   const [category, setCategory] = useState('');
 
   const saveTask = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      Alert.alert('Authentication Error', 'You must be logged in to add a task.');
+    return;
+    }
+
     if (!title.trim() || !category) return;
 
     try {
-      await addDoc(collection(db, 'tasks'), {
+      await addDoc(collection(db, 'users', user.uid, 'tasks'), {
         title: title.trim(),
         category,
         createdAt: new Date(),
+        userId: user.uid,
       });
 
       Alert.alert('Success', 'Task added successfully!');
       setTitle('');
       setCategory('');
       closeModal(); // close popup
+
     } catch (err) {
       console.error('Failed to save:', err);
       Alert.alert('Error', 'Something went wrong.');

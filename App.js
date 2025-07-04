@@ -6,7 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import SplashScreen from './screens/SplashScreen';
 import BoardingScreen from './screens/BoardingScreen';
 import BottomNavTab from './BottomNavTab';
-import MoodCheckInScreen from './screens/MoodCheckInScreen';
+import MoodCheckInScreen from './screens/MoodcheckInScreen';
 import NotepadScreen from './screens/NotepadScreen';
 import HabitandGoalScreen from './screens/HabitandGoalScreen';
 import AddTaskScreen from './screens/AddTaskScreen';
@@ -32,6 +32,7 @@ export default function App() {
       <Stack.Screen name="Notepad" component={NotepadScreen}/>
       <Stack.Screen name="HabitsandGoals" component={HabitandGoalScreen}/>
       <Stack.Screen name="AddTask" component={AddTaskScreen}/>
+      
 
       </Stack.Navigator>
       <Toast/>

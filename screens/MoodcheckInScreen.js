@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';  
 import app from '../firebase'
+import { getAuth } from 'firebase/auth';
 
 
 const db = getFirestore(app);
@@ -56,7 +57,16 @@ const defaultTags = [
 
     {/*save btn fxn */}
     const handleSave = async() => {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+            Alert.alert('Authentication Error', 'You must be logged in to check-in mood.');
+          return;
+          }
+      
       setSaveError('');
+
       if (!selectedMood) {
         setSaveError('Please select a mood before saving.');
         setTimeout(() => setSaveError(''), 3000);
@@ -65,15 +75,16 @@ const defaultTags = [
 
       // mood check-in saved on firebase
       try {
-            await addDoc(collection(db, 'moodCheckins'), {
+            await addDoc(collection(db,'users', user.uid, 'moodCheckins'), {
               mood: selectedMood.label,
               moodColor: selectedMood.color,
               tags: selectedTags,
               notes: note,
               createdAt: serverTimestamp(),
+              userId: user.uid
             });
 
-      Alert.alert("🎉 Well done!", "You've successfully logged your mood.", [
+      Alert.alert("Well done!", "You've successfully logged your mood.", [
         {
           text: "OK",
           onPress: () => navigation.navigate('HomeTabs'),

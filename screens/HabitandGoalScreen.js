@@ -4,9 +4,11 @@ import { Checkbox } from 'react-native-paper';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import AddTaskScreen from './AddTaskScreen';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc} from 'firebase/firestore';
 import { Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { getAuth } from 'firebase/auth';
+
 
 const categoryColors = {
   'self-care': '#20C997',
@@ -35,16 +37,19 @@ const confirmDelete = (id) => {
   );
 };
 
-
 const HabitandGoalScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const user = getAuth().currentUser;
 
   // get tasks from Firebase
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'tasks'), (snapshot) => {
+    if (!user) return;
+    const taskRef = collection(db, 'users', user.uid, 'tasks');
+
+    const unsubscribe = onSnapshot(taskRef, (snapshot) => {
       const firebaseTasks = snapshot.docs.map((doc) => ({
         id: doc.id,
         title: doc.data().title,
@@ -85,9 +90,14 @@ const HabitandGoalScreen = () => {
 
       {/* Task List */}
       <ScrollView style={styles.taskList}>
-        {tasks.map((task) => {
-          const isChecked = checkedTasks.includes(task.id);
-          const borderColor = categoryColors[task.category];
+        {tasks.length === 0 ? (
+          <Text style={styles.placeholder}>
+            No tasks added yet.
+          </Text>
+        ) : 
+          tasks.map((task) => {
+            const isChecked = checkedTasks.includes(task.id);
+            const borderColor = categoryColors[task.category];
 
     return (
     <TouchableOpacity
@@ -116,12 +126,12 @@ const HabitandGoalScreen = () => {
     })}
     </ScrollView>
 
-      {/* Add Button */}
+      {/* Add Tasks Button */}
       <TouchableOpacity style={styles.saveBtn} onPress={() => setModalVisible(true)}>
         <Text style={styles.saveText}>+ Add</Text>
       </TouchableOpacity>
    
-         {/* Modal */}
+      {/* Modal */}
       <Modal visible={modalVisible} animationType="fade" transparent>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
@@ -136,91 +146,91 @@ const HabitandGoalScreen = () => {
 export default HabitandGoalScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 40,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: '#FAF9F6',
-  },
+container: {
+  flex: 1,
+  marginTop: 40,
+  paddingHorizontal: 20,
+  paddingVertical: 20,
+  backgroundColor: '#FAF9F6',
+},
 
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 20,
-  },
+topRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 20,
+},
 
-  headerText: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#50483D',
-  },
+headerText: {
+  fontSize: 26,
+  fontWeight: 'bold',
+  color: '#50483D',
+},
 
-  taskList: {
-    marginTop: 20,
-    flexGrow: 1,
-  },
+taskList: {
+  marginTop: 20,
+  flexGrow: 1,
+},
 
-  taskItem: {
-    flexDirection: 'row',
-    backgroundColor: '#FAF9F6',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
-    borderWidth: 2,
-  },
+taskItem: {
+  flexDirection: 'row',
+  backgroundColor: '#FAF9F6',
+  padding: 16,
+  borderRadius: 12,
+  alignItems: 'center',
+  marginBottom: 12,
+  borderWidth: 2,
+},
 
-  taskTextContainer: {
-    marginLeft: 12,
-  },
+taskTextContainer: {
+  marginLeft: 12,
+},
 
-  taskTitle: {
-    fontWeight: '600',
-    fontSize: 16,
-    color: 'black',
-  },
+taskTitle: {
+  fontWeight: '600',
+  fontSize: 16,
+  color: 'black',
+},
 
-  legendRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-    flexWrap: 'wrap',
-  },
+legendRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 16,
+  flexWrap: 'wrap',
+},
 
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 12,
-    marginBottom: 8,
-  },
+legendItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginRight: 12,
+  marginBottom: 8,
+},
 
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 6,
-  },
+legendDot: {
+  width: 10,
+  height: 10,
+  borderRadius: 5,
+  marginRight: 6,
+},
 
-  legendText: {
-    fontSize: 12,
-    color: 'black',
-  },
+legendText: {
+  fontSize: 12,
+  color: 'black',
+},
 
- saveBtn: {
-    marginTop: 20,
-    backgroundColor: '#A8D5BA',
-    padding: 14,
-    borderRadius: 15,
-    alignItems: 'center',
-  },
+saveBtn: {
+  marginTop: 20,
+  backgroundColor: '#A8D5BA',
+  padding: 14,
+  borderRadius: 15,
+  alignItems: 'center',
+},
 
-  saveText: {
-    fontWeight: 'bold',
-    color: 'black',
-  },
+saveText: {
+  fontWeight: 'bold',
+  color: 'black',
+},
 
 modalBackground: {
   flex: 1,
@@ -240,5 +250,14 @@ modalContainer: {
   shadowRadius: 4,
   elevation: 5,
 }, 
+
+placeholder:{
+ justifyContent: 'center', 
+ textAlign: 'center', 
+ marginTop: 200, 
+ color: '#777', 
+ fontSize: 17,
+}
+
 
 });

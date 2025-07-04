@@ -4,9 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db, storage } from '../firebase';
+import { getAuth } from 'firebase/auth';
+
 
 const moods = [
   { label: 'joy', color: '#FFE38E' },
@@ -28,7 +29,6 @@ const NotepadScreen = () => {
   const navigation = useNavigation();
   const [recording, setRecording] = useState(null);
   const [audioURI, setAudioURI] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const timerRef = useRef(null);
   const [sound, setSound] = useState(null);
@@ -113,9 +113,7 @@ const NotepadScreen = () => {
   };
 
   {/* Save function */}
-   const handleSave = async () => {
-  console.log("Save button clicked"); // error handling
-
+  const handleSave = async () => {
   setSaveError('');
 
   if (!selectedMood) {
@@ -127,13 +125,20 @@ const NotepadScreen = () => {
 
   if (!note) {
     setSaveError('Please write something before saving.');
-    console.log("No note written"); // error handling
+    console.log("No note written");
     return;
   }
 
   try {
-    console.log("Saving entry to Firestore..."); // error handling
-    await addDoc(collection(db, 'entries'), {
+    const user = getAuth().currentUser;
+    if (!user) {
+      setSaveError('User not authenticated.');
+      return;
+    }
+
+    console.log("Saving entry to Firestore...");
+
+    await addDoc(collection(db, 'users', user.uid, 'entries'), {
       title: title || 'Untitled',
       mood: selectedMood.label,
       moodColor: selectedMood.color,
@@ -141,9 +146,9 @@ const NotepadScreen = () => {
       createdAt: serverTimestamp(),
     });
 
-    console.log("Entry saved to Firestore"); // error handling
+    console.log("Entry saved to Firestore");
 
-    Alert.alert("🎉 Saved!", "Your journal entry was saved.", [
+    Alert.alert("Saved!", "Your journal entry was saved.", [
       {
         text: "OK",
         onPress: () => {
@@ -155,7 +160,6 @@ const NotepadScreen = () => {
       },
     ]);
   } catch (error) {
-    // error handling
     console.error("Firestore save error:", error);
     setSaveError('Failed to save. Try again.');
   }

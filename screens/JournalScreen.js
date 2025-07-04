@@ -1,51 +1,73 @@
 import React, {useState, useCallback} from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet} from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import app from '../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import {query, orderBy} from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
 
 const db = getFirestore(app);
+
+const getMoodEmoji = (mood) => {
+  switch (mood.toLowerCase()) {
+    case 'joy': return '😁';
+    case 'sad': return '😞';
+    case 'angry': return '😡';
+    case 'fear': return '😨';
+    case 'calm': return '😌';
+    case 'neutral': return '😐';
+    case 'surprise': return '😯';
+    case 'disgust': return '🤢';
+    case 'contempt': return '😤';
+    default: return '📝';
+  }
+};
 
 const JournalScreen = () => {
   const navigation = useNavigation();
   const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useFocusEffect(
-  useCallback(() => {
-    const fetchEntries = async () => {
-      try {
-        const entriesRef = collection(db, 'entries');
-        const q = query(entriesRef, orderBy('createdAt', 'desc'));  //sorting the entries
+    useCallback(() => {
+      const fetchEntries = async () => {
+        try {
+          const user = getAuth().currentUser;
+          if (!user) return;
 
-        const snapshot = await getDocs(q);
-        const firebaseEntries = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            title: data.title || 'Untitled',
-            mood: data.mood || 'Neutral',
-            moodColor: data.moodColor || '#D8CAB8',
-            date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
-            description: data.note || '',
-            hasAudio: !!data.audioURL,
-            duration: data.duration || '',
-            audioURL: data.audioURL || null,
-          };
-        });
+          const entriesRef = collection(db, 'users', user.uid, 'entries');
+          const q = query(entriesRef, orderBy('createdAt', 'desc'));
+          const snapshot = await getDocs(q);
 
-        setEntries(firebaseEntries);
-      } catch (error) {
-        console.error('Error fetching journal entries:', error);
-      }
-    };
+          const firebaseEntries = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              title: data.title || 'Untitled',
+              mood: data.mood || 'Neutral',
+              moodColor: data.moodColor || '#D8CAB8',
+              date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
+              description: data.note || '',
+              hasAudio: !!data.audioURL,
+              duration: data.duration || '',
+              audioURL: data.audioURL || null,
+            };
+          });
 
-    fetchEntries(); 
-  }, [])
-);
+          setEntries(firebaseEntries);
+        } catch (error) {
+          console.error('Error fetching journal entries:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
+      fetchEntries();
+    }, [])
+  );
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -58,7 +80,9 @@ const JournalScreen = () => {
 
       {/* Mood Tag */}
       <View style={[styles.moodTag, { backgroundColor: item.moodColor }]}>
-        <Text style={styles.moodText}>{item.mood}</Text>
+        <Text style={[styles.moodText, { color: '#000' }]}>
+          {getMoodEmoji(item.mood)} {item.mood}
+        </Text>
       </View>
 
       {/* Description */}
@@ -87,12 +111,17 @@ const JournalScreen = () => {
       </View>
 
       {/* Entries */}
-      <FlatList
-        data={entries}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" style={{ marginTop: 50 }} />
+      ) : (
+        <FlatList
+          data={entries}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          ListEmptyComponent={<Text style={styles.placeholder}>No journal entries yet. Start writing!</Text>}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      )}
 
       {/* Floating Button */}
       <TouchableOpacity
@@ -210,4 +239,13 @@ const styles = StyleSheet.create({
     padding: 18,
     elevation: 5,
   },
+
+  placeholder: {
+  justifyContent: 'center', 
+  textAlign: 'center', 
+  marginTop: 200, 
+  color: '#777', 
+  fontSize: 17,
+}
+
 });

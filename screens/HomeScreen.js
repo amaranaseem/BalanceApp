@@ -5,8 +5,7 @@ import { Checkbox } from 'react-native-paper';
 import * as Progress from 'react-native-progress';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-
-
+import { getAuth } from 'firebase/auth';
 
 const categoryColors = {
   'self-care': '#20C997',
@@ -17,10 +16,12 @@ const categoryColors = {
 const HomeScreen = ({ navigation }) => {
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const user = getAuth().currentUser;
 
   {/*getting tasks from firebase */}
   useEffect(() => {
-  const unsubscribe = onSnapshot(collection(db, 'tasks'), (snapshot) => {
+  if (!user) return;
+  const unsubscribe = onSnapshot(collection(db, 'users', user.uid,'tasks'), (snapshot) => {
     const firebaseTasks = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
