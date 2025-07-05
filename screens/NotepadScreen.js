@@ -33,6 +33,7 @@ const NotepadScreen = () => {
   const timerRef = useRef(null);
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [autoStopTimeout, setAutoStopTimeout] = useState(null);
 
   {/* Timer function */}
   useEffect(() => {
@@ -59,20 +60,30 @@ const NotepadScreen = () => {
     try {
       if (!audioURI) return;
 
-      const { sound } = await Audio.Sound.createAsync(
+      if (sound) {
+        const status = await sound.getStatusAsync();
+        if (status.isPlaying) {
+          await sound.pauseAsync();
+          setIsPlaying(false);
+        } else {
+          await sound.playAsync();
+          setIsPlaying(true);
+        }
+        return;
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: audioURI },
         { shouldPlay: true }
       );
-      setSound(sound);
+      setSound(newSound);
       setIsPlaying(true);
 
-      sound.setOnPlaybackStatusUpdate(status => {
-        if (!status.isPlaying) {
+      newSound.setOnPlaybackStatusUpdate(status => {
+        if (status.didJustFinish || !status.isPlaying) {
           setIsPlaying(false);
         }
       });
-
-      await sound.playAsync();
     } catch (error) {
       console.error('Playback error:', error);
     }
@@ -81,24 +92,32 @@ const NotepadScreen = () => {
   {/* Start Audio function */}
   const startRecording = async () => {
     try {
+      // Stop existing recording if still active
+      if (recording) {
+        await recording.stopAndUnloadAsync();
+        setRecording(null);
+      }
+
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
         alert('Permission to access microphone is required!');
         return;
       }
 
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
+      const newRecording = new Audio.Recording();
+      await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      await newRecording.startAsync();
 
-      setRecordingTime(0);
-      setRecording(recording);
+      setRecording(newRecording);
 
-      setTimeout(() => stopRecording(), 60000);
+      // Auto stop after 60 seconds
+      const timeout = setTimeout(() => stopRecording(), 60000);
+      setAutoStopTimeout(timeout);
     } catch (err) {
       console.error('Error starting recording', err);
     }
   };
+
 
   {/* Stop Audio function */}
   const stopRecording = async () => {
@@ -155,7 +174,7 @@ const NotepadScreen = () => {
     return;
   }
 
-  //Cloundinary 
+  //Cloundinary for audio saving
   let audioURL = null;
     if (audioURI) {
       console.log('Uploading audio to Cloudinary...');
@@ -182,14 +201,14 @@ const NotepadScreen = () => {
       mood: selectedMood.label,
       moodColor: selectedMood.color,
       note: note,
-      audioURL: audioURL || null,
+      audioURL: audioURL,
       duration: recordingTime,
       createdAt: serverTimestamp(),
     });
 
     console.log("Entry saved to Firestore");
 
-    Alert.alert("Saved!", "Your journal entry was saved.", [
+    Alert.alert("Saved!", "Your journal entry is saved.", [
       {
         text: "OK",
         onPress: () => {
@@ -271,13 +290,12 @@ const NotepadScreen = () => {
       <View style={styles.audioContainer}>
         <View style={styles.audioBar}>
           <TouchableOpacity onPress={playRecording}>
-            <Ionicons name={isPlaying ? "pause" : "play"} size={22} color="#A58E74" />
+            <Ionicons name={isPlaying ? "pause" : "play"} size={24} color="black" />
           </TouchableOpacity>
           <View style={styles.waveform} />
           <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
-          <Ionicons name="time" size={18} color="#A58E74" />
           <TouchableOpacity onPress={() => setAudioURI(null)} style={{ marginLeft: 10 }}>
-            <Ionicons name="trash" size={20} color="#A58E74" />
+            <Ionicons name="trash" size={20} color="#E94F4F" />
           </TouchableOpacity>
         </View>
       </View>
@@ -451,29 +469,23 @@ inlineTimer: {
   color: '#50483D',
 },
 
-audioContainer: {
-  marginTop: 20,
-  padding: 12,
-  borderRadius: 14,
-  backgroundColor: '#fff',
-  borderWidth: 1,
-  borderColor: '#D8CAB8',
-  height: 83,
-},
-
 audioBar: {
   flexDirection: 'row',
   alignItems: 'center',
   paddingVertical: 10,
   paddingHorizontal: 12,
-  borderRadius: 20,
+  borderRadius: 30,
   backgroundColor: '#fff',
-  marginBottom: 16,
+  marginBottom: 10,
+  height: 55,
+  borderWidth: 1,
+  borderColor: '#D8CAB8',
+  marginTop: 20, 
 },
 
 waveform: {
   flex: 1,
-  height: 16,
+  height: 10,
   backgroundColor: '#ccc',
   borderRadius: 10,
   marginHorizontal: 10,
