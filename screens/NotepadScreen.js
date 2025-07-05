@@ -16,7 +16,7 @@ const moods = [
   { label: 'fear', color: '#C9B8FF' },
   { label: 'calm', color: '#B8E2DC' },
   { label: 'neutral', color: '#B7A282' },
-  { label: 'surprise', color: '#F7C59F' },
+  { label: 'tired', color: '#B0A8B9' },
   { label: 'disgust', color: '#BFD8A5' },
   { label: 'contempt', color: '#D8A7B1' },
 ];
@@ -47,6 +47,7 @@ const NotepadScreen = () => {
     return () => clearInterval(timer);
   }, [recording]);
 
+  {/* Formatting Time */}
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -112,6 +113,31 @@ const NotepadScreen = () => {
     }
   };
 
+  {/*Function to store audio on Cloundinary */}
+  const uploadToCloudinary = async (audioURI) => {
+  const data = new FormData();
+  data.append('file', {
+    uri: audioURI,
+    type: 'audio/m4a',
+    name: 'recording.m4a',
+  });
+  data.append('upload_preset', 'journal_audio');
+  data.append('cloud_name', 'dstxsoomq');
+
+  try {
+    const response = await fetch('https://api.cloudinary.com/v1_1/dstxsoomq/auto/upload', {
+      method: 'POST',
+      body: data,
+    });
+
+    const result = await response.json();
+    return result.secure_url; 
+  } catch (error) {
+    console.error('Cloudinary upload failed:', error);
+    return null;
+  }
+};
+
   {/* Save function */}
   const handleSave = async () => {
   setSaveError('');
@@ -123,12 +149,25 @@ const NotepadScreen = () => {
     return;
   }
 
-  if (!note) {
-    setSaveError('Please write something before saving.');
-    console.log("No note written");
+  if (!note && !audioURI) {
+    setSaveError('Please write or record audio before saving.');
+    console.log("No entry made");
     return;
   }
 
+  //Cloundinary 
+  let audioURL = null;
+    if (audioURI) {
+      console.log('Uploading audio to Cloudinary...');
+      audioURL = await uploadToCloudinary(audioURI);
+      if (!audioURL) {
+        setSaveError('Audio upload failed.');
+        return;
+      }
+      console.log('Audio uploaded:', audioURL);
+    }
+
+    //User based 
   try {
     const user = getAuth().currentUser;
     if (!user) {
@@ -143,6 +182,8 @@ const NotepadScreen = () => {
       mood: selectedMood.label,
       moodColor: selectedMood.color,
       note: note,
+      audioURL: audioURL || null,
+      duration: recordingTime,
       createdAt: serverTimestamp(),
     });
 
@@ -251,7 +292,7 @@ const NotepadScreen = () => {
             >
               <Ionicons name={recording ? "stop" : "mic-outline"} size={24} color="black" />
             </TouchableOpacity>
-            {recording && <Text style={styles.inlineTimer}>{formatTime(recordingTime)}</Text>}
+          {recording && <Text style={styles.inlineTimer}>{formatTime(recordingTime)}</Text>}
           </View>
           <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
             <Text style={styles.saveText}>Save</Text>

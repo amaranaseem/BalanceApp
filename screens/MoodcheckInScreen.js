@@ -16,7 +16,7 @@ const moods = [
   { emoji: '😨', label: 'fear', color: '#C9B8FF' },
   { emoji: '😌', label: 'calm', color: '#B8E2DC' },
   { emoji: '😐', label: 'neutral', color: '#B7A282' },
-  { emoji: '😯', label: 'surprise', color: '#F7C59F' },
+  { emoji: '😩', label: 'tired', color: '#B0A8B9' },
   { emoji: '🤢', label: 'disgust', color: '#BFD8A5' },
   { emoji: '😤', label: 'contempt', color: '#D8A7B1' },
 

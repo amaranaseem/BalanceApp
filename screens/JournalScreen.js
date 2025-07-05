@@ -11,24 +11,9 @@ import { getAuth } from 'firebase/auth';
 
 const db = getFirestore(app);
 
-const getMoodEmoji = (mood) => {
-  switch (mood.toLowerCase()) {
-    case 'joy': return '😁';
-    case 'sad': return '😞';
-    case 'angry': return '😡';
-    case 'fear': return '😨';
-    case 'calm': return '😌';
-    case 'neutral': return '😐';
-    case 'surprise': return '😯';
-    case 'disgust': return '🤢';
-    case 'contempt': return '😤';
-    default: return '📝';
-  }
-};
-
 const JournalScreen = () => {
   const navigation = useNavigation();
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState([]); 
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
@@ -62,7 +47,7 @@ const JournalScreen = () => {
           console.error('Error fetching journal entries:', error);
         } finally {
           setLoading(false);
-        }
+        } 
       };
 
       fetchEntries();
@@ -81,7 +66,7 @@ const JournalScreen = () => {
       {/* Mood Tag */}
       <View style={[styles.moodTag, { backgroundColor: item.moodColor }]}>
         <Text style={[styles.moodText, { color: '#000' }]}>
-          {getMoodEmoji(item.mood)} {item.mood}
+        {item.mood}
         </Text>
       </View>
 
@@ -114,15 +99,15 @@ const JournalScreen = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#000" style={{ marginTop: 50 }} />
       ) : (
-        <FlatList
-          data={entries}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          ListEmptyComponent={<Text style={styles.placeholder}>No journal entries yet. Start writing!</Text>}
-          contentContainerStyle={{ paddingBottom: 100 }}
-        />
+      <FlatList
+        data={entries}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={<Text style={styles.placeholder}>No journal entries yet. Start writing!</Text>}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      />
       )}
-
+      
       {/* Floating Button */}
       <TouchableOpacity
         style={styles.fab}

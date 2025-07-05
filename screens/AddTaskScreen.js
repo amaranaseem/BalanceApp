@@ -35,9 +35,10 @@ const AddTaskScreen = ({ closeModal }) => {
       });
 
       Alert.alert('Success', 'Task added successfully!');
+      console.log ('Task added');
       setTitle('');
       setCategory('');
-      closeModal(); // close popup
+      closeModal(); // close popup  
 
     } catch (err) {
       console.error('Failed to save:', err);
