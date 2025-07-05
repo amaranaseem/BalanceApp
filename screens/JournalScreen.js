@@ -7,6 +7,8 @@ import app from '../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import {query, orderBy} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import EntryPreviewScreen from './EntryPreviewScreen';
+
 
 
 const db = getFirestore(app);
@@ -36,8 +38,8 @@ const JournalScreen = () => {
               moodColor: data.moodColor || '#D8CAB8',
               date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
               description: data.note || '',
-              hasAudio: !!data.audioURL,
-              duration: data.duration || '',
+              hasAudio: !!data.audioURL,   // audio link
+              duration: data.duration || '', 
               audioURL: data.audioURL || null,
             };
           });
@@ -55,7 +57,18 @@ const JournalScreen = () => {
   );
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity style= {styles.card} onPress={() => navigation.navigate('EntryPreview', { entry: 
+      {
+        title: item.title, 
+        date: item.date, 
+        mood: item.mood,
+        moodColor: item.moodColor, 
+        description: item.description, 
+        audioURL: item.audioURL, 
+        duration: item.duration
+
+      }
+     })}>
 
       {/* Title and Date*/}
       <View style={styles.cardHeader}>
@@ -81,10 +94,13 @@ const JournalScreen = () => {
       {item.hasAudio && (
         <View style={styles.audio}>
           <Ionicons name="play" size={20} color="black" />
-          <Text style={styles.audioText}>{item.duration}</Text>
+          <Text style={styles.audioText}>{item.duration < 60 
+          ? `${item.duration.toFixed(1)}s` 
+          : `${(item.duration / 60).toFixed(1)}m`}
+    </Text>
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
