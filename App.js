@@ -10,8 +10,8 @@ import MoodCheckInScreen from './screens/MoodcheckInScreen';
 import NotepadScreen from './screens/NotepadScreen';
 import HabitandGoalScreen from './screens/HabitandGoalScreen';
 import AddTaskScreen from './screens/AddTaskScreen';
-
 import Toast from 'react-native-toast-message';
+import EntryPreviewScreen from './screens/EntryPreviewScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -32,6 +32,7 @@ export default function App() {
       <Stack.Screen name="Notepad" component={NotepadScreen}/>
       <Stack.Screen name="HabitsandGoals" component={HabitandGoalScreen}/>
       <Stack.Screen name="AddTask" component={AddTaskScreen}/>
+      <Stack.Screen name="EntryPreview" component={EntryPreviewScreen}/>
       
 
       </Stack.Navigator>
