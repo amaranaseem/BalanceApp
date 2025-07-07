@@ -19,7 +19,9 @@ const categoryColors = {
 // delete task
 const deleteTask = async (id) => {
   try {
-    await deleteDoc(doc(db, 'tasks', id));
+    const user = getAuth().currentUser;
+    const taskRef = doc(db, 'users', user.uid, 'tasks', id)
+    await deleteDoc(taskRef);
   } catch (error) {
     console.error('Error deleting task:', error);
   }
@@ -54,6 +56,8 @@ const HabitandGoalScreen = () => {
         id: doc.id,
         title: doc.data().title,
         category: doc.data().category,
+        progress: doc.data().progress,
+        target: doc.data().target,
       }));
 
       setTasks(firebaseTasks); 
@@ -69,78 +73,90 @@ const HabitandGoalScreen = () => {
     );
   };
 
+return (
+  <View style={styles.container}>
+    {/* Header */}
+    <View style={styles.topRow}>
+      <Text style={styles.headerText}>My Tasks</Text>
+  </View>
+
+  {/* Task List */}
+  <ScrollView style={styles.taskList}>
+
+  {/* tasks & habits */}
+  <Text style={styles.sectionHeader}>Habits & Self-care Tasks</Text>
+  {tasks.filter(task => task.category === 'habit' || task.category === 'self-care'). length === 0 ? (
+    <Text style={styles.placeholder}> No tasks added yet.</Text>
+    ) : (
+    tasks
+     .filter(task => task.category === 'habit' || task.category === 'self-care')
+     .map((task) => {
+      const isChecked = checkedTasks.includes(task.id);
+      const borderColor = categoryColors[task.category];
+          
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.topRow}>
-        <Text style={styles.headerText}>Habits & Goals</Text>
-      </View>
+  <TouchableOpacity key={task.id} style={[styles.taskItem, { borderColor }]} onPress={() => toggleTask(task.id)} >
+  <Checkbox status={isChecked ? 'checked' : 'unchecked'} onPress={() => toggleTask(task.id)} color={borderColor}/>
+  <View style={styles.taskTextContainer}>
+  <Text style={styles.taskTitle}>{task.title}</Text>
+  </View>
 
-      {/* Category Legend */}
-      <View style={styles.legendRow}>
-        {Object.entries(categoryColors).map(([key, color]) => (
-          <View key={key} style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: color }]} />
-            <Text style={styles.legendText}>
-              {key.charAt(0).toUpperCase() + key.slice(1)}
-            </Text>
-          </View>
-        ))}
-      </View>
+  {/* delete btn*/}
+  <TouchableOpacity onPress={() => confirmDelete(task.id)} style={{ marginLeft: 'auto' }} >
+  <Ionicons name="trash" size={20} color="#E94F4F" />
+  </TouchableOpacity>
+  </TouchableOpacity>
+   );
+  })
+)}
 
-      {/* Task List */}
-      <ScrollView style={styles.taskList}>
-        {tasks.length === 0 ? (
-          <Text style={styles.placeholder}>
-            No tasks added yet.
-          </Text>
-        ) : 
-          tasks.map((task) => {
-            const isChecked = checkedTasks.includes(task.id);
-            const borderColor = categoryColors[task.category];
+  {/*goals */}     
+  <Text style={styles.sectionHeader}>Goals</Text>
+  {tasks.filter(task => task.category === 'goal'). length === 0 ? (
+    <Text style={styles.placeholder}> No goal added yet.</Text>
+    ) : (
+    tasks
+     .filter(task => task.category === 'goal')
+     .map((task) => {
+        
+        const progress = task.progress || 0;
+        const target = task.target || 30;
+        const progressPercent = Math.min(progress / target, 1);
 
-    return (
-    <TouchableOpacity
-      key={task.id}
-      style={[styles.taskItem, { borderColor }]}
-      onPress={() => toggleTask(task.id)}
-    >
-      <Checkbox
-      status={isChecked ? 'checked' : 'unchecked'}
-      onPress={() => toggleTask(task.id)}
-      color={borderColor}
-      />
-      <View style={styles.taskTextContainer}>
-      <Text style={styles.taskTitle}>{task.title}</Text>
-      </View>
-
-       {/* delete btn*/}
-      <TouchableOpacity
-        onPress={() => confirmDelete(task.id)}
-        style={{ marginLeft: 'auto' }}
-      >
-      <Ionicons name="trash" size={20} color="#E94F4F" />
-      </TouchableOpacity>
-      </TouchableOpacity>
-      );
-    })}
-    </ScrollView>
-
-      {/* Add Tasks Button */}
-      <TouchableOpacity style={styles.saveBtn} onPress={() => setModalVisible(true)}>
-        <Text style={styles.saveText}>+ Add</Text>
-      </TouchableOpacity>
-   
-      {/* Modal */}
-      <Modal visible={modalVisible} animationType="fade" transparent>
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <AddTaskScreen closeModal={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+  return (
+  <View key={task.id} style={[styles.goalCard, { borderColor: categoryColors.goal }]}>
+    <Text style={styles.goalTitle}>{task.title}</Text>
+    <View style={styles.progressBarBackground}>
+      <View style={[styles.progressBarFill, { width: `${progressPercent * 100}%` }, ]}/>
     </View>
-  );
+  
+    <Text style={styles.goalCount}>{progress}/{target}</Text>
+    <TouchableOpacity onPress={() => confirmDelete(task.id)} style={styles.goalDelete}>
+      <Ionicons name="trash" size={18} color="#E94F4F" />
+    </TouchableOpacity>
+  </View>
+        );
+      })
+  )} 
+
+
+</ScrollView>
+
+ {/* Add Tasks Button */}
+ <TouchableOpacity style={styles.saveBtn} onPress={() => setModalVisible(true)}>
+  <Text style={styles.saveText}>+ Add</Text>
+ </TouchableOpacity>
+   
+ {/* Modal */}
+ <Modal visible={modalVisible} animationType="fade" transparent>
+  <View style={styles.modalBackground}>
+  <View style={styles.modalContainer}>
+  <AddTaskScreen closeModal={() => setModalVisible(false)} />
+  </View>
+  </View>
+ </Modal>
+ </View>
+ );
 };
 
 export default HabitandGoalScreen;
@@ -159,7 +175,7 @@ topRow: {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 12,
-  marginBottom: 20,
+  marginBottom: 10,
 },
 
 headerText: {
@@ -175,9 +191,9 @@ taskList: {
 
 taskItem: {
   flexDirection: 'row',
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
   padding: 16,
-  borderRadius: 12,
+  borderRadius: 16,
   alignItems: 'center',
   marginBottom: 12,
   borderWidth: 2,
@@ -254,10 +270,60 @@ modalContainer: {
 placeholder:{
  justifyContent: 'center', 
  textAlign: 'center', 
- marginTop: 200, 
+ marginTop: 100, 
  color: '#777', 
  fontSize: 17,
-}
+},
+
+goalCard: {
+  borderWidth: 2,
+  borderRadius: 16,
+  padding: 16,
+  backgroundColor: '#fff',
+  marginBottom: 12,
+  position: 'relative',
+},
+
+goalTitle: {
+  fontWeight: '600',
+  fontSize: 16,
+  color: 'black',
+  marginBottom: 8,
+},
+
+progressBarBackground: {
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: '#ddd',
+  overflow: 'hidden',
+},
+
+progressBarFill: {
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: '#FDCB83',
+},
+
+goalCount: {
+  marginTop: 8,
+  textAlign: 'right',
+  fontWeight: 'bold',
+  color: '#333',
+},
+
+goalDelete: {
+  position: 'absolute',
+  top: 12,
+  right: 12,
+},
+
+sectionHeader: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginBottom: 20,
+  marginTop: 10,
+  color: '#50483D',
+},
 
 
 });

@@ -26,155 +26,150 @@ const defaultTags = [
   'work', 'family', 'health', 'no sleep', 'social media', 'friends', 'relaxed', 'love'
 ];
 
-  {/*Mood checkin */}
-  const MoodCheckInScreen = () => {
-    const [selectedMood, setSelectedMood] = useState(null);
-    const [selectedTags, setSelectedTags] = useState([]);
-    const [note, setNote] = useState('');
-    const [tagError, setTagError ] = useState('');
-    const [saveError, setSaveError ] = useState('');
-    const navigation = useNavigation();
+{/*Mood checkin */}
+const MoodCheckInScreen = () => {
+  const [selectedMood, setSelectedMood] = useState(null);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [note, setNote] = useState('');
+  const [tagError, setTagError ] = useState('');
+  const [saveError, setSaveError ] = useState('');
+  const navigation = useNavigation();
 
-  {/*Mood checkin */}
-  const today = new Date().toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  });
+{/*Mood checkin */}
+const today = new Date().toLocaleDateString('en-GB', {
+  day: 'numeric', month: 'long', year: 'numeric'
+});
 
+{/*Tags fxn */}
+const handleTagPress = (tag) => {
+  setTagError('');
+    if (selectedTags.includes(tag)) {
+      setSelectedTags((prev) => prev.filter((t) => t !== tag));
 
-  {/*Tags fxn */}
-  const handleTagPress = (tag) => {
-      setTagError('');
-      if (selectedTags.includes(tag)) {
-        setSelectedTags((prev) => prev.filter((t) => t !== tag));
-      } else if (selectedTags.length < 3) {
-        setSelectedTags((prev) => [...prev, tag]);
-      } else {
-        setTagError('You can select up to 3 tags only.');
-        setTimeout(() => setTagError(''), 3000);
-      }
-    };
+  } else if (selectedTags.length < 3) {
+      setSelectedTags((prev) => [...prev, tag]);
 
-
-    {/*save btn fxn */}
-    const handleSave = async() => {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-            Alert.alert('Authentication Error', 'You must be logged in to check-in mood.');
-          return;
-          }
-      
-      setSaveError('');
-
-      if (!selectedMood) {
-        setSaveError('Please select a mood before saving.');
-        setTimeout(() => setSaveError(''), 3000);
-        return;
-      }
-
-      // mood check-in saved on firebase
-      try {
-            await addDoc(collection(db,'users', user.uid, 'moodCheckins'), {
-              mood: selectedMood.label,
-              moodColor: selectedMood.color,
-              tags: selectedTags,
-              notes: note,
-              createdAt: serverTimestamp(),
-              userId: user.uid
-            });
-
-      Alert.alert("Well done!", "You've successfully logged your mood.", [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate('HomeTabs'),
-        }
-      ]);
-    } catch (error) {
-    console.error("Error saving mood check-in:", error);
-    setSaveError('Something went wrong. Try again.');
+  } else {
+    setTagError('You can select up to 3 tags only.');
+    
+    setTimeout(() => setTagError(''), 3000);
   }
 };
 
-  return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
-      <ScrollView contentContainerStyle={styles.container}>
-        
-        {/* Header */}
-        <View style={styles.topRow}>
-          <Text style={styles.headerText}>Mood Check-In</Text>
-          <View style={styles.closeCircle}>
-            <TouchableOpacity onPress={()=> navigation.navigate('HomeTabs')}>
-              <Ionicons name="close" size={22} color="black" />
-            </TouchableOpacity>
-          </View>
-        </View>
 
-        {/* Date */}
-        <View style={styles.dateRow}>
-          <Ionicons name="calendar-outline" size={20} color="#A58E74" />
-          <Text style={styles.dateText}>{today}</Text>
-        </View>
+{/*save btn fxn */}
+const handleSave = async() => {
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-        {/* Mood Selection */}
-        <Text style={styles.heading}>How are you feeling?</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodScroll}>
-          {moods.map((mood, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[styles.moodItem, selectedMood?.label === mood.label && { backgroundColor: mood.color }]}
-              onPress={() => setSelectedMood(mood)}>
-              <Text style={styles.emoji}>{mood.emoji}</Text>
-              <Text style={styles.moodLabel}>{mood.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+  if (!user) {
+    Alert.alert('Authentication Error', 'You must be logged in to check-in mood.');
+    return;
+  }
+  setSaveError('');
 
-        {/* Error on save */}
-        {saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
+  if (!selectedMood) {
+    setSaveError('Please select a mood before saving.');
+    setTimeout(() => setSaveError(''), 3000);
+    return;
+  }
 
+ // mood check-in saved on firebase
+  try {
+  await addDoc(collection(db,'users', user.uid, 'moodCheckins'), {
+    mood: selectedMood.label,
+    moodColor: selectedMood.color,
+    tags: selectedTags,
+    notes: note,
+    createdAt: serverTimestamp(),
+    date: new Date().toISOString().split('T')[0],
+    userId: user.uid
+  });
 
-        {/* Tags */}
-        <Text style={styles.heading}>What makes you feel this way?</Text>
-        <View style={styles.tagcontainer}>
-          {defaultTags.map((tag, i) => (
-            <TouchableOpacity
-              key={i}
-              style={[
-                styles.tag,
-                selectedTags.includes(tag) && styles.selectedTag,
-              ]}
-              onPress={() => handleTagPress(tag)}
-            >
-              <Text style={[styles.tagText, selectedTags.includes(tag) && styles.selectedTagText]}>{tag}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+  Alert.alert("Well done!", "You've successfully logged your mood.", [
+  { text: "OK", onPress: () => navigation.navigate('HomeTabs'), }
+  ]);
+  
+} catch (error) {
+    console.error("Error saving mood check-in:", error);
+    setSaveError('Something went wrong. Try again.');
+}
+};
 
-        {/* Error on tags */}
-        {tagError !== '' && <Text style={styles.errorText}>{tagError}</Text>}
-
-        
-        {/* Note Input */}
-        <Text style={styles.heading}>Want to jot down what’s on your mind?</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Write about your day..."
-          multiline
-          maxLength={30}
-          value={note}
-          onChangeText={setNote}
-        />
-        <Text style={styles.counter}>({note.length}/30)</Text>
-
-
-        {/* Save Button */}
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-          <Text style={styles.saveText}>Save</Text>
+return (
+ <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
+  <ScrollView contentContainerStyle={styles.container}>
+      
+  {/* Header */}
+  <View style={styles.topRow}>
+    <Text style={styles.headerText}>Mood Check-In</Text>
+      <View style={styles.closeCircle}>
+        <TouchableOpacity onPress={()=> navigation.navigate('HomeTabs')}>
+          <Ionicons name="close" size={22} color="black" />
         </TouchableOpacity>
+    </View>
+  </View>
 
-      </ScrollView>
-    </KeyboardAvoidingView>
+  {/* Date */}
+  <View style={styles.dateRow}>
+  <Ionicons name="calendar-outline" size={20} color="#A58E74" />
+  <Text style={styles.dateText}>{today}</Text>
+  </View>
+
+  {/* Mood Selection */}
+  <Text style={styles.heading}>How are you feeling?</Text>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodScroll}>
+  {moods.map((mood, index) => (
+  <TouchableOpacity
+  key={index}
+  style={[styles.moodItem, selectedMood?.label === mood.label && { backgroundColor: mood.color }]}
+  onPress={() => setSelectedMood(mood)}>
+  <Text style={styles.emoji}>{mood.emoji}</Text>
+  <Text style={styles.moodLabel}>{mood.label}</Text>
+  </TouchableOpacity>
+  ))}
+  </ScrollView>
+
+  {/* Error on save */}
+  {saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
+
+  {/* Tags */}
+  <Text style={styles.heading}>What makes you feel this way?</Text>
+  <View style={styles.tagcontainer}>
+  
+  {defaultTags.map((tag, i) => (
+  <TouchableOpacity key={i} style={[ styles.tag, selectedTags.includes(tag) && styles.selectedTag, ]}
+  onPress={() => handleTagPress(tag)} >
+  
+  <Text style={[styles.tagText, selectedTags.includes(tag) && styles.selectedTagText]}>{tag}</Text>
+  </TouchableOpacity>
+  ))}
+  </View>
+
+  {/* Error on tags */}
+  {tagError !== '' && <Text style={styles.errorText}>{tagError}</Text>}
+
+        
+  {/* Note Input */}
+  <Text style={styles.heading}>Want to jot down what’s on your mind?</Text>
+  <TextInput
+  style={styles.input}
+  placeholder="Write about your day..."
+  multiline
+  maxLength={30}
+  value={note}
+  onChangeText={setNote}
+  />
+  <Text style={styles.counter}>({note.length}/30)</Text>
+
+
+  {/* Save Button */}
+  <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+  <Text style={styles.saveText}>Save</Text>
+  </TouchableOpacity>
+
+  </ScrollView>
+  </KeyboardAvoidingView>
   );
 };
 

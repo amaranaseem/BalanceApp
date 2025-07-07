@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -15,16 +15,24 @@ const AddTaskScreen = ({ closeModal }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
 
+  const [trackNow, setTrackNow] = useState(false);
+  const [target, setTarget] = useState('');
+  const [saveError, setSaveError] = useState('');
+
   const saveTask = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
+    setSaveError('');
 
-    if (!user) {
-      Alert.alert('Authentication Error', 'You must be logged in to add a task.');
+
+    if (!user) 
     return;
-    }
 
-    if (!title.trim() || !category) return;
+    if (!title.trim() || !category) {
+     setSaveError('Please write tasks name and select category.');
+     console.log('Field cannot be empty.')
+     return;
+    }
 
     try {
       await addDoc(collection(db, 'users', user.uid, 'tasks'), {
@@ -32,13 +40,19 @@ const AddTaskScreen = ({ closeModal }) => {
         category,
         createdAt: new Date(),
         userId: user.uid,
+        trackNow,
+        completedCount: 0,
+        target: category === 'goal' ? 30 : 1,
+        progress: category === 'goal' ? 0: null,
       });
 
       Alert.alert('Success', 'Task added successfully!');
       console.log ('Task added');
       setTitle('');
       setCategory('');
-      closeModal(); // close popup  
+      setTarget('');
+      setTrackNow(false);
+      closeModal();
 
     } catch (err) {
       console.error('Failed to save:', err);
@@ -86,6 +100,18 @@ const AddTaskScreen = ({ closeModal }) => {
             </Text>
           </TouchableOpacity>
         ))}
+      </View>
+      {/* Target input for goals */}
+     {category === 'goal'}
+
+      {/* Track Now */}
+      <View style={styles.trackRow}>
+        <Text style={styles.subheading}>Track Now</Text>
+        <Switch
+          value={trackNow}
+          onValueChange={setTrackNow}
+          thumbColor={trackNow ? '#A58E74' : '#ccc'}
+        />
       </View>
 
       {/* Save */}
@@ -159,4 +185,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
   },
+
+  trackRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+
+  fixedTargetText: {
+  fontSize: 16,
+  marginBottom: 10,
+  fontWeight: 'bold',
+  color: '#333',
+},
+
 });
