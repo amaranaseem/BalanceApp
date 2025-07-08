@@ -13,12 +13,9 @@ const moods = [
   { label: 'joy', color: '#FFE38E' },
   { label: 'sad', color: '#90C3E6' },
   { label: 'angry', color: '#E94F4F' },
-  { label: 'fear', color: '#C9B8FF' },
+  { label: 'anxiety', color: '#C9B8FF' },
   { label: 'calm', color: '#B8E2DC' },
   { label: 'neutral', color: '#B7A282' },
-  { label: 'tired', color: '#B0A8B9' },
-  { label: 'disgust', color: '#BFD8A5' },
-  { label: 'contempt', color: '#D8A7B1' },
 ];
 
 const NotepadScreen = () => {

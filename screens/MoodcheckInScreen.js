@@ -10,20 +10,16 @@ import { getAuth } from 'firebase/auth';
 const db = getFirestore(app);
 
 const moods = [
-  { emoji: '😁', label: 'joy', color: '#FFE38E' },
-  { emoji: '😞', label: 'sad', color: '#90C3E6' },
-  { emoji: '😡', label: 'angry', color: '#E94F4F' },
-  { emoji: '😨', label: 'fear', color: '#C9B8FF' },
-  { emoji: '😌', label: 'calm', color: '#B8E2DC' },
-  { emoji: '😐', label: 'neutral', color: '#B7A282' },
-  { emoji: '😩', label: 'tired', color: '#B0A8B9'},
-  { emoji: '🤢', label: 'disgust', color: '#BFD8A5' },
-  { emoji: '😤', label: 'contempt', color: '#D8A7B1' },
-
+  { emoji: '😁', label: 'joy', color: '#FFE38E', score: 1 },
+  { emoji: '😞', label: 'sad', color: '#90C3E6', score: 2 },
+  { emoji: '😡', label: 'angry', color: '#E94F4F', score: 3 },
+  { emoji: '😨', label: 'anxiety', color: '#C9B8FF', score: 4 },
+  { emoji: '😌', label: 'calm', color: '#B8E2DC', score: 5 },
+  { emoji: '😐', label: 'neutral', color: '#B7A282', score: 6 },
 ];
 
 const defaultTags = [
-  'work', 'family', 'health', 'no sleep', 'social media', 'friends', 'relaxed', 'love'
+  'work', 'family', 'health', 'no sleep', 'social media', 'friends', 'relaxed', 'love', 'tired', 'fear','bored'
 ];
 
 {/*Mood checkin */}
@@ -82,8 +78,8 @@ const handleSave = async() => {
     tags: selectedTags,
     notes: note,
     createdAt: serverTimestamp(),
-    date: new Date().toISOString().split('T')[0],
-    userId: user.uid
+    userId: user.uid, 
+    score: selectedMood.score,
   });
 
   Alert.alert("Well done!", "You've successfully logged your mood.", [
@@ -203,7 +199,7 @@ const styles = StyleSheet.create({
   },
 
   headerText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#50483D',
   },
