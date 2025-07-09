@@ -164,10 +164,10 @@ export default HabitandGoalScreen;
 const styles = StyleSheet.create({
 container: {
   flex: 1,
-  marginTop: 40,
   paddingHorizontal: 20,
   paddingVertical: 20,
   backgroundColor: '#FAF9F6',
+  paddingTop: 50,
 },
 
 topRow: {
@@ -301,7 +301,7 @@ progressBarBackground: {
 progressBarFill: {
   height: 8,
   borderRadius: 4,
-  backgroundColor: '#FDCB83',
+  backgroundColor: '#9C27B0',
 },
 
 goalCount: {

@@ -140,7 +140,7 @@ export default JournalScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 40,
+    paddingTop: 50,
     paddingHorizontal: 20,
     paddingVertical: 20,
     backgroundColor: '#FAF9F6',
