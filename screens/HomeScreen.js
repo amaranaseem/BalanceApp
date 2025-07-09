@@ -1,11 +1,13 @@
 import React, { useState, useEffect} from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, snapshot } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Checkbox } from 'react-native-paper';
 import * as Progress from 'react-native-progress';
-import { collection, onSnapshot, updateDoc, doc} from 'firebase/firestore';
+import { collection, onSnapshot, updateDoc, doc, Timestamp} from 'firebase/firestore';
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
+import { startOfWeek, endOfWeek, isSameDay } from 'date-fns';
+
 
 const categoryColors = {
   'self-care': '#20C997',
@@ -13,10 +15,111 @@ const categoryColors = {
   goal: '#9C27B0',
 };
 
+const moods = [
+  {label: 'joy', color: '#FFE38E'},
+  {label: 'sad', color: '#90C3E6' },
+  {label: 'angry', color: '#E94F4F'},
+  {label: 'anxiety', color: '#C9B8FF' },
+  {label: 'calm', color: '#B8E2DC'},
+  {label: 'neutral', color: '#B7A282'},
+];
+
+
 const HomeScreen = ({ navigation }) => {
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [tasks, setTasks] = useState([]);
   const user = getAuth().currentUser;
+  const [moodStreak, setMoodStreak] = useState(0);
+  const [userProfilePicUrl, setUserProfilePicUrl] = useState('https://placehold.co/100x100'); 
+  const [moodLogDays, setMoodLogDays] = useState({});
+  const [moodCheckIns, setMoodCheckIns] = useState([]);
+
+
+ {/*Fetch mood streak*/}
+  useEffect(() => {
+  if (!user) return;
+  const unsubscribe = onSnapshot(
+    collection(db, 'users', user.uid, 'moodCheckins'),
+    (snapshot) => {
+      const today = new Date();
+      const datesSet = new Set();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
+        const dateStr = createdAt.toDateString(); // Normalize
+        datesSet.add(dateStr);
+      });
+
+      let streak = 0;
+      for (let i = 0; i < 30; i++) {
+        const day = new Date(today);
+        day.setDate(today.getDate() - i);
+        const key = day.toDateString();
+        if (datesSet.has(key)) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+
+      setMoodStreak(streak);
+    }
+  );
+
+  return unsubscribe;
+}, []);
+
+{/*Mood bar */}
+useEffect(() => {
+  if (!user) return;
+
+  const unsubscribe = onSnapshot(
+    collection(db, 'users', user.uid, 'moodCheckins'),
+    (snapshot) => {
+      const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+      const end = endOfWeek(new Date(), { weekStartsOn: 1 });
+
+      const weekCheckIns = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((entry) => {
+          const date = entry.createdAt?.toDate?.();
+          return date && date >= start && date <= end;
+        });
+
+      setMoodCheckIns(weekCheckIns);
+    }
+  );
+
+  return unsubscribe;
+}, []);
+
+
+{/*Mood bar */}
+const getWeekMoodData = () => {
+  const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+
+  return Array.from({ length: 7 }).map((_, i) => {
+    const currentDate = new Date(start);
+    currentDate.setDate(start.getDate() + i);
+
+    const checkIn = moodCheckIns.find((entry) => {
+      const date = entry.createdAt?.toDate?.();
+      return date && isSameDay(date, currentDate);
+    });
+
+    const color = checkIn
+      ? moods.find((m) => m.label === checkIn.mood)?.color
+      : null;
+
+    return {
+      day: currentDate.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+      logged: !!checkIn,
+      color,
+    };
+  });
+};
+
 
   {/*getting tasks from firebase */}
   useEffect(() => {
@@ -73,10 +176,18 @@ return (
     
   <ScrollView style={styles.container}>
   <View style={styles.topRow}>
-  <View style={styles.notificationCircle}>
-    <Ionicons name="notifications" size={22} color="black"/>
+
+  {/* Profile */}
+  <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.notificationCircle}>
+  <Image source={{ uri: userProfilePicUrl }} style={styles.profilePic} />
+  </TouchableOpacity>
+
+  {/* Mood Streak */}
+  <View style={styles.streak}>
+  <Ionicons name="flame" size={20} color="gold" />
+  <Text style={styles.streakText}>{moodStreak}-Day Mood Streak</Text>
   </View>
-        
+    
    </View>
 
     {/* Welcome card */}
@@ -87,6 +198,24 @@ return (
     </View>
     <Image source={require('../assets/meditation.jpg')} style={styles.illustration} />
     </View>
+
+    {/* Mood Tracker Bar */}
+    <View style={styles.moodBar}>
+  {getWeekMoodData().map((entry, index) => (
+    <View
+      key={index}
+      style={[
+        styles.moodCircle,
+        {
+          backgroundColor: entry.logged ? entry.color : '#D9D9D9',
+          opacity: entry.logged ? 1 : 0.4,
+        },
+      ]}
+    >
+      <Text style={styles.moodLetter}>{entry.day}</Text>
+    </View>
+  ))}
+</View>
 
     {/* Mood Check-In */}
     <TouchableOpacity style={styles.moodCard} onPress={()=> navigation.navigate('MoodCheckIn')}>
@@ -112,6 +241,8 @@ return (
       height={10}
       style={{ borderRadius: 10 }}
      />
+
+    
 
     {/* Task Legend*/}
     <View style={styles.legendRow}>
@@ -170,7 +301,7 @@ container: {
 topRow: {
   flexDirection: 'row',
   justifyContent: 'space-between',
-  marginLeft: 320,
+  marginBottom: 20,
   alignItems: 'center',
 },
 
@@ -217,20 +348,36 @@ illustration: {
   marginTop: -40,
 },
 
-  moodBar:{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 10,
-    paddingHorizontal: 8,
-    borderColor: '#D8CAB8', 
-    borderRadius: 16, 
-    borderWidth: 1,
-    height: 55,
-    backgroundColor:'#fff'
-  },
+moodBar:{
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 20,
+  marginBottom: 10,
+  paddingHorizontal: 8,
+  borderColor: '#D8CAB8', 
+  borderRadius: 16, 
+  borderWidth: 1,
+  height: 55,
+  backgroundColor:'#fff'
+},
 
+moodCircle: {
+  width: 38,
+  height: 38,
+  borderRadius: 19,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#D9D9D9', 
+  opacity: 0.9,
+},
+
+moodLetter: {
+  fontWeight: '800',
+  color: 'black',
+  fontSize: 16,
+  
+},
 
 moodCard: {
   backgroundColor: '#F4E9DA',
@@ -327,6 +474,30 @@ legendDot: {
 legendText: {
   fontSize: 12,
   color: 'black',
+},
+
+profilePic: {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  borderColor: '#000', 
+  borderWidth: 2,
+},
+
+streak: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  paddingHorizontal: 10,
+  paddingVertical: 5,
+  borderRadius: 20,
+},
+
+streakText: {
+  color: 'black',
+  fontWeight: 'bold',
+  marginLeft: 6,
+  fontSize: 14,
 },
 
 });
