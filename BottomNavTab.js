@@ -20,7 +20,6 @@ function BottomNavTab() {
             else if (route.name === 'Tasks'){iconName = focused ? 'clipboard' : 'clipboard-outline';}
             else if (route.name === 'Insight'){iconName = focused ? 'bar-chart' : 'bar-chart-outline';}
             else if (route.name === 'Meditate'){iconName = focused ? 'headset' : 'headset-outline';}
-            else if (route.name === 'Profile'){iconName = focused ? 'person' : 'person-outline';}
             return <Ionicons name={iconName} size={size} color={color}/>;
           },
           tabBarActiveTintColor: 'black', 
@@ -42,7 +41,6 @@ function BottomNavTab() {
             <Tab.Screen name="Tasks" component={HabitandGoalScreen}/>
             <Tab.Screen name="Meditate" component={InsightScreen}/>
             <Tab.Screen name="Insight" component={InsightScreen}/>
-            <Tab.Screen name="Profile" component={ProfileScreen}/>
             
 
         </Tab.Navigator>
