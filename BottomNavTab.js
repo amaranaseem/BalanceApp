@@ -3,9 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screens/HomeScreen';
 import JournalScreen from './screens/JournalScreen';
 import HabitandGoalScreen from './screens/HabitandGoalScreen';
-import ProfileScreen from './screens/ProfileScreen';
 import { Ionicons } from '@expo/vector-icons' 
 import InsightScreen from './screens/InsightScreen';
+import MeditationScreen from './screens/Meditation/MeditationScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,8 +18,8 @@ function BottomNavTab() {
             if (route.name === 'Home'){iconName = focused ? 'home' : 'home-outline';}
             else if (route.name === 'Journal'){iconName = focused ? 'book' : 'book-outline';}
             else if (route.name === 'Tasks'){iconName = focused ? 'clipboard' : 'clipboard-outline';}
-            else if (route.name === 'Insight'){iconName = focused ? 'bar-chart' : 'bar-chart-outline';}
             else if (route.name === 'Meditate'){iconName = focused ? 'headset' : 'headset-outline';}
+            else if (route.name === 'Insight'){iconName = focused ? 'bar-chart' : 'bar-chart-outline';}
             return <Ionicons name={iconName} size={size} color={color}/>;
           },
           tabBarActiveTintColor: 'black', 
@@ -39,7 +39,7 @@ function BottomNavTab() {
             <Tab.Screen name="Home" component={HomeScreen}/>
             <Tab.Screen name="Journal" component={JournalScreen}/>
             <Tab.Screen name="Tasks" component={HabitandGoalScreen}/>
-            <Tab.Screen name="Meditate" component={InsightScreen}/>
+            <Tab.Screen name="Meditate" component={MeditationScreen}/>
             <Tab.Screen name="Insight" component={InsightScreen}/>
             
 

@@ -7,7 +7,7 @@ import app from '../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import {query, orderBy} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import EntryPreviewScreen from './EntryPreviewScreen';
+import EntryPreviewScreen from './EntryPreviewScreen'; 
 
 
 
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
 
   headerText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#50483D',
     marginBottom: 20,
