@@ -295,7 +295,7 @@ container: {
   flex: 1,
   backgroundColor: '#FAF9F6',
   paddingHorizontal: 20,
-  paddingTop: 50,
+  paddingTop: 60,
 },
 
 topRow: {

@@ -167,7 +167,7 @@ container: {
   paddingHorizontal: 20,
   paddingVertical: 20,
   backgroundColor: '#FAF9F6',
-  paddingTop: 50,
+  paddingTop: 60,
 },
 
 topRow: {

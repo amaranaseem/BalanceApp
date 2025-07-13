@@ -206,11 +206,11 @@ export default InsightScreen;
 
 const styles = StyleSheet.create({
 container: {
-    flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: '#FAF9F6', 
+  flex: 1,
+  paddingTop: 60,
+  paddingHorizontal: 20,
+  paddingVertical: 20,
+  backgroundColor: '#FAF9F6', 
 },
 
 scrollList: {
@@ -227,55 +227,55 @@ topRow: {
 },
 
 headerText: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#50483D',
+  fontSize: 26,
+  fontWeight: 'bold',
+  color: '#50483D',
 },
 
 subHeading: {
-    fontSize: 14,
-    textAlign: 'center',
-    color: '#000',
-    marginBottom: 25,
+  fontSize: 14,
+  textAlign: 'center',
+  color: '#000',
+  marginBottom: 25,
 },
 
 chart: {
-    borderRadius: 16,
-    marginTop: 20,
+  borderRadius: 16,
+  marginTop: 20,
 },
 
 legendRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    marginBottom: 16,
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-around',
+  marginBottom: 16,
 },
 
 legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  flexDirection: 'row',
+  alignItems: 'center',
 },
 
 legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 6,
+  width: 10,
+  height: 10,
+  borderRadius: 5,
+  marginRight: 6,
 },
 
 legendText: {
-    fontSize: 13,
-    color: 'black',
-    textTransform: 'capitalize',
-    marginBottom: 6,
-    marginRight: 12,
+  fontSize: 13,
+  color: 'black',
+  textTransform: 'capitalize',
+  marginBottom: 6,
+  marginRight: 12,
 },
 
 overviewItem: {
-    fontSize: 14,
-    color: '#333',
-    marginVertical: 3,
-    textAlign: 'center',
+  fontSize: 14,
+  color: '#333',
+  marginVertical: 3,
+  textAlign: 'center',
 },
 
 overviewRow: {

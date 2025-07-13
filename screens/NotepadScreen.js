@@ -323,7 +323,7 @@ export default NotepadScreen;
 const styles = StyleSheet.create({
 container: {
   flexGrow: 1,
-  paddingTop: 50,
+  paddingTop: 60,
   paddingHorizontal: 20,
   paddingBottom: 10,
   backgroundColor: '#FAF9F6',
