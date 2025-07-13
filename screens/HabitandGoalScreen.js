@@ -191,7 +191,6 @@ taskList: {
 
 taskItem: {
   flexDirection: 'row',
-  backgroundColor: '#fff',
   padding: 16,
   borderRadius: 16,
   alignItems: 'center',
@@ -279,7 +278,6 @@ goalCard: {
   borderWidth: 2,
   borderRadius: 16,
   padding: 16,
-  backgroundColor: '#fff',
   marginBottom: 12,
   position: 'relative',
 },
