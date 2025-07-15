@@ -182,7 +182,7 @@ useFocusEffect(
         >
             <View>
               <Text style={styles.title}>{item.title?.trim() ? item.title : 'Untitled'}</Text>
-              <Text style={styles.subtitle}>{item.duration} m</Text>
+              <Text style={styles.subtitle}>{item.duration} sec</Text>
             </View>
             <Ionicons name="play" size={24} color="#50483D"/>
           </TouchableOpacity>
