@@ -8,7 +8,7 @@ const ProfileScreen = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       await signOut(getAuth());
-      navigation.navigate('Login'); // replace 'Login' with your actual login screen name
+      navigation.navigate('Login'); 
     } catch (error) {
       console.error('Logout error:', error);
     }
