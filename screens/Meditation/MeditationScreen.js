@@ -1,16 +1,16 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image} from 'react-native';
 import React, { useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { addDocs, collection, getDocs, query,where } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default function MeditationScreen({ navigation }) {
+const MeditationScreen = ({ navigation }) => {
 const [featuredMeditation, setFeaturedMeditation] = useState([]); 
 const [loading, setLoading] = useState(true);
 const [meditationSessions, setMeditationSessions] = useState([]);
 
-
+{/*Featured Meditations*/}
 useFocusEffect(
     useCallback(() => {
       const fetchFeaturedMeditation = async () => {
@@ -42,6 +42,7 @@ useFocusEffect(
     }, [])
 );
 
+{/*Meditation Sessions */}
 useFocusEffect(
   useCallback(() => {
     const fetchSessions = async () => {
@@ -66,8 +67,8 @@ useFocusEffect(
     fetchSessions();
   }, [])
 );
-
- {/**  const [userMeditations, setUserMeditations]= useState([]);
+{/*User Meditations Audio */}
+ const [userMeditations, setUserMeditations]= useState([]);
 
   useFocusEffect(
   useCallback(() => {
@@ -76,7 +77,7 @@ useFocusEffect(
         const user = auth.currentUser;
         if(!user) return;
 
-        const userMeditationRef = collection(db, 'userMeditations');
+        const userMeditationRef = collection(db,'users', user.uid,'userMeditations');
         const q = query(userMeditationRef, where('userId', '==', user.uid));
         const snapshot = await getDocs(q);
 
@@ -92,19 +93,14 @@ useFocusEffect(
 
     fetchUserMeditations();
   }, [])
-);*/}
-
+);
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.topRow}>
         <Text style={styles.headerText}>Meditation</Text>
-        <View style={styles.searchCircle}>
-          <Ionicons name="search" size={22} color="black" />
-        </View>
       </View>
-
       {/* Featured Meditation */}
       <ScrollView>
       <View style={styles.sectionHeader}>
@@ -123,11 +119,11 @@ useFocusEffect(
         }
       )}
       >
-          <View>
-            <Text style={styles.featuredTitle}>{item.title}</Text>
-            <Text style={styles.featuredSubtitle}>{item.duration}</Text>
+      <View>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.subtitle}>{item.duration}</Text>
           </View>
-          <Ionicons name="play-circle-outline" size={28} color="#50483D" />
+          <Ionicons name="play" size={24} color="#50483D" />
         </TouchableOpacity>
       ))}
 
@@ -154,41 +150,51 @@ useFocusEffect(
           />
         )}
         <View>
-          <Text style={styles.sessionTitle}>{session.title}</Text>
+          <Text style={styles.title}>{session.title}</Text>
           {session.description ? (
-            <Text style={styles.sessionSubtitle}>{session.description}</Text>
+            <Text style={styles.subtitle}>{session.description}</Text>
           ) : null}
         </View>
       </View>
-      <Ionicons name="chevron-forward" size={22} color="#999" />
+      <Ionicons name="chevron-forward" size={22} color="#000" />
     </TouchableOpacity>
   ))}
 
-      {/* Your Audio Section 
+      {/* Your Audio Section */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Your Audio</Text>
         <TouchableOpacity onPress={() => navigation.navigate('YourAudioScreen')}>
-          <Ionicons name="add-circle-outline" size={24} color="#555" />
+         <Text style={styles.viewAll}>View all</Text>
         </TouchableOpacity>
       </View>
 
       {userMeditations.length === 0 ? (
         <Text>No uploads yet</Text>
       ) : (
-        userMeditations.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.userCard}>
+        userMeditations.slice(0,4).map((item, index) => (
+          <TouchableOpacity key={item.id || index} style={styles.userCard}
+          onPress={() => navigation.navigate('AudioPlayerScreen', { 
+          title: item.title,
+          url: item.audioURL, 
+          imgURL: 'https://res.cloudinary.com/dstxsoomq/image/upload/v1752538325/audioplaceholder_tqxloj.jpg',
+        }
+      )}
+        >
             <View>
-              <Text>{item.title}</Text>
-              <Text>{item.duration}</Text>
+              <Text style={styles.title}>{item.title?.trim() ? item.title : 'Untitled'}</Text>
+              <Text style={styles.subtitle}>{item.duration} m</Text>
             </View>
-            <Ionicons name="play" size={24} color="#6B8EFC" />
+            <Ionicons name="play" size={24} color="#50483D"/>
           </TouchableOpacity>
         ))
-      )}*/}
+      )}
     </ScrollView>
     </View>
   );
 }
+
+export default MeditationScreen;
+
 
 const styles = StyleSheet.create({
 container: {
@@ -205,16 +211,6 @@ topRow: {
   justifyContent: 'space-between',
   gap: 12,
   marginBottom: 20,
-},
-
-searchCircle: {
-  width: 38,
-  height: 38,
-  borderRadius: 19,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#D8CAB8',
-  opacity: 0.8,
 },
 
 headerText: {
@@ -235,14 +231,15 @@ sectionHeader: {
 sectionTitle: {
   fontSize: 20,
   fontWeight: '600',
-  marginBottom: 8,
+  marginBottom: 10,
   marginTop: 10,
   color: '#000',
 },
 
 viewAll: {
   fontSize: 14,
-  color: '#50483D',
+  color: 'blue',
+  textDecorationLine: 'underline'
 },
   
 featuredItem: {
@@ -255,17 +252,17 @@ featuredItem: {
   alignItems: 'center',
 },
 
-featuredTitle: {
+title: {
   fontSize: 16,
-  fontWeight: '500',
-   color: '#000',
+  fontWeight: '600',
+  color: '#000',
 },
 
-featuredSubtitle: {
+subtitle: {
   fontSize: 14,
   color: '#666',
   marginTop: 4,
-   color: '#000',
+  color: '#000',
 },
 
 sessionCard: {
@@ -276,19 +273,7 @@ sessionCard: {
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-},
-
-sessionTitle: {
-  fontSize: 16,
-  fontWeight: '500',
-  color: '#000',
-},
-
-sessionSubtitle: {
-  fontSize: 12,
-  color: '#999',
-  marginTop: 4,
-  color: '#cc'
+  marginTop: 8,
 },
 
 userCard: {
@@ -298,12 +283,8 @@ userCard: {
   marginBottom: 12,
   borderColor: '#EEE',
   borderWidth: 1,
-},
-
-sessionImage: {
-  width: 50,
-  height: 50,
-  borderRadius: 8,
-  backgroundColor: '#eee',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flexDirection: 'row'
 },
 });
