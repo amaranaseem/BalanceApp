@@ -17,6 +17,7 @@ import AudioPlayer from './screens/Meditation/AudioPlayerScreen';
 import FeaturedViewAllScreen from './screens/Meditation/FeaturedViewAllScreen';
 import MeditationSessionDetail from './screens/Meditation/MeditationSessionDetail';
 import SessionsAudioPlayerScreen from './screens/Meditation/SessionsAudioPlayerScreen';
+import AudioRecorderModal from './screens/Meditation/AudioRecorderModal';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,11 +38,14 @@ export default function App() {
       <Stack.Screen name="HabitsandGoals" component={HabitandGoalScreen}/>
       <Stack.Screen name="AddTask" component={AddTaskScreen}/>
       <Stack.Screen name="EntryPreview" component={EntryPreviewScreen}/>
-      <Stack.Screen name="YourAudio" component={YourAudioScreen}/>
+      <Stack.Screen name="YourAudioScreen" component={YourAudioScreen}/>
       <Stack.Screen name="AudioPlayerScreen" component={AudioPlayer}/>
       <Stack.Screen name="FeaturedViewAll" component={FeaturedViewAllScreen}/>
       <Stack.Screen name="MeditationSessionDetail" component={MeditationSessionDetail}/> 
       <Stack.Screen name="SessionsAudioPlayerScreen" component={SessionsAudioPlayerScreen}/>
+      <Stack.Screen name="AudioRecordedModal" component={AudioRecorderModal}/>
+    
+
       </Stack.Navigator>
       <Toast/>
     </NavigationContainer>
