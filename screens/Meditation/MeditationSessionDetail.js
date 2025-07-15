@@ -70,8 +70,8 @@ const MeditationSessionDetail = ({ route, navigation }) => {
 
         {tracks.map((track) => (
           <View key={track.id} style={styles.trackItem}>
-            <Text style={styles.trackTitle}>{track.title}</Text>
-            <Text style={styles.trackDuration}>{track.duration}</Text>
+            <Text style={styles.trackTitle}>{track.title?.trim() || 'Untitled'}</Text>
+            <Text style={styles.trackDuration}>{track.duration} m</Text>
           </View>
         ))}
       </ScrollView>

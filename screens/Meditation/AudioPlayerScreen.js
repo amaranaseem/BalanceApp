@@ -96,19 +96,19 @@ return (
     {/* Controls */}
     <View style={styles.controls}>
      <TouchableOpacity>
-        <Ionicons name="play-back-outline" size={30} color="#3C4F46" />
+        <Ionicons name="play-back" size={30} color="#3C4F46" />
      </TouchableOpacity>
 
     <TouchableOpacity onPress={togglePlay}>
       <Ionicons
-       name={isPlaying ? 'pause-outline' : 'play-outline'}
+       name={isPlaying ? 'pause' : 'play'}
        size={40}
        color="#3C4F46"
       />
     </TouchableOpacity>
 
     <TouchableOpacity>
-    <Ionicons name="play-forward-outline" size={30} color="#3C4F46" />
+    <Ionicons name="play-forward" size={30} color="#3C4F46" />
     </TouchableOpacity>
     </View>
     </View>

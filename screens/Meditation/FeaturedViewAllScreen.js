@@ -66,7 +66,7 @@ useFocusEffect(
             <Text style={styles.featuredTitle}>{item.title}</Text>
             <Text style={styles.featuredSubtitle}>{item.duration}</Text>
           </View>
-          <Ionicons name="play-circle-outline" size={28} color="#50483D" />
+          <Ionicons name="play" size={24} color="#50483D" />
         </TouchableOpacity>
       ))}
     </ScrollView>
