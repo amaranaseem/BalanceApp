@@ -30,11 +30,32 @@ Week 5: Mood Logging & Journaling (24th June – 30th June) **(Partially Complet
 ✅Build journal page (text + voice recording option)
 ✅Save enteries to Firebase
 ✅Test the screens
-Audio saving on Firebase 
+✅Audio saving on Firebase 
 
-Week 6: : Habit & Goal and Self-care Features (1st July – 7th July) **(In Progress)**
-Develop 'Habit & Goals page'
-Save entries to Firebase
-Add static notification page
-search for gamification element 
+Week 6: : Habit & Goal and Self-care Features (1st July – 7th July) **(Completed)**
+✅Develop 'Habit & Goals page'
+✅Save entries to Firebase
+✅Add static notification page
+✅Search for gamification element
 
+Week 7: Gamification, Meditation & Data Visualization  (8th July- 16th July) **(In Progress)**
+✅Add gamification element
+✅Create Line chart
+✅Build meditation page with custom record audio
+Mood-based motivational tips
+Add profile page
+
+**UP NEXT**
+Week 8: Testing, Polish & Evaluation (17th July- 25th July) 
+Testing all features
+Testing on different screen sizes
+Fix usability issues and ensure accessibility(readability)
+Polish UI
+Define and document evaluation metrics 
+
+Week 9 & 10: Final Report, Reflection & Submission (27th July- 13th Aug)
+Final Report writing
+Annotate screenshots for documentation
+Prepare for demo 
+Write 300-500 personal reflection 
+Review the final report and artefact
