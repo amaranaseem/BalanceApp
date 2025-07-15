@@ -100,6 +100,7 @@ const NotepadScreen = () => {
         alert('Permission to access microphone is required!');
         return;
       }
+       setRecordingTime(0); 
 
       const newRecording = new Audio.Recording();
       await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
