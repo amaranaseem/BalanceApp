@@ -59,13 +59,10 @@ const AudioPlayerScreen = ({ route, navigation }) => {
 
 return (
     <View style={styles.container}>
-        <View style={styles.topRow}>
-            <TouchableOpacity
-                style={styles.closeCircle}
-                onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})}
-                >
-                <Ionicons name="close" size={22} color="black" />
-            </TouchableOpacity>
+    <View style={styles.topRow}>
+      <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})} >
+        <Ionicons name="close" size={22} color="black" />
+      </TouchableOpacity>
     </View>
 
     {/* Artwork */}
