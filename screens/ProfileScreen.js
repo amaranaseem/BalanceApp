@@ -111,7 +111,7 @@ style={styles.input}
 
 <TouchableOpacity
 onPress={handleSubmit}
-style={[styles.saveButton, uploading && styles.disabledButton]}
+style={styles.saveButton}
 disabled={uploading}
 >
 <Text style={styles.saveText}>{uploading ? 'Saving...' : 'Save'}</Text>
@@ -340,10 +340,6 @@ saveButton: {
   padding: 10,
   backgroundColor: '#A8D5BA',
   borderRadius: 5,
-},
-
-disabledButton: {
-  backgroundColor: '#ccc',
 },
 
 saveText: {
