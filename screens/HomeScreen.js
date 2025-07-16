@@ -80,7 +80,6 @@ useEffect(() => {
           break;
         }
       }
-
       setMoodStreak(streak);
     }
   );
