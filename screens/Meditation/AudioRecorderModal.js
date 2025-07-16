@@ -130,7 +130,7 @@ const uploadToCloudinary = async (audioURI) => {
     name: 'recording.m4a',
   });
   data.append('upload_preset', 'your_meditation_audio');
-  data.append('cloud_name', 'dstxsoomq');        
+  data.append("folder", "your_meditation_audio");   //stores in specific folder
 
   try {
     const response = await fetch('https://api.cloudinary.com/v1_1/dstxsoomq/auto/upload', {
