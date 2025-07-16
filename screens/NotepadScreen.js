@@ -3,9 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
-import { doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db, storage } from '../firebase';
+import {  collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
 
 
@@ -192,30 +191,30 @@ const NotepadScreen = () => {
       return;
     }
 
-    console.log("Saving entry to Firestore...");
+  console.log("Saving entry to Firestore...");
 
-    await addDoc(collection(db, 'users', user.uid, 'entries'), {
-      title: title || 'Untitled',
-      mood: selectedMood.label,
-      moodColor: selectedMood.color,
-      note: note,
-      audioURL: audioURL,
-      duration: recordingTime,
-      createdAt: serverTimestamp(),
-    });
+  await addDoc(collection(db, 'users', user.uid, 'entries'), {
+    userId: user.uid,
+    title: title || 'Untitled',
+    mood: selectedMood.label,
+    moodColor: selectedMood.color,
+    note: note,
+    audioURL: audioURL,
+    duration: recordingTime,
+    createdAt: serverTimestamp(),
+  });
 
-    console.log("Entry saved to Firestore");
+  console.log("Entry saved to Firestore");
 
-    Alert.alert("Saved!", "Your journal entry is saved.", [
-      {
-        text: "OK",
-        onPress: () => {
-          setTitle('');
-          setNote('');
-          setSelectedMood(null);
-          navigation.navigate('BottomNavTab', { screen: 'Journal' });
-        },
+  Alert.alert("Saved!", "Your journal entry is saved.", [
+  { text: "OK",
+    onPress: () => {
+    setTitle('');
+    setNote('');
+    setSelectedMood(null);
+    navigation.navigate('BottomNavTab', { screen: 'Journal' });
       },
+    },
     ]);
   } catch (error) {
     console.error("Firestore save error:", error);
@@ -230,93 +229,84 @@ const NotepadScreen = () => {
     year: 'numeric',
   });
 
-  return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-      <ScrollView contentContainerStyle={styles.container}>
+return (
+  <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+  <ScrollView contentContainerStyle={styles.container}>
 
-        {/* Header */}
-        <View style={styles.topRow}>
-          <TextInput
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Untitled"
-            placeholderTextColor="#999"
-            style={styles.headerTextInput}
-          />
-          <TouchableOpacity
-            style={styles.closeCircle}
-            onPress={() => navigation.navigate('BottomNavTab', { screen: 'Journal' })}
-          >
-            <Ionicons name="close" size={22} color="black" />
-          </TouchableOpacity>
-        </View>
+  {/* Header */}
+  <View style={styles.topRow}>
+  <TextInput
+    value={title}
+    onChangeText={setTitle}
+    placeholder="Untitled"
+    placeholderTextColor="#999"
+    style={styles.headerTextInput}
+  />
+  <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', { screen: 'Journal' })} >
+  <Ionicons name="close" size={22} color="black" />
+  </TouchableOpacity>
+  </View>
       
-      {/*Date */}
-        <View style={styles.dateRow}>
-          <Ionicons name="calendar-outline" size={20} color="#A58E74" />
-          <Text style={styles.dateText}>{today}</Text>
-        </View>
+  {/*Date */}
+  <View style={styles.dateRow}>
+  <Ionicons name="calendar-outline" size={20} color="#A58E74" />
+  <Text style={styles.dateText}>{today}</Text>
+  </View>
 
-        <Text style={styles.heading}>How are you feeling?</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodScroll}>
-          {moods.map((mood, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.moodItem,
-                selectedMood?.label === mood.label && { backgroundColor: mood.color },
-              ]}
-              onPress={() => setSelectedMood(mood)}
-            >
-              <Text style={styles.moodLabelOnly}>{mood.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+  <Text style={styles.heading}>How are you feeling?</Text>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodScroll}>
+  {moods.map((mood, index) => (
+  <TouchableOpacity key={index} style={[styles.moodItem, selectedMood?.label === mood.label && { backgroundColor: mood.color },]}
+  onPress={() => setSelectedMood(mood)}>
+  <Text style={styles.moodLabelOnly}>{mood.label}</Text>
+  </TouchableOpacity>
+  ))}
+  </ScrollView>
 
-        {saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
+{saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Write about your day..."
-          multiline
-          value={note}
-          onChangeText={setNote}
-        />
+  <TextInput
+    style={styles.input}
+    placeholder="Write about your day..."
+    multiline
+    value={note}
+    onChangeText={setNote}
+  />
 
-      {/* Audio Preview */}
-      {audioURI && (
-      <View style={styles.audioContainer}>
-        <View style={styles.audioBar}>
-          <TouchableOpacity onPress={playRecording}>
-            <Ionicons name={isPlaying ? "pause" : "play"} size={24} color="black" />
-          </TouchableOpacity>
-          <View style={styles.waveform} />
-          <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
-          <TouchableOpacity onPress={() => setAudioURI(null)} style={{ marginLeft: 10 }}>
-            <Ionicons name="trash" size={20} color="#E94F4F" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    )}
+  {/* Audio Preview */}
+  {audioURI && (
+  <View style={styles.audioContainer}>
+  <View style={styles.audioBar}>
+  <TouchableOpacity onPress={playRecording}>
+    <Ionicons name={isPlaying ? "pause" : "play"} size={24} color="black" />
+  </TouchableOpacity>
+  <View style={styles.waveform} />
+  <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
+  <TouchableOpacity onPress={() => setAudioURI(null)} style={{ marginLeft: 10 }}>
+  <Ionicons name="trash" size={20} color="#E94F4F" />
+  </TouchableOpacity>
+  </View>
+  </View>
+  )}
 
-        {/* Buttons */}
-        <View style={styles.footerRow}>
-          <View style={styles.recordingRow}>
-            <TouchableOpacity
-              style={styles.iconBtn}
-              onPress={recording ? stopRecording : startRecording}
-            >
-              <Ionicons name={recording ? "stop" : "mic-outline"} size={24} color="black" />
-            </TouchableOpacity>
-          {recording && <Text style={styles.inlineTimer}>{formatTime(recordingTime)}</Text>}
-          </View>
-          <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-            <Text style={styles.saveText}>Save</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+  {/* Buttons */}
+  <View style={styles.footerRow}>
+  <View style={styles.recordingRow}>
+  <TouchableOpacity
+  style={styles.iconBtn}
+  onPress={recording ? stopRecording : startRecording} >
+   <Ionicons name={recording ? "stop" : "mic-outline"} size={24} color="black" />
+  </TouchableOpacity>
+  {recording && <Text style={styles.inlineTimer}>{formatTime(recordingTime)}</Text>}
+  </View>
+  <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+  <Text style={styles.saveText}>Save</Text>
+  </TouchableOpacity>
+  </View>
+  </ScrollView>
+  </KeyboardAvoidingView>
+  
+);
 };
 
 export default NotepadScreen;

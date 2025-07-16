@@ -18,6 +18,7 @@ import FeaturedViewAllScreen from './screens/Meditation/FeaturedViewAllScreen';
 import MeditationSessionDetail from './screens/Meditation/MeditationSessionDetail';
 import SessionsAudioPlayerScreen from './screens/Meditation/SessionsAudioPlayerScreen';
 import AudioRecorderModal from './screens/Meditation/AudioRecorderModal';
+import ProfileScreen from './screens/ProfileScreen'; 
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,7 @@ export default function App() {
       <Stack.Screen name="MeditationSessionDetail" component={MeditationSessionDetail}/> 
       <Stack.Screen name="SessionsAudioPlayerScreen" component={SessionsAudioPlayerScreen}/>
       <Stack.Screen name="AudioRecordedModal" component={AudioRecorderModal}/>
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen}/>
     
 
       </Stack.Navigator>

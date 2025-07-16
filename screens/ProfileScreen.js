@@ -1,39 +1,508 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { getAuth, signOut } from 'firebase/auth';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons} from '@expo/vector-icons';
+import { doc, getDoc, collection, getDocs, updateDoc} from 'firebase/firestore';
+import { db } from '../firebase';
+import * as ImagePicker from 'expo-image-picker';
+
 
 const ProfileScreen = ({ navigation }) => {
-  
-  const handleLogout = async () => {
+
+const [userData, setUserData] = useState(null);
+const [checkInCount, setCheckInCount] = useState(0);
+const [journalCount, setJournalCount] = useState(0);
+const [streakCount, setStreakCount] = useState(0);
+const user = getAuth().currentUser;
+const [image, setImage] = useState(null);
+
+const [isEditing, setIsEditing] = useState(false);
+const [newUsername, setNewUsername] = useState('');
+const [uploading, setUploading] = useState(false);
+
+{/* Edit profile and username */}
+const pickImage = async () => {
+  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permission.granted) {
+    alert('Permission to access media library is required!');
+    return;
+   }
+
+  const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
+
+  if (!result.cancelled) {
+    setImage(result.assets[0].uri || result.uri);
+  }
+  };
+
+const handleSubmit = async () => {
+  const user = getAuth().currentUser;
+  if (!user) return;
+
+  try {
+  setUploading(true);
+  let imageUrl = userData?.profileImage || '';
+
+  if (image) {
+  const formData = new FormData();
+    formData.append("file", {
+    uri: image,
+    type: "image/jpeg",
+    name: "profile.jpg",
+  });
+   formData.append("upload_preset", "profile_image");
+   formData.append("folder", "profile_image");
+
+  const response = await fetch("https://api.cloudinary.com/v1_1/dstxsoomq/image/upload", {
+  method: "POST",
+  body: formData,
+  });
+
+  const data = await response.json();
+  if (data.secure_url) {
+  imageUrl = data.secure_url;
+  } else {
+   throw new Error("Image upload failed");
+  }
+  }
+
+  // Save to Firestore
+  const userRef = doc(db, 'users', user.uid);
+  await updateDoc(userRef, {
+  profileImage: imageUrl,
+  username: newUsername || userData?.username,
+  });
+
+  // Refresh UI
+  setUserData((prev) => ({
+  ...prev,
+  profileImage: imageUrl,
+  username: newUsername || prev.username,
+  }));
+
+  setIsEditing(false);
+  setUploading(false);
+  setImage(null);
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    setUploading(false);
+  }
+};
+
+{/* Getting user data from firebase */}
+useEffect(() => {
+ const fetchUserData = async () => {
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, 'users', user.uid);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+      setUserData(docSnap.data());
+    } else {
+      console.log('No such user data!');
+    }
+   } catch (error) {
+    console.error('Error fetching user data:', error);
+   }
+ };
+
+  fetchUserData();
+}, []);
+
+{/* Getting stats and profile data from firebase */}
+useEffect(() => {
+  const fetchProfileData = async () => {
+    if (!user) return;
+
     try {
-      await signOut(getAuth());
-      navigation.navigate('Login'); // replace 'Login' with your actual login screen name
-    } catch (error) {
-      console.error('Logout error:', error);
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setUserData(userSnap.data());
+      }
+
+      const checkInsSnap = await getDocs(collection(db, 'users', user.uid, 'moodCheckins'));
+      const journalsSnap = await getDocs(collection(db, 'users', user.uid, 'entries'));
+      const moodCheckinSnap = await getDocs(collection(db, 'users', user.uid, 'moodCheckins'));
+
+      setCheckInCount(checkInsSnap.size);
+      setJournalCount(journalsSnap.size);
+
+      // Calculate streak from moodCheckins
+      const today = new Date();
+      const datesSet = new Set();
+
+      moodCheckinSnap.forEach(doc => {
+        const data = doc.data();
+        const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
+        datesSet.add(createdAt.toDateString());
+      });
+
+      let streak = 0;
+      for (let i = 0; i < 30; i++) {
+        const day = new Date(today);
+        day.setDate(today.getDate() - i);
+        const key = day.toDateString();
+        if (datesSet.has(key)) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+      setStreakCount(streak);
+
+    } catch (err) {
+      console.error('Error fetching profile stats:', err);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text>ProfileScreen</Text>
+  fetchProfileData();
+}, []);
 
-      <TouchableOpacity onPress={handleLogout} style={{ position: 'absolute', right: 20 }}>
-        <Ionicons name="log-out-outline" size={24} color="black" />
-      </TouchableOpacity>
-    </View>
-  );
+{/*Logout feature */}
+const handleLogout = async () => {
+  try {
+  await signOut(getAuth());
+  navigation.navigate('Login'); 
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+  };
+
+return (
+<View style={styles.container}>
+
+{/* Header */}
+<View style={styles.topRow}>
+  <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', { screen: 'HomeScreen' })}>
+  <Ionicons name="close" size={22} color="black" />
+  </TouchableOpacity>
+</View>
+
+<ScrollView showsVerticalScrollIndicator = {false}>
+
+{/*Profile pic and information */}
+{userData && (
+<>
+<View style={styles.profileSection}>
+<View style={styles.profileImageWrapper}>
+<Image source={userData.profileImage ? { uri: userData.profileImage } : require('../assets/profilepic.png')} style={styles.profileImage}/>
+</View>
+<Text style={styles.name}>{userData.name}</Text>
+<Text style={styles.username}>@{userData.username}</Text>
+</View>
+
+{/* Status Overview */}
+<View style={styles.gridRow}>
+<View style={styles.statCard}>
+<Ionicons name="checkbox-outline" size={22} color="#50483D" />
+<Text style={styles.statLabel}>Check-ins</Text>
+<Text style={styles.statNumber}>{checkInCount}</Text>
+</View>
+
+<View style={styles.statCard}>
+<Ionicons name="book-outline" size={22} color="#50483D" />
+<Text style={styles.statLabel}>Journal</Text>
+<Text style={styles.statNumber}>{journalCount}</Text>
+</View>
+
+<View style={styles.statCard}>
+<Ionicons name="ribbon-outline" size={22} color="#50483D" />
+<Text style={styles.statLabel}>Streaks</Text>
+<Text style={styles.statNumber}>{streakCount}</Text>
+</View>
+</View>
+</>
+)}
+
+{/* Settings Button */}
+<TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('SettingsScreen')}>
+<Ionicons name="settings-outline" size={18} color="#50483D" />
+<Text style={styles.settingsText}>Settings</Text>
+</TouchableOpacity>
+
+{/* Profile Edit Button */}
+<TouchableOpacity style={styles.settingsButton} onPress={() => {
+setIsEditing(true);
+setNewUsername(userData.username || '');
+}}>
+<Text style={styles.settingsText}>Edit Profile</Text>
+</TouchableOpacity>
+
+{/* Logout */}
+<TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+<Ionicons name="log-out-outline" size={20} color="#fff" />
+<Text style={styles.logoutText}>Logout</Text>
+</TouchableOpacity>
+</ScrollView>
+
+{isEditing && (
+<View style={styles.modalOverlay}>
+<View style={styles.modalContainer}>
+<Text style={styles.modalTitle}>Edit Profile</Text>
+
+<TouchableOpacity onPress={pickImage}>
+<Image source={ image ? { uri: image } : userData?.profileImage ? { uri: userData.profileImage } : require('../assets/profilepic.png')}
+style={styles.modalProfileImage} />
+
+<Text style={styles.changePicText}>Change Profile Picture</Text>
+</TouchableOpacity>
+
+<TextInput
+value={newUsername}
+onChangeText={setNewUsername}
+placeholder="Username"
+style={styles.input}
+/>
+
+<View style={styles.modalButtonRow}>
+<TouchableOpacity onPress={() => setIsEditing(false)} style={styles.cancelButton}>
+<Text style={styles.cancelText}>Cancel</Text>
+</TouchableOpacity>
+
+<TouchableOpacity
+onPress={handleSubmit}
+style={[styles.saveButton, uploading && styles.disabledButton]}
+disabled={uploading}
+>
+<Text style={styles.saveText}>{uploading ? 'Saving...' : 'Save'}</Text>
+</TouchableOpacity>
+</View>
+</View>
+</View>
+)}
+
+</View>
+
+);
 };
 
 
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: '#FAF9F6',
-  },
+container: {
+  flex: 1,
+  paddingTop: 60,
+  paddingHorizontal: 20,
+  paddingVertical: 20,
+  backgroundColor: '#FAF9F6',
+},
+
+topRow: {
+  flexDirection: 'row-reverse',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 20,
+},
+
+headerTextInput: {
+  fontSize: 24,
+  fontWeight: 'bold',
+  flex: 1,
+  color: '#50483D',
+},
+  
+closeCircle: {
+  width: 38,
+  height: 38,
+  borderRadius: 19,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#D8CAB8',
+  opacity: 0.8,
+},
+
+profileSection: {
+  alignItems: 'center',
+  marginBottom: 30,
+},
+
+profileImageWrapper: {
+  position: 'relative',
+},
+
+profileImage: {
+  width: 100,
+  height: 100,
+  borderRadius: 50,
+},
+
+name: {
+  fontSize: 20,
+  fontWeight: '600',
+  color: '#50483D',
+  marginTop: 10,
+},
+
+username: {
+  fontSize: 14,
+  color: '#7F7B73',
+},
+
+statsBox: {
+  backgroundColor: '#F1E7D7',
+  padding: 16,
+  borderRadius: 10,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 20,
+},
+
+statsLabel: {
+  fontSize: 16,
+  color: '#50483D',
+  flex: 1,
+  marginLeft: 10,
+},
+
+statsValue: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#50483D',
+},
+
+gridRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: 30,
+},
+
+statCard: {
+  backgroundColor: '#F1E7D7',
+  width: '30%',
+  paddingVertical: 16,
+  borderRadius: 12,
+  alignItems: 'center',
+},
+
+statLabel: {
+  fontSize: 14,
+  color: '#50483D',
+  marginTop: 8,
+},
+
+statNumber: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#50483D',
+  marginTop: 4,
+},
+
+settingsButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderColor: '#50483D',
+  borderWidth: 1,
+  borderRadius: 10,
+  padding: 12,
+  marginBottom: 20,
+},
+
+settingsText: {
+  color: '#50483D',
+  marginLeft: 8,
+  fontSize: 16,
+},
+
+logoutBtn: {
+  backgroundColor: '#D9534F',
+  padding: 12,
+  borderRadius: 10,
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+logoutText: {
+  color: '#fff',
+  fontSize: 16,
+  marginLeft: 6,
+},
+
+modalOverlay: {
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 20,
+  zIndex: 10,
+},
+
+modalContainer: {
+  backgroundColor: '#fff',
+  padding: 20,
+  borderRadius: 10,
+  width: '100%',
+},
+
+modalTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginBottom: 10,
+  textAlign: 'center',
+  color: '#50483D',
+},
+
+modalProfileImage: {
+  width: 80,
+  height: 80,
+  borderRadius: 40,
+  alignSelf: 'center',
+  marginBottom: 10,
+},
+
+changePicText: {
+  textAlign: 'center',
+  color: '#50483D',
+  marginBottom: 10,
+},
+
+input: {
+  borderBottomWidth: 1,
+  borderColor: '#ccc',
+  marginTop: 20,
+  fontSize: 16,
+  padding: 8,
+},
+
+modalButtonRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 20,
+},
+
+cancelButton: {
+  padding: 10,
+},
+
+cancelText: {
+  color: 'red',
+},
+
+saveButton: {
+  padding: 10,
+  backgroundColor: '#A8D5BA',
+  borderRadius: 5,
+},
+
+disabledButton: {
+  backgroundColor: '#ccc',
+},
+
+saveText: {
+  color: '#fff',
+},
+
 });
