@@ -1,19 +1,27 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image} from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image, ScrollView, Platform} from 'react-native'
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
-import Toast from 'react-native-toast-message';
+import { Ionicons } from '@expo/vector-icons';
 
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-{/*User Authentication with error handling for password*/}
+
+{/*User Authentication with error handling*/}
 const handleRegister = async () => {
-  if (!username || !email || !password) {
+  if (!email || !password || !confirmPassword) {
     alert('All fields are required');
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('Please enter a valid email');
     return;
   }
 
@@ -22,104 +30,103 @@ const handleRegister = async () => {
     return;
   }
 
+  if (password !== confirmPassword) {
+    alert('Passwords do not match');
+    return;
+  }
+
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-    await updateProfile(userCredential.user, { displayName: username });
-    console.log('Username set as:', username);
-
-    Toast.show({
-    type: 'success',
-    text1: `Welcome ${username} to Balance!`,
-    });
-
-    navigation.navigate('HomeTabs');
+    console.log('User registered:', userCredential.user.uid);
+    navigation.navigate('Board');
   } catch (error) {
     console.log('Registration error:', error);
 
-    if (error.code === 'auth/weak-password') {
-      alert('Password should be 6 character long');
+    if (error.code === 'auth/email-already-in-use') {
+      alert('This email is already in use.');
+    } else if (error.code === 'auth/weak-password') {
+      alert('The password is too weak.');
     } else {
-      alert(error.message);
+      alert('Registration failed: ' + error.message);
     }
   }
 };
 
+return (
+  <KeyboardAvoidingView style={styles.container}  behavior={Platform.OS === 'android' ? 'padding' : 'height'}>
+  <ScrollView contentContainerStyle={styles.scrollcontainer} keyboardShouldPersistTaps="handled"showsVerticalScrollIndicator= {false}>
+  {/* Logo */}
+  <View style={styles.logoContainer}>
+  <Image source={require('../assets/logo.jpg')} style={styles.logo} />
+  <Text style={styles.appName}>Balance</Text>
+  </View>
 
-
-  return (
-   <KeyboardAvoidingView style={styles.container} behavior='padding'>
-
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Image source={require('../assets/logo.jpg')} style={styles.logo} />
-          <Text style={styles.appName}>Balance</Text>
-        </View>
-
-        <Text style={styles.headerText}>Register</Text>
-        <Text style={styles.subText}>Start your journey with us.</Text>
-
-         {/* Username Field */}
-        <View style={styles.inputWrapper}>
-        <Text style={styles.inputLabel}>Username</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="tester"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-          />
-        </View>
-      </View>
+  <Text style={styles.headerText}>Register</Text>
+  <Text style={styles.subText}>Start your journey with us.</Text>
          
-        {/* Email Field */}
-        <View style={styles.inputWrapper}>
-        <Text style={styles.inputLabel}>Email</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="abc@gmail.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-      </View>
+  {/* Email Field */}
+  <View style={styles.inputWrapper}>
+  <Text style={styles.inputLabel}>Email</Text>
+  <View style={styles.inputContainer}>
+     <Ionicons name="mail-outline" size={20} color="#6E665B" style={styles.icon} />
+  <TextInput
+  style={styles.inputText}
+  placeholder="abc@gmail.com"
+  value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+  autoCapitalize="none"
+  />
+  </View>
+  </View>
 
-        {/* Password Field */}
-        <View style={styles.inputWrapper}>
-          <Text style={styles.inputLabel}>Password</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputText}
-              placeholder="******"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              
-            />
-        </View>
-        </View>
+  {/* Password Field */}
+  <View style={styles.inputWrapper}>
+  <Text style={styles.inputLabel}>Password</Text>
+  <View style={styles.inputContainer}>
+     <Ionicons name="lock-closed-outline" size={20} color="#6E665B" style={styles.icon} />
+  <TextInput
+  style={styles.inputText}
+  placeholder="******"
+  value={password}
+  onChangeText={setPassword}
+  secureTextEntry       
+  />
+  </View>
+  </View>
 
-        {/* Register Button */}  
-         <View style={styles.buttoncontainer}>
-           <TouchableOpacity style={styles.button} onPress={handleRegister}>
-              <Text style={styles.buttonText}>Continue</Text>
-           </TouchableOpacity>
-         </View>
+  {/* Confirm Password Field */}
+  <View style={styles.inputWrapper}>
+  <Text style={styles.inputLabel}>Confirm Password</Text>
+  <View style={styles.inputContainer}>
+     <Ionicons name="lock-closed-outline" size={20} color="#6E665B" style={styles.icon} />
+  <TextInput
+  style={styles.inputText}
+  placeholder="******"
+  value={confirmPassword}
+  onChangeText={setConfirmPassword}
+  secureTextEntry       
+  />
+  </View>
+  </View>
 
-        {/* Login Link */}
-        <View style={styles.linkcontainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.linkText}>Already a member? Login</Text>
-          </TouchableOpacity>
-        </View>
-        
-       </KeyboardAvoidingView>
-     );
-   };
+  {/* Register Button */}  
+  <View style={styles.buttoncontainer}>
+  <TouchableOpacity style={styles.button} onPress={handleRegister}>
+  <Text style={styles.buttonText}>Continue</Text>
+  </TouchableOpacity>
+  </View>
+
+  {/* Login Link */}
+  <View style={styles.linkcontainer}>
+  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+  <Text style={styles.linkText}>Already a member? Login</Text>
+  </TouchableOpacity>
+  </View>
+  </ScrollView>
+  </KeyboardAvoidingView>
+ );
+};
 
 export default RegisterScreen
 
@@ -127,9 +134,8 @@ const styles = StyleSheet.create({
 container: {
   flex: 1,
   justifyContent: 'flex-start',
-  alignItems: 'flex-start',
   backgroundColor: '#FAF9F6', 
-  paddingHorizontal: 20,
+  paddingHorizontal: 5,
   paddingTop: 90,
 },
 
@@ -170,7 +176,7 @@ subText:{
 
 inputWrapper: {
   width: '100%',
-  marginBottom: 15,
+  marginBottom: 15, 
 },
 
 inputLabel: {
@@ -181,19 +187,20 @@ inputLabel: {
 },
 
 inputContainer: {
+ flexDirection: 'row',
+  alignItems: 'center',
   width: '100%',
   height: 50,
   backgroundColor: '#EFE8DD',
   borderRadius: 20,
   paddingHorizontal: 15,
-  justifyContent: 'center',
+  marginBottom: 10,
 },
 
 inputText: {
   fontSize: 14,
   color: 'black',
 },
-
 
 buttonText: {
   fontSize: 16,
@@ -214,7 +221,7 @@ button:{
   width: '100%',
   alignItems: 'center',
   position:'absolute', 
-  borderRadius: 20,
+  borderRadius: 14,
   marginTop: 40,
   marginBottom: 30,
   elevation: 2,
@@ -231,5 +238,15 @@ linkcontainer:{
   marginTop: 35,
   marginLeft: 10,
 },
+
+scrollcontainer:{
+  flexGrow: 1,
+  justifyContent: 'flex-start',
+  paddingHorizontal: 20, 
+},
+
+icon:{
+  marginRight: 10
+}
 
 });
