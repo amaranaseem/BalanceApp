@@ -498,6 +498,7 @@ profilePic: {
   height: 50,
   borderRadius: 200,
   borderColor: '#000',
+  borderWidth: 0.5,
 },
 
 streak: {
@@ -507,6 +508,7 @@ streak: {
   paddingHorizontal: 10,
   paddingVertical: 5,
   borderRadius: 20,
+  borderWidth: 0.5,
 },
 
 streakText: {
