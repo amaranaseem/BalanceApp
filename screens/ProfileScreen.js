@@ -8,11 +8,135 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 const ProfileScreen = ({ navigation }) => {
+  const [userData, setUserData] = useState(null);
+  const [checkInCount, setCheckInCount] = useState(0);
+  const [journalCount, setJournalCount] = useState(0);
+  const [streakCount, setStreakCount] = useState(0);
+  const [image, setImage] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [uploading, setUploading] = useState(false);
+
+  const user = getAuth().currentUser;
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      alert('Permission to access media library is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.assets?.[0]?.uri || result.uri);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!user) return;
+
+    try {
+      setUploading(true);
+      let imageUrl = userData?.profileImage || '';
+
+      if (image) {
+        const formData = new FormData();
+        formData.append("file", {
+          uri: image,
+          type: "image/jpeg",
+          name: "profile.jpg",
+        });
+        formData.append("upload_preset", "profile_image");
+        formData.append("folder", "profile_image");
+
+        const response = await fetch("https://api.cloudinary.com/v1_1/dstxsoomq/image/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        if (data.secure_url) {
+          imageUrl = data.secure_url;
+        } else {
+          throw new Error("Image upload failed");
+        }
+      }
+
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        profileImage: imageUrl,
+        username: newUsername || userData?.username,
+      });
+
+      setUserData(prev => ({
+        ...prev,
+        profileImage: imageUrl,
+        username: newUsername || prev.username,
+      }));
+
+      setIsEditing(false);
+      setUploading(false);
+      setImage(null);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setUploading(false);
+    }
+  };
+
+  const fetchProfileData = async () => {
+    if (!user) return;
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+      }
+
+      const checkInsSnap = await getDocs(collection(db, 'users', user.uid, 'moodCheckins'));
+      const journalsSnap = await getDocs(collection(db, 'users', user.uid, 'entries'));
+
+      setCheckInCount(checkInsSnap.size);
+      setJournalCount(journalsSnap.size);
+
+      const datesSet = new Set();
+      checkInsSnap.forEach(doc => {
+        const data = doc.data();
+        const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
+        datesSet.add(createdAt.toDateString());
+      });
+
+      let streak = 0;
+      const today = new Date();
+      for (let i = 0; i < 30; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        if (datesSet.has(date.toDateString())) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+
+      setStreakCount(streak);
+    } catch (err) {
+      console.error('Error fetching profile data:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
   
   const handleLogout = async () => {
     try {
       await signOut(getAuth());
-      navigation.navigate('Login'); // replace 'Login' with your actual login screen name
+      navigation.navigate('Login'); 
     } catch (error) {
       console.error('Logout error:', error);
     }
