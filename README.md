@@ -42,17 +42,17 @@ Week 7: Gamification, Meditation & Data Visualization  (8th July- 16th July) **(
 ✅Add gamification element
 ✅Create Line chart
 ✅Build meditation page with custom record audio
-Mood-based motivational tips
-Add profile page
+❌Mood-based motivational tips
+✅Add profile page
 
-**UP NEXT**
-Week 8: Testing, Polish & Evaluation (17th July- 25th July) 
+Week 8: Testing, Polish & Evaluation (17th July- 25th July) **(In Progress)**
 Testing all features
 Testing on different screen sizes
 Fix usability issues and ensure accessibility(readability)
 Polish UI
 Define and document evaluation metrics 
 
+**UP NEXT**
 Week 9 & 10: Final Report, Reflection & Submission (27th July- 13th Aug)
 Final Report writing
 Annotate screenshots for documentation
