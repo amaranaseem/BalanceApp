@@ -1,155 +1,122 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { getAuth, signOut } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { Ionicons} from '@expo/vector-icons';
-import { doc, getDoc, collection, getDocs, updateDoc} from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, orderBy} from 'firebase/firestore';
 import { db } from '../firebase';
-import * as ImagePicker from 'expo-image-picker';
+import EditProfileScreen from './EditProfileScreen';
 
+const achievements = [
+  { icon: "🎉", text: "3 habits maintained for 7 days in a row!" },
+  { icon: "🥇", text: "You completed 85% of your May goals" },
+  { icon: "🔥", text: "You're on a 10-day streak!" },
+];
+
+const AchievementItem = ({ icon, text }) => (
+  <View style={styles.achievementItem}>
+    <Text style={styles.icon}>{icon}</Text>
+    <Text style={styles.achievementLabel}>{text}</Text>
+  </View>
+);
 
 const ProfileScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [checkInCount, setCheckInCount] = useState(0);
   const [journalCount, setJournalCount] = useState(0);
   const [streakCount, setStreakCount] = useState(0);
-  const [image, setImage] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [newUsername, setNewUsername] = useState('');
-  const [uploading, setUploading] = useState(false);
-
+  const [editProfileModalVisible, setEditProfileModalVisible] = useState(false);
+  const [consistency, setMoodConsistency] = useState(0);
+  const [topMood, setTopMood] = useState('');
+  
   const user = getAuth().currentUser;
 
-  const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      alert('Permission to access media library is required!');
-      return;
-    }
+const fetchProfileData = async () => {
+  if (!user) return;
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7,
-    });
+  try {
+  const userRef = doc(db, 'users', user.uid);
+  const docSnap = await getDoc(userRef);
+  if (docSnap.exists()) {
+  setUserData(docSnap.data());
+  }
 
-    if (!result.cancelled) {
-      setImage(result.assets?.[0]?.uri || result.uri);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!user) return;
-
-    try {
-      setUploading(true);
-      let imageUrl = userData?.profileImage || '';
-
-      if (image) {
-        const formData = new FormData();
-        formData.append("file", {
-          uri: image,
-          type: "image/jpeg",
-          name: "profile.jpg",
-        });
-        formData.append("upload_preset", "profile_image");
-        formData.append("folder", "profile_image");
-
-        const response = await fetch("https://api.cloudinary.com/v1_1/dstxsoomq/image/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await response.json();
-        if (data.secure_url) {
-          imageUrl = data.secure_url;
-        } else {
-          throw new Error("Image upload failed");
-        }
-      }
-
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        profileImage: imageUrl,
-        username: newUsername || userData?.username,
-      });
-
-      setUserData(prev => ({
-        ...prev,
-        profileImage: imageUrl,
-        username: newUsername || prev.username,
-      }));
-
-      setIsEditing(false);
-      setUploading(false);
-      setImage(null);
-    } catch (err) {
-      console.error("Error updating profile:", err);
-      setUploading(false);
-    }
-  };
-
-  const fetchProfileData = async () => {
-    if (!user) return;
-
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      const docSnap = await getDoc(userRef);
-      if (docSnap.exists()) {
-        setUserData(docSnap.data());
-      }
-
-      const checkInsSnap = await getDocs(collection(db, 'users', user.uid, 'moodCheckins'));
-      const journalsSnap = await getDocs(collection(db, 'users', user.uid, 'entries'));
-
-      setCheckInCount(checkInsSnap.size);
-      setJournalCount(journalsSnap.size);
-
-      const datesSet = new Set();
-      checkInsSnap.forEach(doc => {
-        const data = doc.data();
-        const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
-        datesSet.add(createdAt.toDateString());
-      });
-
-      let streak = 0;
-      const today = new Date();
-      for (let i = 0; i < 30; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        if (datesSet.has(date.toDateString())) {
-          streak++;
-        } else {
-          break;
-        }
-      }
-
-      setStreakCount(streak);
-    } catch (err) {
-      console.error('Error fetching profile data:', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfileData();
-  }, []);
-
+{/*getting check-ins, journal and streaks overview from firebase */}
   
-  const handleLogout = async () => {
-    try {
-      await signOut(getAuth());
-      navigation.navigate('Login'); 
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
+  const checkInsSnap = await getDocs(collection(db, 'users', user.uid, 'moodCheckins'));
+  const journalsSnap = await getDocs(collection(db, 'users', user.uid, 'entries'));
+
+  setCheckInCount(checkInsSnap.size);
+  setJournalCount(journalsSnap.size);
+
+  const datesSet = new Set();
+  checkInsSnap.forEach(doc => {
+  const data = doc.data();
+  const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
+  datesSet.add(createdAt.toDateString());
+  });
+
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 30; i++) {
+  const date = new Date(today);
+  date.setDate(today.getDate() - i);
+  if (datesSet.has(date.toDateString())) {
+  streak++;
+  } else {
+  break;
+  }
+ }
+  setStreakCount(streak);
+
+{/*getting moods overview from firebase */}
+
+const moodRef = collection(db, 'users', user.uid, 'moodCheckins');
+const q = query(moodRef, orderBy('createdAt'));
+const snapshot = await getDocs(q);
+
+const moodCounts = {};
+snapshot.forEach(doc => {
+  const data = doc.data();
+  const mood = data.mood;
+  if (mood) {
+    moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+  }
+});
+
+const total = Object.values(moodCounts).reduce((a, b) => a + b, 0);
+const avg = total / Object.keys(moodCounts).length || 0;
+
+let variation = 0;
+Object.values(moodCounts).forEach(count => {
+  variation += Math.abs(count - avg);
+});
+
+const consistency = total ? Math.max(0, 100 - Math.floor((variation / total) * 100)) : 0;
+setMoodConsistency(consistency);
+
+const top = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+setTopMood(top);
+} catch (err) {
+  console.error('Error fetching profile data:', err);
+  }
+};
+ useEffect(() => {
+  fetchProfileData();
+}, []);
+
 
 return (
 <View style={styles.container}>
 
 {/* Header */}
 <View style={styles.topRow}>
-  <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', { screen: 'HomeScreen' })}>
-  <Ionicons name="close" size={22} color="black" />
-  </TouchableOpacity>
+<TouchableOpacity  style={styles.closeCircle} onPress={() => navigation.navigate('SettingScreen')}>
+  <Ionicons name="settings-outline" size={22} color="#50483D" />
+</TouchableOpacity>
+
+<TouchableOpacity onPress={() => navigation.navigate('BottomNavTab', { screen: 'HomeScreen' })}>
+  <Ionicons name="chevron-back-outline" size={24} color="black" />
+</TouchableOpacity>
 </View>
 
 <ScrollView showsVerticalScrollIndicator = {false}>
@@ -157,99 +124,94 @@ return (
 {/*Profile pic and information */}
 {userData && (
 <>
-<View style={styles.profileSection}>
-<View style={styles.profileImageWrapper}>
-<Image source={userData.profileImage ? { uri: userData.profileImage } : require('../assets/profilepic.png')} style={styles.profileImage}/>
-</View>
+<View style={styles.profileRow}>
+<Image
+  source={userData.profileImage ? { uri: userData.profileImage } : require('../assets/profilepic.png')}
+  style={styles.profileImage}
+/>
+<TouchableOpacity style={styles.editIconWrapper} onPress={() => setEditProfileModalVisible(true)}>
+    <Ionicons name="pencil" size={16} color="#000"/>
+</TouchableOpacity>
+
+<View style={styles.profileInfo}>
 <Text style={styles.name}>{userData.name}</Text>
 <Text style={styles.username}>@{userData.username}</Text>
 </View>
+</View>
+
 
 {/* Status Overview */}
 <View style={styles.gridRow}>
+
+{/* Check-ins */}
 <View style={styles.statCard}>
 <Ionicons name="checkbox-outline" size={22} color="#50483D" />
 <Text style={styles.statLabel}>Check-ins</Text>
 <Text style={styles.statNumber}>{checkInCount}</Text>
 </View>
 
+{/* Journal */}
 <View style={styles.statCard}>
 <Ionicons name="book-outline" size={22} color="#50483D" />
 <Text style={styles.statLabel}>Journal</Text>
 <Text style={styles.statNumber}>{journalCount}</Text>
 </View>
 
+{/* Streaks */}
 <View style={styles.statCard}>
 <Ionicons name="ribbon-outline" size={22} color="#50483D" />
 <Text style={styles.statLabel}>Streaks</Text>
 <Text style={styles.statNumber}>{streakCount}</Text>
 </View>
 </View>
+
+<View style={styles.gridRow}>
+{/* Top Mood */}
+<View style={styles.statCard}>
+<Ionicons name="happy-outline" size={22} color="#50483D" />
+<Text style={styles.statLabel}>Top Mood</Text>
+<Text style={styles.statNumber}>{topMood}</Text>
+</View>
+
+{/* Streaks */}
+<View style={styles.statCard}>
+<Ionicons name="analytics-outline" size={22} color="#50483D" />
+<Text style={styles.statLabel}>Consistency</Text>
+<Text style={styles.statNumber}>{consistency}%</Text>
+</View>
+</View>
+
 </>
 )}
 
-{/* Settings Button */}
-<TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('SettingsScreen')}>
-<Ionicons name="settings-outline" size={18} color="#50483D" />
-<Text style={styles.settingsText}>Settings</Text>
-</TouchableOpacity>
+{/* Achievements Section*/}
+<Text style={styles.sectionTitle}>Achievements</Text>
+<View style={styles.achievementContainer}>
+{achievements.map((item, index) => (
+<AchievementItem key={index} icon={item.icon} text={item.text} />
+))}
+<Text style={styles.unachievedItem}>💡 Started your first self-care habit</Text>
+<Text style={styles.unachievedItem}>⏰ You didn't miss a reminder this week!</Text>
+<Text style={styles.unachievedItem}>💯 Maintained full consistency for 1 week!</Text>
+</View>
 
-{/* Profile Edit Button */}
-<TouchableOpacity style={styles.settingsButton} onPress={() => {
-setIsEditing(true);
-setNewUsername(userData.username || '');
-}}>
-<Text style={styles.settingsText}>Edit Profile</Text>
-</TouchableOpacity>
-
-{/* Logout */}
-<TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-<Ionicons name="log-out-outline" size={20} color="#fff" />
-<Text style={styles.logoutText}>Logout</Text>
-</TouchableOpacity>
-</ScrollView>
-
-{isEditing && (
-<View style={styles.modalOverlay}>
+{/* Modal for editing profile*/}
+<Modal visible={editProfileModalVisible} animationType="fade" transparent>
+<View style={styles.modalBackground}>
 <View style={styles.modalContainer}>
-<Text style={styles.modalTitle}>Edit Profile</Text>
-
-<TouchableOpacity onPress={pickImage}>
-<Image source={ image ? { uri: image } : userData?.profileImage ? { uri: userData.profileImage } : require('../assets/profilepic.png')}
-style={styles.modalProfileImage} />
-
-<Text style={styles.changePicText}>Change Profile Picture</Text>
-</TouchableOpacity>
-
-<TextInput
-value={newUsername}
-onChangeText={setNewUsername}
-placeholder="Username"
-style={styles.input}
+<EditProfileScreen
+  userData={userData}
+  setUserData={setUserData}
+  closeModal={() => setEditProfileModalVisible(false)}
 />
-
-<View style={styles.modalButtonRow}>
-<TouchableOpacity onPress={() => setIsEditing(false)} style={styles.cancelButton}>
-<Text style={styles.cancelText}>Cancel</Text>
-</TouchableOpacity>
-
-<TouchableOpacity
-onPress={handleSubmit}
-style={styles.saveButton}
-disabled={uploading}
->
-<Text style={styles.saveText}>{uploading ? 'Saving...' : 'Save'}</Text>
-</TouchableOpacity>
 </View>
 </View>
-</View>
-)}
+</Modal>
 
+</ScrollView>
 </View>
-
 );
 };
-
 
 export default ProfileScreen;
 
@@ -267,7 +229,7 @@ topRow: {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 12,
-  marginBottom: 20,
+  marginBottom: 10,
 },
 
 headerTextInput: {
@@ -278,8 +240,8 @@ headerTextInput: {
 },
   
 closeCircle: {
-  width: 38,
-  height: 38,
+  width: 34,
+  height: 34,
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
@@ -287,19 +249,21 @@ closeCircle: {
   opacity: 0.8,
 },
 
-profileSection: {
-  alignItems: 'center',
-  marginBottom: 30,
-},
-
-profileImageWrapper: {
-  position: 'relative',
-},
-
 profileImage: {
-  width: 100,
-  height: 100,
+  width: 80,
+  height: 80,
   borderRadius: 50,
+  borderWidth: 0.5,
+},
+
+profileRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 20,
+},
+
+profileInfo: {
+  marginLeft: 18,
 },
 
 name: {
@@ -313,6 +277,16 @@ username: {
   fontSize: 14,
   color: '#7F7B73',
 },
+
+editIconWrapper: {
+  position: 'absolute',
+  right: 260, 
+  bottom: 5,
+  backgroundColor: '#D8CAB8',
+  borderRadius: 20,
+  padding: 6,
+},
+
 
 statsBox: {
   backgroundColor: '#F1E7D7',
@@ -339,8 +313,10 @@ statsValue: {
 
 gridRow: {
   flexDirection: 'row',
-  justifyContent: 'space-between',
-  marginBottom: 30,
+  justifyContent: 'space-evenly',
+  marginBottom: 15,
+  marginTop: 15,
+  alignItems: 'center'
 },
 
 statCard: {
@@ -364,110 +340,60 @@ statNumber: {
   marginTop: 4,
 },
 
-settingsButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderColor: '#50483D',
-  borderWidth: 1,
-  borderRadius: 10,
-  padding: 12,
-  marginBottom: 20,
-},
-
-settingsText: {
-  color: '#50483D',
-  marginLeft: 8,
-  fontSize: 16,
-},
-
-logoutBtn: {
-  backgroundColor: '#D9534F',
-  padding: 12,
-  borderRadius: 10,
-  flexDirection: 'row',
+modalBackground: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
   justifyContent: 'center',
   alignItems: 'center',
-},
-
-logoutText: {
-  color: '#fff',
-  fontSize: 16,
-  marginLeft: 6,
-},
-
-modalOverlay: {
-  position: 'absolute',
-  top: 0,
-  bottom: 0,
-  left: 0,
-  right: 0,
-  backgroundColor: 'rgba(0,0,0,0.5)',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: 20,
-  zIndex: 10,
 },
 
 modalContainer: {
+  width: '90%',
   backgroundColor: '#fff',
+  borderRadius: 12,
   padding: 20,
-  borderRadius: 10,
-  width: '100%',
 },
 
-modalTitle: {
+sectionTitle: {
   fontSize: 18,
   fontWeight: 'bold',
-  marginBottom: 10,
-  textAlign: 'center',
-  color: '#50483D',
-},
-
-modalProfileImage: {
-  width: 80,
-  height: 80,
-  borderRadius: 40,
-  alignSelf: 'center',
-  marginBottom: 10,
-},
-
-changePicText: {
-  textAlign: 'center',
   color: '#50483D',
   marginBottom: 10,
+  marginTop: 20
 },
 
-input: {
-  borderBottomWidth: 1,
-  borderColor: '#ccc',
-  marginTop: 20,
-  fontSize: 16,
-  padding: 8,
+achievementContainer: {
+  marginTop: 16,
+  alignContent: 'space-evenly',
 },
 
-modalButtonRow: {
+achievementItem: {
+  backgroundColor: '#F1E7D7',
   flexDirection: 'row',
-  justifyContent: 'space-between',
-  marginTop: 20,
+  alignItems: 'center',
+  marginVertical: 5,
+  borderRadius: 30,
+  padding: 14
 },
 
-cancelButton: {
-  padding: 10,
+unachievedItem:{
+  backgroundColor: '#D9D9D9',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginVertical: 5,
+  borderRadius: 30,
+  padding: 14, 
+  opacity: 0.4
 },
 
-cancelText: {
-  color: 'red',
+icon: {
+  fontSize: 16,
+  marginRight: 10,
 },
 
-saveButton: {
-  padding: 10,
-  backgroundColor: '#A8D5BA',
-  borderRadius: 5,
-},
-
-saveText: {
-  color: '#fff',
+achievementLabel: {
+  fontSize: 14,
+  color: '#333',
 },
 
 });
