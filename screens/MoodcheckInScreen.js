@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Alert, Platform } from 'react-native';
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';  
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';  
 import app from '../firebase'
 import { getAuth } from 'firebase/auth';
 
@@ -52,7 +52,6 @@ const handleTagPress = (tag) => {
   }
 };
 
-
 {/*save btn fxn */}
 const handleSave = async() => {
   const auth = getAuth();
@@ -72,7 +71,25 @@ const handleSave = async() => {
 
  // mood check-in saved on firebase
   try {
-  await addDoc(collection(db,'users', user.uid, 'moodCheckins'), {
+
+  // limiting mood check-in to one
+  const todayDate = new Date();
+  todayDate.setHours(0,0,0,0); 
+
+  const checkinRef = collection(db, 'users', user.uid, 'moodCheckins');
+  const snapshot = await getDocs(checkinRef);
+
+  const alreadyLoggedToday = snapshot.docs.some(doc => {
+    const checkinDate = doc.data().createdAt?.toDate();
+    return checkinDate && checkinDate.setHours(0,0,0,0) === todayDate.getTime();
+  });
+
+  if(alreadyLoggedToday){
+    Alert.alert('Mood Already Logged', "You've already logged your mood for today.");
+    return;
+  }
+
+  await addDoc(checkinRef, {
     mood: selectedMood.label,
     moodColor: selectedMood.color,
     tags: selectedTags,
@@ -93,8 +110,9 @@ const handleSave = async() => {
 };
 
 return (
- <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
-  <ScrollView contentContainerStyle={styles.container}>
+ <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  keyboardVerticalOffset={100}>
+  <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       
   {/* Header */}
   <View style={styles.topRow}>
