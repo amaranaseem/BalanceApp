@@ -46,7 +46,7 @@ Week 7: Gamification, Meditation & Data Visualization  (8th July- 16th July) **(
 ✅Add profile page
 
 Week 8: Testing, Polish & Evaluation (17th July- 25th July) **(In Progress)**
-Testing all features
+✅Testing all features
 Testing on different screen sizes
 Fix usability issues and ensure accessibility(readability)
 Polish UI
