@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Alert, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Alert, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -19,7 +19,7 @@ const moods = [
 ];
 
 const defaultTags = [
-  'work', 'family', 'health', 'no sleep', 'social media', 'friends', 'relaxed', 'love', 'tired', 'fear','bored'
+  'work', 'family', 'health', 'sleepy', 'friends', 'relaxed', 'love', 'school', 'tired','bored', 'stress', 'media'
 ];
 
 {/*Mood checkin */}
@@ -110,18 +110,22 @@ const handleSave = async() => {
 };
 
 return (
- <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-  keyboardVerticalOffset={100}>
-  <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+ <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={20}>
+
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+  <View style={styles.container}>
+
+  {/* Fixed Header and Mood selection */}
+  <View style={{ paddingHorizontal: 20, paddingTop: 60 }}>
       
   {/* Header */}
   <View style={styles.topRow}>
-    <Text style={styles.headerText}>Mood Check-In</Text>
-      <View style={styles.closeCircle}>
-        <TouchableOpacity onPress={()=> navigation.navigate('HomeTabs')}>
-          <Ionicons name="close" size={22} color="black" />
-        </TouchableOpacity>
-    </View>
+  <Text style={styles.headerText}>Mood Check-In</Text>
+  <View style={styles.closeCircle}>
+    <TouchableOpacity onPress={()=> navigation.navigate('HomeTabs')}>
+    <Ionicons name="close" size={22} color="black" />
+    </TouchableOpacity>
+  </View>
   </View>
 
   {/* Date */}
@@ -129,6 +133,7 @@ return (
   <Ionicons name="calendar-outline" size={20} color="#A58E74" />
   <Text style={styles.dateText}>{today}</Text>
   </View>
+
 
   {/* Mood Selection */}
   <Text style={styles.heading}>How are you feeling?</Text>
@@ -142,13 +147,18 @@ return (
   <Text style={styles.moodLabel}>{mood.label}</Text>
   </TouchableOpacity>
   ))}
+
   </ScrollView>
 
   {/* Error on save */}
   {saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
+  
+  </View>
+
+  <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}  keyboardShouldPersistTaps="handled" >
 
   {/* Tags */}
-  <Text style={styles.heading}>What makes you feel this way?</Text>
+  <Text style={styles.heading}>What made you feel this way?</Text>
   <View style={styles.tagcontainer}>
   
   {defaultTags.map((tag, i) => (
@@ -183,6 +193,8 @@ return (
   </TouchableOpacity>
 
   </ScrollView>
+  </View>
+  </TouchableWithoutFeedback>
   </KeyboardAvoidingView>
   );
 };
@@ -192,9 +204,6 @@ export default MoodCheckInScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
     backgroundColor: '#FAF9F6', 
   },
 
