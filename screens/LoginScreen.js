@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image, ScrollView, Platform} from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image, ScrollView, Platform, TouchableWithoutFeedback, Keyboard} from 'react-native'
 import { auth, db} from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -10,6 +10,7 @@ import { doc, getDoc } from 'firebase/firestore';
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword,setShowPassword ]= useState(false);
 
 
 {/*User Authentication with error handling*/}
@@ -94,6 +95,7 @@ const handlePasswordReset = async () => {
 
 return (
   <KeyboardAvoidingView style={styles.container}  behavior={Platform.OS === 'android' ? 'padding' : 'height'}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
   <ScrollView contentContainerStyle={styles.scrollcontainer} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator= {false}>
   
   {/* Logo  */}
@@ -131,8 +133,11 @@ return (
     placeholder="*******"
     value={password}
     onChangeText={setPassword}
-    secureTextEntry
+    secureTextEntry={!setShowPassword}
   />
+  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+      <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />
+  </TouchableOpacity>
 
   {/* Forgot Password Link */}
   </View>
@@ -155,6 +160,7 @@ return (
   </TouchableOpacity>
   </View>
   </ScrollView>
+  </TouchableWithoutFeedback>
   </KeyboardAvoidingView>
   );
 };
@@ -232,6 +238,7 @@ inputContainer: {
   borderRadius: 20,
   paddingHorizontal: 15,
   marginBottom: 10,
+  justifyContent: 'space-between'
 },
 
 icon: {
@@ -241,6 +248,7 @@ icon: {
 inputText: {
   fontSize: 14,
   color: 'black',
+  flex: 1
 },
 
 forgotTextContainer: {

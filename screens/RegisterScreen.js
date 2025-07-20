@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image, ScrollView, Platform} from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image, ScrollView, Platform, TouchableWithoutFeedback, Keyboard} from 'react-native'
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,16 +10,17 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
 
-{/*User Authentication with error handling*/}
-const handleRegister = async () => {
+ {/*User Authentication with error handling*/}
+ const handleRegister = async () => {
   if (!email || !password || !confirmPassword) {
     alert('All fields are required');
     return;
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     alert('Please enter a valid email');
     return;
@@ -54,6 +55,7 @@ const handleRegister = async () => {
 
 return (
   <KeyboardAvoidingView style={styles.container}  behavior={Platform.OS === 'android' ? 'padding' : 'height'}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
   <ScrollView contentContainerStyle={styles.scrollcontainer} keyboardShouldPersistTaps="handled"showsVerticalScrollIndicator= {false}>
   {/* Logo */}
   <View style={styles.logoContainer}>
@@ -68,7 +70,7 @@ return (
   <View style={styles.inputWrapper}>
   <Text style={styles.inputLabel}>Email</Text>
   <View style={styles.inputContainer}>
-     <Ionicons name="mail-outline" size={20} color="#6E665B" style={styles.icon} />
+    <Ionicons name="mail-outline" size={20} color="#6E665B" style={styles.icon} />
   <TextInput
   style={styles.inputText}
   placeholder="abc@gmail.com"
@@ -84,14 +86,17 @@ return (
   <View style={styles.inputWrapper}>
   <Text style={styles.inputLabel}>Password</Text>
   <View style={styles.inputContainer}>
-     <Ionicons name="lock-closed-outline" size={20} color="#6E665B" style={styles.icon} />
+    <Ionicons name="lock-closed-outline" size={20} color="#6E665B" style={styles.icon} />
   <TextInput
   style={styles.inputText}
   placeholder="******"
   value={password}
   onChangeText={setPassword}
-  secureTextEntry       
+  secureTextEntry= {!setShowPassword}        
   />
+  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+    <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />
+  </TouchableOpacity>
   </View>
   </View>
 
@@ -105,8 +110,11 @@ return (
   placeholder="******"
   value={confirmPassword}
   onChangeText={setConfirmPassword}
-  secureTextEntry       
+  secureTextEntry= {!setShowConfirmPassword}     
   />
+  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+    <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />
+  </TouchableOpacity>
   </View>
   </View>
 
@@ -124,6 +132,7 @@ return (
   </TouchableOpacity>
   </View>
   </ScrollView>
+  </TouchableWithoutFeedback>
   </KeyboardAvoidingView>
  );
 };
@@ -195,11 +204,13 @@ inputContainer: {
   borderRadius: 20,
   paddingHorizontal: 15,
   marginBottom: 10,
+  justifyContent: 'space-between'
 },
 
 inputText: {
   fontSize: 14,
   color: 'black',
+  flex: 1
 },
 
 buttonText: {
