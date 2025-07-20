@@ -18,230 +18,229 @@ const JournalScreen = () => {
   const [entries, setEntries] = useState([]); 
   const [loading, setLoading] = useState(true);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchEntries = async () => {
-        try {
-          const user = getAuth().currentUser;
-          if (!user) return;
+ useFocusEffect(
+  useCallback(() => {
+   const fetchEntries = async () => {
+    try {
+     const user = getAuth().currentUser;
+     if (!user) return;
 
-          const entriesRef = collection(db, 'users', user.uid, 'entries');
-          const q = query(entriesRef, orderBy('createdAt', 'desc'));
-          const snapshot = await getDocs(q);
+     const entriesRef = collection(db, 'users', user.uid, 'entries');
+     const q = query(entriesRef, orderBy('createdAt', 'desc'));
+     const snapshot = await getDocs(q);
 
-          const firebaseEntries = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              title: data.title || 'Untitled',
-              mood: data.mood || 'Neutral',
-              moodColor: data.moodColor || '#D8CAB8',
-              date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
-              description: data.note || '',
-              hasAudio: !!data.audioURL,   // audio link
-              duration: data.duration || '', 
-              audioURL: data.audioURL || null,
-            };
-          });
-
-          setEntries(firebaseEntries);
-        } catch (error) {
-          console.error('Error fetching journal entries:', error);
-        } finally {
-          setLoading(false);
-        } 
+     const firebaseEntries = snapshot.docs.map((doc) => {
+     const data = doc.data();
+     return {
+      id: doc.id,
+      title: data.title || 'Untitled',
+      mood: data.mood || 'Neutral',
+      moodColor: data.moodColor || '#D8CAB8',
+      date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
+      description: data.note || '',
+      hasAudio: !!data.audioURL,   // audio link
+      duration: data.duration || '', 
+      audioURL: data.audioURL || null,
       };
+     });
 
-      fetchEntries();
-    }, [])
+     setEntries(firebaseEntries);
+     } catch (error) {
+      console.error('Error fetching journal entries:', error);
+     } finally {
+       setLoading(false);
+     } 
+    };
+
+     fetchEntries();
+   }, [])
   );
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style= {styles.card} onPress={() => navigation.navigate('EntryPreview', { entry: 
-      {
-        title: item.title, 
-        date: item.date, 
-        mood: item.mood,
-        moodColor: item.moodColor, 
-        description: item.description, 
-        audioURL: item.audioURL, 
-        duration: item.duration
+   <TouchableOpacity style= {styles.card} onPress={() => navigation.navigate('EntryPreview', { entry: 
+    {
+      title: item.title, 
+      date: item.date, 
+      mood: item.mood,
+      moodColor: item.moodColor, 
+      description: item.description, 
+      audioURL: item.audioURL, 
+      duration: item.duration
+    }
+   })}>
 
-      }
-     })}>
+  {/* Title and Date*/}
+  <View style={styles.cardHeader}>
+  <Text style={styles.cardTitle}>{item.title}</Text>
+  <Text style={styles.cardDate}>{item.date}</Text>
+  </View>
 
-      {/* Title and Date*/}
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardDate}>{item.date}</Text>
-      </View>
+  {/* Mood Tag */}
+  <View style={[styles.moodTag, { backgroundColor: item.moodColor }]}>
+  <Text style={[styles.moodText, { color: '#000' }]}>
+  {item.mood}
+  </Text>
+  </View>
 
-      {/* Mood Tag */}
-      <View style={[styles.moodTag, { backgroundColor: item.moodColor }]}>
-        <Text style={[styles.moodText, { color: '#000' }]}>
-        {item.mood}
-        </Text>
-      </View>
+  {/* Description */}
+  {item.description && (
+  <Text style={styles.cardText} numberOfLines={5}>
+    {item.description}
+  </Text>
+  )}
 
-      {/* Description */}
-      {item.description && (
-        <Text style={styles.cardText} numberOfLines={5}>
-          {item.description}
-        </Text>
-      )}
+ {/* Audio */}
+ {item.hasAudio && (
+ <View style={styles.audio}>
+ <Ionicons name="play" size={20} color="black" />
+ <Text style={styles.audioText}>{item.duration < 60 
+  ? `${item.duration.toFixed(1)}s` 
+  : `${(item.duration / 60).toFixed(1)}m`}
+ </Text>
+  </View>
+  )}
+  </TouchableOpacity>
+ );
 
-      {/* Audio */}
-      {item.hasAudio && (
-        <View style={styles.audio}>
-          <Ionicons name="play" size={20} color="black" />
-          <Text style={styles.audioText}>{item.duration < 60 
-          ? `${item.duration.toFixed(1)}s` 
-          : `${(item.duration / 60).toFixed(1)}m`}
-    </Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+return (
+  <View style={styles.container}>
 
-  return (
-    <View style={styles.container}>
+  {/* Header */}
+ <View style={styles.topRow}>
+ <Text style={styles.headerText}>My Journal</Text>
+ </View>
 
-      {/* Header */}
-      <View style={styles.topRow}>
-        <Text style={styles.headerText}>My Journal</Text>
-      </View>
-
-      {/* Entries */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#000" style={{ marginTop: 50 }} />
-      ) : (
-      <FlatList
-        data={entries}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        ListEmptyComponent={<Text style={styles.placeholder}>No journal entries yet. Start writing!</Text>}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      />
-      )}
+ {/* Entries */}
+ {loading ? (
+ <ActivityIndicator size="large" color="#000" style={{ marginTop: 50 }} />
+  ) : (
+ <FlatList
+  data={entries}
+  keyExtractor={(item) => item.id}
+  renderItem={renderItem}
+  ListEmptyComponent={<Text style={styles.placeholder}>No journal entries yet. Start writing!</Text>}
+  contentContainerStyle={{ paddingBottom: 100 }}
+ />
+  )}
       
-      {/* Floating Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate('Notepad')}
-      >
-        <Ionicons name="add" size={28} color="white" />
-      </TouchableOpacity>
-    </View>
+  {/* Floating Button */}
+  <TouchableOpacity
+  style={styles.fab}
+  onPress={() => navigation.navigate('Notepad')}
+  >
+   <Ionicons name="add" size={28} color="white" />
+  </TouchableOpacity>
+   </View>
   );
 };
 
 export default JournalScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: '#FAF9F6',
-  },
+container: {
+  flex: 1,
+  paddingTop: 60,
+  paddingHorizontal: 20,
+  paddingVertical: 20,
+  backgroundColor: '#FAF9F6',
+},
 
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 20,
-  },
+topRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 20,
+},
 
-  headerText: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#50483D',
-    marginBottom: 20,
-  },
+headerText: {
+  fontSize: 26,
+  fontWeight: 'bold',
+  color: '#50483D',
+  marginBottom: 20,
+},
 
-  closeCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#D8CAB8',
-    opacity: 0.8,
-  },
+closeCircle: {
+  width: 38,
+  height: 38,
+  borderRadius: 19,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#D8CAB8',
+  opacity: 0.8,
+},
 
-  card: {
-    backgroundColor: '#F6EFE6',
-    borderColor: '#D8CAB8',
-    borderWidth: 1,
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 16,
-  },
+card: {
+  backgroundColor: '#F6EFE6',
+  borderColor: '#D8CAB8',
+  borderWidth: 1,
+  borderRadius: 20,
+  padding: 16,
+  marginBottom: 16,
+},
 
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
+cardHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: 6,
+},
 
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#50483D',
-  },
+cardTitle: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#50483D',
+},
 
-  cardDate: {
-    fontSize: 13,
-    color: '#7A6F5F',
-  },
+cardDate: {
+  fontSize: 13,
+  color: '#7A6F5F',
+},
 
-  moodTag: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    marginVertical: 6,
-  },
+moodTag: {
+  alignSelf: 'flex-start',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 20,
+  marginVertical: 6,
+},
 
-  moodText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: 'black',
-    textTransform: 'capitalize',
-  },
+moodText: {
+  fontSize: 12,
+  fontWeight: 'bold',
+  color: 'black',
+  textTransform: 'capitalize',
+},
 
-  cardText: {
-    fontSize: 13,
-    color: '#50483D',
-    marginBottom: 8,
-  },
+cardText: {
+  fontSize: 13,
+  color: '#50483D',
+  marginBottom: 8,
+},
 
-  audio: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginTop: 4,
-    gap: 6,
-  },
+audio: {
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  marginTop: 4,
+  gap: 6,
+},
 
-  audioText: {
-    fontSize: 12,
-    color: '#50483D',
-  },
+audioText: {
+  fontSize: 12,
+  color: '#50483D',
+},
 
-  fab: {
-    position: 'absolute',
-    right: 30,
-    bottom: 30,
-    backgroundColor: '#A58E74',
-    borderRadius: 40,
-    padding: 18,
-    elevation: 5,
-  },
+fab: {
+  position: 'absolute',
+  right: 30,
+  bottom: 30,
+  backgroundColor: '#A58E74',
+  borderRadius: 40,
+  padding: 18,
+  elevation: 5,
+},
 
-  placeholder: {
+placeholder: {
   justifyContent: 'center', 
   textAlign: 'center', 
   marginTop: 200, 
