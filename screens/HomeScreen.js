@@ -214,7 +214,13 @@ const toggleTask = async (id) => {
 };
 
 {/* prgoress bar for tasks */}
-const progress = tasks.length === 0 ? 0 : checkedTasks.length / tasks.length;
+// Keep only checked task IDs that still exist in the current task list
+const validCheckedTasks = checkedTasks.filter((id) =>
+  tasks.find((task) => task.id === id)
+);
+
+// Calculate progress based on valid tasks only
+const progress = tasks.length === 0 ? 0 : validCheckedTasks.length / tasks.length;
 
 
 return (
