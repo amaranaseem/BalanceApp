@@ -30,7 +30,7 @@ const deleteTask = async (id) => {
 // confirm delete task
 const confirmDelete = (id) => {
   Alert.alert(
-    'Delete Task',
+    '❌ Delete Task',
     'Are you sure you want to delete this task?',
   [
     { text: 'Cancel', style: 'cancel' },
@@ -45,6 +45,9 @@ const HabitandGoalScreen = () => {
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [tasks, setTasks] = useState([]);
   const user = getAuth().currentUser;
+
+  const [shownGoalAlerts, setShownGoalAlerts] = useState([]);
+
 
 // get tasks from Firebase
 useEffect(() => {
@@ -66,12 +69,6 @@ useEffect(() => {
     return () => unsubscribe();
   }, []);
 
-// checking the tasks
-const toggleTask = (id) => {
-  setCheckedTasks((prev) =>
-    prev.includes(id) ? prev.filter((taskId) => taskId !== id) : [...prev, id]
-  );
-};
 
 return (
   <View style={styles.container}>
@@ -92,12 +89,10 @@ return (
     tasks
     .filter(task => task.category === 'habit' || task.category === 'self-care')
     .map((task) => {
-    const isChecked = checkedTasks.includes(task.id);
     const borderColor = categoryColors[task.category];
           
 return (
-  <TouchableOpacity key={task.id} style={[styles.taskItem, { borderColor }]} onPress={() => toggleTask(task.id)} >
-  <Checkbox status={isChecked ? 'checked' : 'unchecked'} onPress={() => toggleTask(task.id)} color={borderColor}/>
+  <TouchableOpacity key={task.id} style={[styles.taskItem, { borderColor }]}>
   <View style={styles.taskTextContainer}>
   <Text style={styles.taskTitle}>{task.title}</Text>
   </View>
@@ -123,6 +118,10 @@ return (
   const progress = task.progress || 0;
   const target = task.target || 30;
   const progressPercent = Math.min(progress / target, 1);
+  if (progress >= target && !shownGoalAlerts.includes(task.id)) {
+  Alert.alert('🎉 Goal Complete', `You completed: ${task.title}`);
+  setShownGoalAlerts(prev => [...prev, task.id]);
+}
 
 return (
   <View key={task.id} style={[styles.goalCard, { borderColor: categoryColors.goal }]}>
