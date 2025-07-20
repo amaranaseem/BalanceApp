@@ -92,7 +92,7 @@ return (
   placeholder="******"
   value={password}
   onChangeText={setPassword}
-  secureTextEntry= {!setShowPassword}        
+  secureTextEntry= {!showPassword}        
   />
   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
     <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />
@@ -110,7 +110,7 @@ return (
   placeholder="******"
   value={confirmPassword}
   onChangeText={setConfirmPassword}
-  secureTextEntry= {!setShowConfirmPassword}     
+  secureTextEntry= {!showConfirmPassword}     
   />
   <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
     <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />

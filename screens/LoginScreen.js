@@ -133,10 +133,10 @@ return (
     placeholder="*******"
     value={password}
     onChangeText={setPassword}
-    secureTextEntry={!setShowPassword}
+    secureTextEntry={!showPassword}
   />
   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-      <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />
+      <Ionicons name={!showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />
   </TouchableOpacity>
 
   {/* Forgot Password Link */}
