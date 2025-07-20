@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, snapshot } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Checkbox } from 'react-native-paper';
 import * as Progress from 'react-native-progress';
@@ -7,7 +7,7 @@ import { collection, onSnapshot, updateDoc, doc, getDoc} from 'firebase/firestor
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
 import { startOfWeek, endOfWeek, isSameDay } from 'date-fns';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const categoryColors = {
   'self-care': '#20C997',
@@ -33,28 +33,27 @@ const HomeScreen = ({ navigation }) => {
 
   const [userProfile, setUserProfile] = useState(null);
 
-
 {/*Fetch user profile*/}
 useEffect(() => {
   const fetchUserProfile = async () => {
-    if (!user) return;
+  if (!user) return;
     try {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
+     const userRef = doc(db, 'users', user.uid);
+     const userSnap = await getDoc(userRef);
 
-      if (userSnap.exists()) {
-        setUserProfile(userSnap.data());
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
+    if (userSnap.exists()) {
+      setUserProfile(userSnap.data());
     }
-  };
+   } catch (error) {
+      console.error('Error fetching user profile:', error);
+   }
+};
 
-  fetchUserProfile();
+ fetchUserProfile();
 }, []);
 
- {/*Fetch mood streak*/}
-  useEffect(() => {
+{/*Fetch mood streak*/}
+useEffect(() => {
   if (!user) return;
   const unsubscribe = onSnapshot(
     collection(db, 'users', user.uid, 'moodCheckins'),
@@ -62,24 +61,28 @@ useEffect(() => {
       const today = new Date();
       const datesSet = new Set();
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
-        const dateStr = createdAt.toDateString(); 
-        datesSet.add(dateStr);
-      });
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
+      const dateStr = createdAt.toDateString(); 
+      datesSet.add(dateStr);
+    });
 
-      let streak = 0;
-      for (let i = 0; i < 30; i++) {
-        const day = new Date(today);
-        day.setDate(today.getDate() - i);
-        const key = day.toDateString();
-        if (datesSet.has(key)) {
-          streak++;
-        } else {
-          break;
-        }
+    let streak = 0;
+    let includeToday = datesSet.has(today.toDateString());
+    
+    // check streak from yesterday
+    for (let i = 1; i < 30; i++) {
+      const day = new Date();
+      day.setDate(today.getDate() - i);
+      const key = day.toDateString();
+      if (datesSet.has(key)) {
+      streak++;
+    } else {
+        break;
       }
+     }
+     if (includeToday) streak += 1; //Add streaks only if today is marked
       setMoodStreak(streak);
     }
   );
@@ -156,33 +159,60 @@ useEffect(() => {
   return unsubscribe; 
 }, []);
 
-  const toggleTask = async (id) => {
-    const task= tasks.find((t) => t.id === id);
-    const isChecked = checkedTasks.includes(id);
+// load the tasks 
+useEffect(()=> {
+  const loadTasks =async () => {
     
-    if (!task) return;
+  const today = new Date().toDateString();
+  const saved = await AsyncStorage.getItem('checkedTasksDaily');
+  const parsed = saved ? JSON.parse(saved): null;
 
-      setCheckedTasks((prev) =>
-      prev.includes(id) ? prev.filter((taskId) => taskId !== id) : [...prev, id]
-    );
-  
+   if(parsed?.date === today) {
+     setCheckedTasks(parsed.tasks);
+  } else{
+    setCheckedTasks([]);
+    await AsyncStorage.setItem('checkedTasksDaily', JSON.stringify ({date: today, tasks: [] }));
+  }
+};
+  loadTasks();
+}, []);
+
+const updatedCheckedTasks = async (newTasks) => {
+  const today = new Date().toDateString();
+  setCheckedTasks(newTasks);
+  await AsyncStorage.setItem('checkedTasksDaily', JSON.stringify ({date: today, tasks: newTasks }));
+}
+
+{/*Toggle Task Function */}
+const toggleTask = async (id) => {
+  const task= tasks.find((t) => t.id === id);
+  const isChecked = checkedTasks.includes(id);
+    
+  if (!task) return;
+  const updatedChecked =  isChecked ? checkedTasks.filter((t) => t !== id) : [...checkedTasks, id];
+  await updatedCheckedTasks(updatedChecked);
+    
+  if(updatedChecked.length === tasks.length && tasks.length > 0 ){
+    Alert.alert ('Great Job!', 'All tasks completed for today.');
+  }
     
  //update goal progress
   if (task.category === 'goal') {
     const taskRef = doc(db, 'users', user.uid, 'tasks', id);
     const currentProgress = task.progress || 0;
 
-    try {
-      await updateDoc(taskRef, {
-        progress: isChecked
-          ? Math.max(currentProgress - 1, 0)
-          : currentProgress + 1,
-      });
-    } catch (err) {
-      console.error('Failed to update goal progress:', err);
-    }
+   try {
+    await updateDoc(taskRef, {
+      progress: isChecked
+      ? Math.max(currentProgress - 1, 0)
+      : currentProgress + 1,
+    });
+  } catch (err) {
+    console.error('Failed to update goal progress:', err);
   }
+ }
 };
+
 {/* prgoress bar for tasks */}
 const progress = tasks.length === 0 ? 0 : checkedTasks.length / tasks.length;
 
@@ -265,11 +295,13 @@ return (
   {/* Task Legend*/}
   <View style={styles.legendRow}>
     {Object.entries(categoryColors).map(([key, color]) => (
-  <View key={key} style={styles.legendItem}>
+    <View key={key} style={styles.legendItem}>
   <View style={[styles.legendDot, { backgroundColor: color }]} />
+  
   <Text style={styles.legendText}>
-  {key.charAt(0).toUpperCase() + key.slice(1)} 
+   {key.charAt(0).toUpperCase() + key.slice(1)} 
   </Text>
+  
   </View>
   ))}
   </View>
@@ -288,6 +320,7 @@ return (
   style={[styles.taskItem, { borderColor }]}
   onPress={() => toggleTask(task.id)}
   >
+
   <Checkbox
   status={isChecked ? 'checked' : 'unchecked'}
   onPress={() => toggleTask(task.id)}
@@ -298,10 +331,10 @@ return (
   </View>
   </TouchableOpacity>
   );
-  })}
-  <View style={{ height: 100 }} />
-  </View>
-  </ScrollView>
+   })}
+ <View style={{ height: 100 }} />
+</View>
+</ScrollView>
   );
 };
 
