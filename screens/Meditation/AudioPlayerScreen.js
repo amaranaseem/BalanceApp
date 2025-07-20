@@ -58,58 +58,58 @@ const AudioPlayerScreen = ({ route, navigation }) => {
   };
 
 return (
-    <View style={styles.container}>
-    <View style={styles.topRow}>
-      <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})} >
-        <Ionicons name="close" size={22} color="black" />
-      </TouchableOpacity>
-    </View>
-
-    {/* Artwork */}
-    {imgURL && (
-       <Image source={{ uri: imgURL }} style={styles.artwork} resizeMode="cover" />
-    )}
-
-    {/* Title */}
-    <Text style={styles.headerTextInput}>{title}</Text>
-
-    <View style= {styles.controlsSection}>
-    {/* Progress Bar */}
-    <Slider
-        style={styles.slider}
-        minimumValue={0}
-        maximumValue={durationMillis}
-        value={positionMillis}
-        minimumTrackTintColor="#3C4F46"
-        maximumTrackTintColor="#ccc"
-        thumbTintColor="#3C4F46"
-        disabled={true} 
-    />
-    <View style={styles.timeRow}>
-       <Text style={styles.timeText}>{millisToMinutes(positionMillis)}</Text>
-       <Text style={styles.timeText}>{millisToMinutes(durationMillis)}</Text>
-    </View>
-
-    {/* Controls */}
-    <View style={styles.controls}>
-     <TouchableOpacity>
-        <Ionicons name="play-back" size={30} color="#3C4F46" />
-     </TouchableOpacity>
-
-    <TouchableOpacity onPress={togglePlay}>
-      <Ionicons
-       name={isPlaying ? 'pause' : 'play'}
-       size={40}
-       color="#3C4F46"
-      />
+  <View style={styles.container}>
+  <View style={styles.topRow}>
+    <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})} >
+      <Ionicons name="close" size={22} color="black" />
     </TouchableOpacity>
+  </View>
 
-    <TouchableOpacity>
-    <Ionicons name="play-forward" size={30} color="#3C4F46" />
-    </TouchableOpacity>
-    </View>
-    </View>
-    </View>
+  {/* Artwork */}
+  {imgURL && (
+    <Image source={{ uri: imgURL }} style={styles.artwork} resizeMode="cover" />
+  )}
+
+  {/* Title */}
+  <Text style={styles.headerTextInput}>{title}</Text>
+
+  <View style= {styles.controlsSection}>
+  {/* Progress Bar */}
+  <Slider
+    style={styles.slider}
+    minimumValue={0}
+    maximumValue={durationMillis}
+    value={positionMillis}
+    minimumTrackTintColor="#3C4F46"
+    maximumTrackTintColor="#ccc"
+    thumbTintColor="#3C4F46"
+    disabled={true} 
+  />
+  <View style={styles.timeRow}>
+    <Text style={styles.timeText}>{millisToMinutes(positionMillis)}</Text>
+    <Text style={styles.timeText}>{millisToMinutes(durationMillis)}</Text>
+  </View>
+
+  {/* Controls */}
+  <View style={styles.controls}>
+   <TouchableOpacity>
+    <Ionicons name="play-back" size={30} color="#3C4F46" />
+   </TouchableOpacity>
+
+  <TouchableOpacity onPress={togglePlay}>
+    <Ionicons
+    name={isPlaying ? 'pause' : 'play'}
+    size={40}
+    color="#3C4F46"
+   />
+  </TouchableOpacity>
+
+  <TouchableOpacity>
+  <Ionicons name="play-forward" size={30} color="#3C4F46" />
+  </TouchableOpacity>
+  </View>
+  </View>
+  </View>
   );
 };
 

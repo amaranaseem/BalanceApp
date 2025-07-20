@@ -26,7 +26,7 @@ const ContactSupportScreen = ({navigation}) => {
     <Text style={styles.para}>9 AM – 6 PM, Mon - Sat</Text>
     </View>
 
-     <View style={styles.row}>
+    <View style={styles.row}>
     <Text style={styles.title}>Response Time: </Text>
     <Text style={styles.para}>Within 24 hours</Text>
     </View>

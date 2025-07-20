@@ -123,14 +123,14 @@ return (
 
 {/*Profile pic and information */}
 {userData && (
-<>
+ <>
 <View style={styles.profileRow}>
 <Image
   source={userData.profileImage ? { uri: userData.profileImage } : require('../assets/profilepic.png')}
   style={styles.profileImage}
 />
 <TouchableOpacity style={styles.editIconWrapper} onPress={() => setEditProfileModalVisible(true)}>
-    <Ionicons name="pencil" size={16} color="#000"/>
+   <Ionicons name="pencil" size={16} color="#000"/>
 </TouchableOpacity>
 
 <View style={styles.profileInfo}>
@@ -138,7 +138,6 @@ return (
 <Text style={styles.username}>@{userData.username}</Text>
 </View>
 </View>
-
 
 {/* Status Overview */}
 <View style={styles.gridRow}>

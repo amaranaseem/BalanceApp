@@ -23,7 +23,7 @@ const deleteTask = async (id) => {
     const taskRef = doc(db, 'users', user.uid, 'tasks', id)
     await deleteDoc(taskRef);
   } catch (error) {
-    console.error('Error deleting task:', error);
+  console.error('Error deleting task:', error);
   }
 };
 
@@ -32,11 +32,11 @@ const confirmDelete = (id) => {
   Alert.alert(
     'Delete Task',
     'Are you sure you want to delete this task?',
-    [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteTask(id) },
-    ]
-  );
+  [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Delete', style: 'destructive', onPress: () => deleteTask(id) },
+  ]
+ );
 };
 
 const HabitandGoalScreen = () => {
@@ -46,38 +46,39 @@ const HabitandGoalScreen = () => {
   const [tasks, setTasks] = useState([]);
   const user = getAuth().currentUser;
 
-  // get tasks from Firebase
-  useEffect(() => {
-    if (!user) return;
-    const taskRef = collection(db, 'users', user.uid, 'tasks');
+// get tasks from Firebase
+useEffect(() => {
+  if (!user) return;
+  const taskRef = collection(db, 'users', user.uid, 'tasks');
 
-    const unsubscribe = onSnapshot(taskRef, (snapshot) => {
-      const firebaseTasks = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        title: doc.data().title,
-        category: doc.data().category,
-        progress: doc.data().progress,
-        target: doc.data().target,
-      }));
+  const unsubscribe = onSnapshot(taskRef, (snapshot) => {
+  const firebaseTasks = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    title: doc.data().title,
+    category: doc.data().category,
+    progress: doc.data().progress,
+    target: doc.data().target,
+   }));
 
-      setTasks(firebaseTasks); 
-    });
+    setTasks(firebaseTasks); 
+  });
 
     return () => unsubscribe();
   }, []);
 
-  // checking the tasks
-  const toggleTask = (id) => {
-    setCheckedTasks((prev) =>
-      prev.includes(id) ? prev.filter((taskId) => taskId !== id) : [...prev, id]
-    );
-  };
+// checking the tasks
+const toggleTask = (id) => {
+  setCheckedTasks((prev) =>
+    prev.includes(id) ? prev.filter((taskId) => taskId !== id) : [...prev, id]
+  );
+};
 
 return (
   <View style={styles.container}>
-    {/* Header */}
-    <View style={styles.topRow}>
-      <Text style={styles.headerText}>My Tasks</Text>
+  
+  {/* Header */}
+  <View style={styles.topRow}>
+  <Text style={styles.headerText}>My Tasks</Text>
   </View>
 
   {/* Task List */}
@@ -86,15 +87,15 @@ return (
   {/* tasks & habits */}
   <Text style={styles.sectionHeader}>Habits & Self-care Tasks</Text>
   {tasks.filter(task => task.category === 'habit' || task.category === 'self-care'). length === 0 ? (
-    <Text style={styles.placeholder}> No tasks added yet.</Text>
+  <Text style={styles.placeholder}> No tasks added yet.</Text>
     ) : (
     tasks
-     .filter(task => task.category === 'habit' || task.category === 'self-care')
-     .map((task) => {
-      const isChecked = checkedTasks.includes(task.id);
-      const borderColor = categoryColors[task.category];
+    .filter(task => task.category === 'habit' || task.category === 'self-care')
+    .map((task) => {
+    const isChecked = checkedTasks.includes(task.id);
+    const borderColor = categoryColors[task.category];
           
-  return (
+return (
   <TouchableOpacity key={task.id} style={[styles.taskItem, { borderColor }]} onPress={() => toggleTask(task.id)} >
   <Checkbox status={isChecked ? 'checked' : 'unchecked'} onPress={() => toggleTask(task.id)} color={borderColor}/>
   <View style={styles.taskTextContainer}>
@@ -110,52 +111,50 @@ return (
   })
 )}
 
-  {/*goals */}     
-  <Text style={styles.sectionHeader}>Goals</Text>
-  {tasks.filter(task => task.category === 'goal'). length === 0 ? (
-    <Text style={styles.placeholder}> No goal added yet.</Text>
-    ) : (
-    tasks
-     .filter(task => task.category === 'goal')
-     .map((task) => {
-        
-        const progress = task.progress || 0;
-        const target = task.target || 30;
-        const progressPercent = Math.min(progress / target, 1);
+{/*goals */}     
+<Text style={styles.sectionHeader}>Goals</Text>
+{tasks.filter(task => task.category === 'goal'). length === 0 ? (
+<Text style={styles.placeholder}> No goal added yet.</Text>
+) : (
+  tasks
+  .filter(task => task.category === 'goal')
+  .map((task) => {
+       
+  const progress = task.progress || 0;
+  const target = task.target || 30;
+  const progressPercent = Math.min(progress / target, 1);
 
-  return (
+return (
   <View key={task.id} style={[styles.goalCard, { borderColor: categoryColors.goal }]}>
-    <Text style={styles.goalTitle}>{task.title}</Text>
-    <View style={styles.progressBarBackground}>
-      <View style={[styles.progressBarFill, { width: `${progressPercent * 100}%` }, ]}/>
-    </View>
-  
-    <Text style={styles.goalCount}>{progress}/{target}</Text>
-    <TouchableOpacity onPress={() => confirmDelete(task.id)} style={styles.goalDelete}>
-      <Ionicons name="trash" size={18} color="#E94F4F" />
-    </TouchableOpacity>
+  <Text style={styles.goalTitle}>{task.title}</Text>
+  <View style={styles.progressBarBackground}>
+    <View style={[styles.progressBarFill, { width: `${progressPercent * 100}%` }, ]}/>
   </View>
-        );
-      })
-  )} 
-
-
+  
+  <Text style={styles.goalCount}>{progress}/{target}</Text>
+  <TouchableOpacity onPress={() => confirmDelete(task.id)} style={styles.goalDelete}>
+    <Ionicons name="trash" size={18} color="#E94F4F" />
+  </TouchableOpacity>
+  </View>
+    );
+  })
+)} 
 </ScrollView>
 
- {/* Add Tasks Button */}
+{/* Add Tasks Button */}
  <TouchableOpacity style={styles.saveBtn} onPress={() => setModalVisible(true)}>
   <Text style={styles.saveText}>+ Add</Text>
  </TouchableOpacity>
    
- {/* Modal */}
- <Modal visible={modalVisible} animationType="fade" transparent>
+{/* Modal */}
+<Modal visible={modalVisible} animationType="fade" transparent>
   <View style={styles.modalBackground}>
   <View style={styles.modalContainer}>
   <AddTaskScreen closeModal={() => setModalVisible(false)} />
   </View>
   </View>
- </Modal>
- </View>
+</Modal>
+</View>
  );
 };
 

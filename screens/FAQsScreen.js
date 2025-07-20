@@ -3,7 +3,7 @@ import React from 'react'
 import { Ionicons } from '@expo/vector-icons';
 
 const FAQsScreen = ({navigation}) => {
-  return (
+return (
   <View style={styles.container}>
   
   {/* Header */}

@@ -10,65 +10,65 @@ const [featuredMeditation, setFeaturedMeditation] = useState([]);
 const [loading, setLoading] = useState(true);
 
 useFocusEffect(
-    useCallback(() => {
-      const fetchFeaturedMeditation = async () => {
-        try {
-          const featuredRef = collection(db, 'featuredMeditation');
-          const snapshot = await getDocs(featuredRef);
+  useCallback(() => {
+  const fetchFeaturedMeditation = async () => {
+   try {
+    const featuredRef = collection(db, 'featuredMeditation');
+    const snapshot = await getDocs(featuredRef);
 
-          const fetchMeditations = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              title: data.title,
-              duration: data.duration, 
-              url: data.url,
-              isFeatured: data.isFeatured,
-              imgURL: data.imgURL,
-            };
-          });
+    const fetchMeditations = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+     id: doc.id,
+     title: data.title,
+     duration: data.duration, 
+     url: data.url,
+     isFeatured: data.isFeatured,
+     imgURL: data.imgURL,
+    };
+  });
 
-          setFeaturedMeditation(fetchMeditations);
-        } catch (error) {
-          console.error('Error fetching featured meditation:', error);
-        } finally {
-          setLoading(false);
-        } 
-      };
+  setFeaturedMeditation(fetchMeditations);
+  } catch (error) {
+    console.error('Error fetching featured meditation:', error);
+  } finally {
+    setLoading(false);
+    } 
+  };
 
-      fetchFeaturedMeditation();
-    }, [])
+    fetchFeaturedMeditation();
+  }, [])
 );
 
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.topRow}>
-        <Text style={styles.headerText}>Featured Meditation</Text>
-        <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})}>
-          <Ionicons name="close" size={22} color="black" />
-        </TouchableOpacity>
-      </View>
+return (
+  <View style={styles.container}>
+  {/* Header */}
+  <View style={styles.topRow}>
+  <Text style={styles.headerText}>Featured Meditation</Text>
+   <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})}>
+    <Ionicons name="close" size={22} color="black" />
+   </TouchableOpacity>
+  </View>
 
-      {/* Featured Meditation */}
-      <ScrollView>
-      {featuredMeditation.map((item, index) => (
-        <TouchableOpacity key={item.id || index} 
-        style={styles.featuredItem} 
-        onPress={() => navigation.navigate('AudioPlayerScreen', { 
-        title: item.title,
-        url: item.url, 
-        imgURL: item.imgURL,
-        }
-      )}
-      >
-          <View>
-            <Text style={styles.featuredTitle}>{item.title}</Text>
-            <Text style={styles.featuredSubtitle}>{item.duration}</Text>
-          </View>
-          <Ionicons name="play" size={24} color="#50483D" />
-        </TouchableOpacity>
-      ))}
+ {/* Featured Meditation */}
+  <ScrollView>
+  {featuredMeditation.map((item, index) => (
+  <TouchableOpacity key={item.id || index} 
+    style={styles.featuredItem} 
+    onPress={() => navigation.navigate('AudioPlayerScreen', { 
+    title: item.title,
+    url: item.url, 
+    imgURL: item.imgURL,
+    }
+  )}
+  >
+  <View>
+  <Text style={styles.featuredTitle}>{item.title}</Text>
+  <Text style={styles.featuredSubtitle}>{item.duration}</Text>
+  </View>
+    <Ionicons name="play" size={24} color="#50483D" />
+    </TouchableOpacity>
+   ))}
     </ScrollView>
     </View>
   );

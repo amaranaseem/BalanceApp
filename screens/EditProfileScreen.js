@@ -13,19 +13,18 @@ const EditProfileScreen = ({ userData, setUserData, closeModal }) => {
   const [uploading, setUploading] = useState(false);
   const user = getAuth().currentUser;
 
-  {/*Saving the changes on Firebase */}
-
+{/*Saving the changes on Firebase */}
 const pickImage = async () => {
- const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
  if (!permission.granted) {
-    alert('Permission required to access media library');
-    return;
+  alert('Permission required to access media library');
+  return;
 }
 
 const result = await ImagePicker.launchImageLibraryAsync({mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7,});
-    if (!result.cancelled) {
-      setImage(result.assets?.[0]?.uri || result.uri);
-    }
+  if (!result.cancelled) {
+    setImage(result.assets?.[0]?.uri || result.uri);
+  }
 };
 
 const handleSubmit = async () => {
@@ -34,44 +33,45 @@ const handleSubmit = async () => {
     setUploading(true);
     let imageUrl = userData?.profileImage || '';
 
-     if (image) {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: image,
-        type: 'image/jpeg',
-        name: 'profile.jpg',
-      });
+   if (image) {
+    const formData = new FormData();
+     formData.append('file', {
+     uri: image,
+     type: 'image/jpeg',
+     name: 'profile.jpg',
+    });
+    
     formData.append('upload_preset', 'profile_image');
     formData.append('folder', 'profile_image');
 
-   const response = await fetch('https://api.cloudinary.com/v1_1/dstxsoomq/image/upload', {
+  const response = await fetch('https://api.cloudinary.com/v1_1/dstxsoomq/image/upload', {
     method: 'POST',
     body: formData,
-    });
+  });
 
-    const data = await response.json();
+  const data = await response.json();
     if (data.secure_url) {
-     imageUrl = data.secure_url;
-    } else {
-        throw new Error('Image upload failed');
-    }
-    }
+    imageUrl = data.secure_url;
+  } else {
+      throw new Error('Image upload failed');
+   }
+  }
 
-    const userRef = doc(db, 'users', user.uid);
-    await updateDoc(userRef, {
-    profileImage: imageUrl,
-    username: newUsername,
-    });
+  const userRef = doc(db, 'users', user.uid);
+  await updateDoc(userRef, {
+  profileImage: imageUrl,
+  username: newUsername,
+  });
 
-   setUserData(prev => ({
-    ...prev,
-    profileImage: imageUrl,
-    username: newUsername,
-    }));
+  setUserData(prev => ({
+  ...prev,
+  profileImage: imageUrl,
+  username: newUsername,
+  }));
 
-   Alert.alert('Success', 'Profile updated');
-    closeModal();
-   } catch (err) {
+  Alert.alert('Success', 'Profile updated');
+   closeModal();
+  } catch (err) {
     console.error('Error updating profile:', err);
     Alert.alert('Error', 'Something went wrong');
   } finally {
@@ -80,48 +80,48 @@ const handleSubmit = async () => {
   };
 
 return (
-<View style={styles.container}>
+ <View style={styles.container}>
 
-{/* Header */}
-<View style={styles.header}>
-<Text style={styles.title}>Edit Profile</Text>
-<TouchableOpacity onPress={closeModal}>
-<Ionicons name="close" size={24} color="black" />
-</TouchableOpacity>
-</View>
+ {/* Header */}
+ <View style={styles.header}>
+ <Text style={styles.title}>Edit Profile</Text>
+ <TouchableOpacity onPress={closeModal}>
+ <Ionicons name="close" size={24} color="black" />
+ </TouchableOpacity>
+ </View>
 
-{/* Profile Image */}
-<View style={styles.imageWrapper}>
-<Image
-source={
+ {/* Profile Image */}
+ <View style={styles.imageWrapper}>
+ <Image
+ source={
     image
     ? { uri: image }
     : userData?.profileImage
     ? { uri: userData.profileImage }
     : require('../assets/profilepic.png')
-}
-style={styles.image}
-/>
-<TouchableOpacity onPress={pickImage} style={styles.editIconWrapper}>
+ }
+ style={styles.image}
+ />
+ <TouchableOpacity onPress={pickImage} style={styles.editIconWrapper}>
     <Ionicons name="pencil" size={16} color="#000"/>
-</TouchableOpacity>
-</View>
+ </TouchableOpacity>
+ </View>
 
-{/* Username Input */}
-<TextInput
+ {/* Username Input */}
+ <TextInput
     value={newUsername}
     onChangeText={setNewUsername}
     placeholder="Username"
     style={styles.input}
-/>
+ />
 
-{/* Save Button */}
-<TouchableOpacity style={styles.saveBtn} onPress={handleSubmit} disabled={uploading}>
-<Text style={styles.saveText}>{uploading ? 'Saving...' : 'Save'}</Text>
-</TouchableOpacity>
-</View>
+  {/* Save Button */}
+  <TouchableOpacity style={styles.saveBtn} onPress={handleSubmit} disabled={uploading}>
+  <Text style={styles.saveText}>{uploading ? 'Saving...' : 'Save'}</Text>
+  </TouchableOpacity>
+  </View>
 
-);
+  );
 };
 
 export default EditProfileScreen;

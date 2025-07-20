@@ -24,107 +24,107 @@ const AudioRecorderModal = ({ closeModal, onSave }) => {
   const [isUploading, setIsUploading] = useState(false);
 
 
-  {/* Timer function */}
-  useEffect(() => {
-    let timer;
-    if (recording) {
-      timer = setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(timer);
-    }
-    return () => clearInterval(timer);
+{/* Timer function */}
+ useEffect(() => {
+  let timer;
+  if (recording) {
+    timer = setInterval(() => {
+    setRecordingTime((prev) => prev + 1);
+  }, 1000);
+   } else {
+    clearInterval(timer);
+  }
+   return () => clearInterval(timer);
   }, [recording]);
 
-  {/* Formatting Time */}
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
+{/* Formatting Time */}
+ const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+};
 
-  {/* Play Audio function */}
-  const playRecording = async () => {
-    try {
-      if (!audioURI) return;
+{/* Play Audio function */}
+ const playRecording = async () => {
+  try {
+  if (!audioURI) return;
 
-      if (sound) {
-        const status = await sound.getStatusAsync();
-        if (status.isPlaying) {
-          await sound.pauseAsync();
-          setIsPlaying(false);
-        } else {
-          await sound.playAsync();
-          setIsPlaying(true);
-        }
-        return;
-      }
+  if (sound) {
+  const status = await sound.getStatusAsync();
+   if (status.isPlaying) {
+    await sound.pauseAsync();
+    setIsPlaying(false);
+    } else {
+    await sound.playAsync();
+    setIsPlaying(true);
+  }
+   return;
+  }
 
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioURI },
-        { shouldPlay: true }
-      );
-      setSound(newSound);
-      setIsPlaying(true);
+  const { sound: newSound } = await Audio.Sound.createAsync(
+  { uri: audioURI },
+  { shouldPlay: true }
+   );
+    setSound(newSound);
+    setIsPlaying(true);
 
-      newSound.setOnPlaybackStatusUpdate(status => {
-        if (status.didJustFinish || !status.isPlaying) {
-          setIsPlaying(false);
-        }
-      });
-    } catch (error) {
-      console.error('Playback error:', error);
+    newSound.setOnPlaybackStatusUpdate(status => {
+    if (status.didJustFinish || !status.isPlaying) {
+      setIsPlaying(false);
     }
-  };
+     });
+  } catch (error) {
+    console.error('Playback error:', error);
+   }
+};
 
-  {/* Start Audio function */}
-  const startRecording = async () => {
-    try {
-      if (recording) {
-        await recording.stopAndUnloadAsync();
-        setRecording(null);
-      }
+{/* Start Audio function */}
+ const startRecording = async () => {
+  try {
+   if (recording) {
+    await recording.stopAndUnloadAsync();
+    setRecording(null);
+  }
 
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission to access microphone is required!');
-        return;
-      }
+  const { status } = await Audio.requestPermissionsAsync();
+  if (status !== 'granted') {
+      alert('Permission to access microphone is required!');
+      return;
+ }
 
-       setRecordingTime(0); 
+  setRecordingTime(0); 
 
-      const newRecording = new Audio.Recording();
-      await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      await newRecording.startAsync();
+  const newRecording = new Audio.Recording();
+  await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+  await newRecording.startAsync();
 
-      setRecording(newRecording);
+  setRecording(newRecording);
 
-      // Auto stop after 60 seconds
-      const timeout = setTimeout(() => stopRecording(), 60000);
-      setAutoStopTimeout(timeout);
-    } catch (err) {
-      console.error('Error starting recording', err);
-    }
-  };
+  // Auto stop after 60 seconds
+  const timeout = setTimeout(() => stopRecording(), 60000);
+    setAutoStopTimeout(timeout);
+  } catch (err) {
+    console.error('Error starting recording', err);
+  }
+};
 
-  {/* Stop Audio function */}
-  const stopRecording = async () => {
-    try {
-      if (!recording) return;
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
-      setAudioURI(uri);
-      setRecording(null);
-    } catch (err) {
-      console.error('Error stopping recording', err);
-    }
-  };
+{/* Stop Audio function */}
+ const stopRecording = async () => {
+  try {
+    if (!recording) return;
+    await recording.stopAndUnloadAsync();
+    const uri = recording.getURI();
+    setAudioURI(uri);
+    setRecording(null);
+  } catch (err) {
+    console.error('Error stopping recording', err);
+   }
+};
 
-  // Function to upload audio to Cloudinary
-const uploadToCloudinary = async (audioURI) => {
-  const data = new FormData();
-  data.append('file', {
+// Function to upload audio to Cloudinary
+ const uploadToCloudinary = async (audioURI) => {
+   const data = new FormData();
+   data.append('file', {
     uri: audioURI,
     type: 'audio/m4a',
     name: 'recording.m4a',
@@ -134,28 +134,28 @@ const uploadToCloudinary = async (audioURI) => {
 
   try {
     const response = await fetch('https://api.cloudinary.com/v1_1/dstxsoomq/auto/upload', {
-      method: 'POST',
-      body: data,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    method: 'POST',
+    body: data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 
-    const result = await response.json();
+  const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.error?.message || 'Upload failed');
-    }
+  if (!response.ok) {
+    throw new Error(result.error?.message || 'Upload failed');
+  }
 
-    return result.secure_url;
-  } catch (error) {
-    console.error('Cloudinary upload failed:', error);
+   return result.secure_url;
+} catch (error) {
+  console.error('Cloudinary upload failed:', error);
     return null;
   }
 };
 
- {/* Save function */}
-const handleSave = async () => {
+{/* Save function */}
+ const handleSave = async () => {
   if (!audioURI) return;
 
   try {
@@ -191,10 +191,9 @@ const handleSave = async () => {
   }
 };
 
-
-
 return (
   <View style={styles.container}>
+
   {/* Header */}
   <View style={styles.header}>
   <TouchableOpacity onPress={closeModal}>
@@ -212,7 +211,7 @@ return (
   />
   
   {/* Audio Preview Bar */}
- {audioURI && (
+  {audioURI && (
   <View style={styles.audioPreview}>
   <TouchableOpacity onPress={playRecording}>
   <Ionicons name={isPlaying ? 'pause' : 'play'} size={24} color="black" />

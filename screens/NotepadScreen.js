@@ -35,12 +35,12 @@ const NotepadScreen = () => {
   useEffect(() => {
     let timer;
     if (recording) {
-      timer = setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(timer);
-    }
+     timer = setInterval(() => {
+      setRecordingTime((prev) => prev + 1);
+    }, 1000);
+   } else {
+    clearInterval(timer);
+   }
     return () => clearInterval(timer);
   }, [recording]);
 
@@ -53,81 +53,80 @@ const NotepadScreen = () => {
 
   {/* Play Audio function */}
   const playRecording = async () => {
-    try {
-      if (!audioURI) return;
+   try {
+    if (!audioURI) return;
 
-      if (sound) {
-        const status = await sound.getStatusAsync();
-        if (status.isPlaying) {
-          await sound.pauseAsync();
-          setIsPlaying(false);
-        } else {
-          await sound.playAsync();
-          setIsPlaying(true);
-        }
-        return;
-      }
-
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioURI },
-        { shouldPlay: true }
-      );
-      setSound(newSound);
-      setIsPlaying(true);
-
-      newSound.setOnPlaybackStatusUpdate(status => {
-        if (status.didJustFinish || !status.isPlaying) {
-          setIsPlaying(false);
-        }
-      });
-    } catch (error) {
-      console.error('Playback error:', error);
+    if (sound) {
+     const status = await sound.getStatusAsync();
+    if (status.isPlaying) {
+     await sound.pauseAsync();
+     setIsPlaying(false);
+    } else {
+     await sound.playAsync();
+     setIsPlaying(true);
     }
+  return;
+ }
+
+  const { sound: newSound } = await Audio.Sound.createAsync(
+  { uri: audioURI },
+  { shouldPlay: true }
+  );
+    setSound(newSound);
+    setIsPlaying(true);
+
+  newSound.setOnPlaybackStatusUpdate(status => {
+  if (status.didJustFinish || !status.isPlaying) {
+  setIsPlaying(false);
+   }
+    });
+  } catch (error) {
+    console.error('Playback error:', error);
+   }
   };
 
   {/* Start Audio function */}
   const startRecording = async () => {
-    try {
-      // Stop existing recording if still active
-      if (recording) {
-        await recording.stopAndUnloadAsync();
-        setRecording(null);
-      }
-
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission to access microphone is required!');
-        return;
-      }
-       setRecordingTime(0); 
-
-      const newRecording = new Audio.Recording();
-      await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      await newRecording.startAsync();
-
-      setRecording(newRecording);
-
-      // Auto stop after 60 seconds
-      const timeout = setTimeout(() => stopRecording(), 60000);
-      setAutoStopTimeout(timeout);
-    } catch (err) {
-      console.error('Error starting recording', err);
+   try {
+    // Stop existing recording if still active
+    if (recording) {
+    await recording.stopAndUnloadAsync();
+    setRecording(null);
     }
-  };
 
+  const { status } = await Audio.requestPermissionsAsync();
+    if (status !== 'granted') {
+    alert('Permission to access microphone is required!');
+     return;
+    }
+    setRecordingTime(0); 
+
+  const newRecording = new Audio.Recording();
+   await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+   await newRecording.startAsync();
+
+   setRecording(newRecording);
+
+  // Auto stop after 60 seconds
+   const timeout = setTimeout(() => stopRecording(), 60000);
+    setAutoStopTimeout(timeout);
+  } catch (err) {
+    console.error('Error starting recording', err);
+   }
+ };
 
   {/* Stop Audio function */}
   const stopRecording = async () => {
-    try {
-      if (!recording) return;
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
-      setAudioURI(uri);
-      setRecording(null);
-    } catch (err) {
-      console.error('Error stopping recording', err);
-    }
-  };
+   try {
+     if (!recording) return;
+     await recording.stopAndUnloadAsync();
+     const uri = recording.getURI();
+     setAudioURI(uri);
+     setRecording(null);
+   } catch (err) {
+     console.error('Error stopping recording', err);
+   }
+ };
 
   {/*Function to store audio on Cloundinary */}
   const uploadToCloudinary = async (audioURI) => {
@@ -152,7 +151,7 @@ const NotepadScreen = () => {
     console.error('Cloudinary upload failed:', error);
     return null;
   }
-};
+ };
 
   {/* Save function */}
   const handleSave = async () => {
@@ -174,16 +173,16 @@ const NotepadScreen = () => {
   //Cloundinary for audio saving
   let audioURL = null;
     if (audioURI) {
-      console.log('Uploading audio to Cloudinary...');
-      audioURL = await uploadToCloudinary(audioURI);
-      if (!audioURL) {
-        setSaveError('Audio upload failed.');
-        return;
-      }
-      console.log('Audio uploaded:', audioURL);
+     console.log('Uploading audio to Cloudinary...');
+     audioURL = await uploadToCloudinary(audioURI);
+     if (!audioURL) {
+      setSaveError('Audio upload failed.');
+      return;
     }
+    console.log('Audio uploaded:', audioURL);
+   }
 
-    //User based 
+  //User based 
   try {
     const user = getAuth().currentUser;
     if (!user) {
@@ -263,8 +262,8 @@ return (
   ))}
   </ScrollView>
 
-{saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
-
+ {saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
+ 
   <TextInput
     style={styles.input}
     placeholder="Write about your day..."
@@ -492,6 +491,5 @@ audioControls: {
   alignItems: 'center',
   paddingHorizontal: 20,
 },
-
 
 });

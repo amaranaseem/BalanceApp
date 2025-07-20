@@ -10,46 +10,42 @@ import MeditationScreen from './screens/Meditation/MeditationScreen';
 const Tab = createBottomTabNavigator();
 
 function BottomNavTab() {
-    return(
-        <Tab.Navigator 
-        screenOptions={({route}) => ({
-          tabBarIcon:({focused, color, size}) =>{
-            let iconName;
-            if (route.name === 'Home'){iconName = focused ? 'home' : 'home-outline';}
-            else if (route.name === 'Journal'){iconName = focused ? 'book' : 'book-outline';}
-            else if (route.name === 'Tasks'){iconName = focused ? 'clipboard' : 'clipboard-outline';}
-            else if (route.name === 'Meditate'){iconName = focused ? 'headset' : 'headset-outline';}
-            else if (route.name === 'Insight'){iconName = focused ? 'bar-chart' : 'bar-chart-outline';}
-            return <Ionicons name={iconName} size={size} color={color}/>;
-          },
-          tabBarActiveTintColor: 'black', 
-          tabBarInactiveTintColor: '#A58E74', 
-          tabBarShowLabel: true,
-        tabBarStyle: {
-          backgroundColor: '#FBEDDD',
-          height: 60,
-          paddingBottom: 30,
-          borderRadius: 30,
-          elevation: 50,
-          marginBottom: 25,
-        },
-        headerShown: false,
-        })}>
+  return(
+  <Tab.Navigator 
+   screenOptions={({route}) => ({
+    tabBarIcon:({focused, color, size}) =>{
+     let iconName;
+     if (route.name === 'Home'){iconName = focused ? 'home' : 'home-outline';}
+      else if (route.name === 'Journal'){iconName = focused ? 'book' : 'book-outline';}
+      else if (route.name === 'Tasks'){iconName = focused ? 'clipboard' : 'clipboard-outline';}
+      else if (route.name === 'Meditate'){iconName = focused ? 'headset' : 'headset-outline';}
+      else if (route.name === 'Insight'){iconName = focused ? 'bar-chart' : 'bar-chart-outline';}
+      return <Ionicons name={iconName} size={size} color={color}/>;
+     },
+      tabBarActiveTintColor: 'black', 
+      tabBarInactiveTintColor: '#A58E74', 
+      tabBarShowLabel: true,
+      tabBarStyle: {
+        backgroundColor: '#FBEDDD',
+        height: 60,
+        paddingBottom: 30,
+        borderRadius: 30,
+        elevation: 50,
+        marginBottom: 25,
+     },
+      headerShown: false,
+    })}>
 
-            <Tab.Screen name="Home" component={HomeScreen}/>
-            <Tab.Screen name="Journal" component={JournalScreen}/>
-            <Tab.Screen name="Tasks" component={HabitandGoalScreen}/>
-            <Tab.Screen name="Meditate" component={MeditationScreen}/>
-            <Tab.Screen name="Insight" component={InsightScreen}/>
+    <Tab.Screen name="Home" component={HomeScreen}/>
+    <Tab.Screen name="Journal" component={JournalScreen}/>
+    <Tab.Screen name="Tasks" component={HabitandGoalScreen}/>
+    <Tab.Screen name="Meditate" component={MeditationScreen}/>
+    <Tab.Screen name="Insight" component={InsightScreen}/>
             
 
-        </Tab.Navigator>
-
+  </Tab.Navigator>
     );
 } 
-
-
-
 export default BottomNavTab;
 
 

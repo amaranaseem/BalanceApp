@@ -53,32 +53,32 @@ const YourAudioScreen = () => {
 
 const renderItem = ({ item }) => (
   <View style={styles.audioCard}>
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-      <View>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.subtitle}>{item.duration}s</Text>
-      </View>
-      <TouchableOpacity onPress={() => navigation.navigate('AudioPlayerScreen', {
-        title: item.title,
-        url: item.audioURL,
-        imgURL:'https://res.cloudinary.com/dstxsoomq/image/upload/v1752538325/audioplaceholder_tqxloj.jpg'
-        })}
-      >
-        <Ionicons name="play" size={28} color="#50483D" />
-      </TouchableOpacity>
-    </View>
+   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+   <View>
+    <Text style={styles.title}>{item.title}</Text>
+    <Text style={styles.subtitle}>{item.duration}s</Text>
+   </View>
+   <TouchableOpacity onPress={() => navigation.navigate('AudioPlayerScreen', {
+    title: item.title,
+    url: item.audioURL,
+    imgURL:'https://res.cloudinary.com/dstxsoomq/image/upload/v1752538325/audioplaceholder_tqxloj.jpg'
+   })}
+   >
+    <Ionicons name="play" size={28} color="#50483D" />
+    </TouchableOpacity>
+  </View>
   </View>
 );
 
-  return (
+return (
   <View style={styles.container}>
-   {/* Header */}
-    <View style={styles.topRow}>
-    <Text style={styles.headerText}>My Audio</Text>
-    <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})}>
-     <Ionicons name="close" size={22} color="black" />
-     </TouchableOpacity>
-   </View>
+  {/* Header */}
+  <View style={styles.topRow}>
+  <Text style={styles.headerText}>My Audio</Text>
+  <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', {screen: 'Meditate'})}>
+    <Ionicons name="close" size={22} color="black" />
+    </TouchableOpacity>
+  </View>
 
   {/* Audio Entries */}
   {loading ? (

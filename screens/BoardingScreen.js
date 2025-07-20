@@ -26,16 +26,16 @@ const OnboardingScreen = ({ navigation }) => {
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      setDob(dateStr);
+     const dateStr = selectedDate.toISOString().split('T')[0];
+     setDob(dateStr);
     }
   };
 
   const pickImage = async () => {
    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      alert('Permission to access media library is required!');
-      return;
+     alert('Permission to access media library is required!');
+     return;
    }
 
   const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
@@ -79,15 +79,15 @@ const OnboardingScreen = ({ navigation }) => {
 
  // Save profile data to Firestore
   const userDocRef = doc(db, "users", user.uid);
-    await setDoc(userDocRef, {
-      uid: user.uid,
-      name,
-      username,
-      dob,
-      gender,
-      profileImage: imageUrl || null,
-      createdAt: new Date(),
-      email: user.email
+   await setDoc(userDocRef, {
+    uid: user.uid,
+    name,
+    username,
+    dob,
+    gender,
+    profileImage: imageUrl || null,
+    createdAt: new Date(),
+    email: user.email
   });
 
   Toast.show({
@@ -122,11 +122,11 @@ return (
   <View style={styles.inputContainer}>
     <Ionicons name="person-outline" size={20} color="#00" style={styles.icon} />
   <TextInput
-    style={styles.inputText}
-    placeholder="Full Name"
-    value={name}
-    onChangeText={setName}
-    autoCapitalize="none"
+   style={styles.inputText}
+   placeholder="Full Name"
+   value={name}
+   onChangeText={setName}
+   autoCapitalize="none"
   />
   </View>
   </View>
@@ -136,17 +136,17 @@ return (
   <View style={styles.inputContainer}>
     <Ionicons name="person-outline" size={20} color="#000" style={styles.icon} />
   <TextInput
-    style={styles.inputText}
-    placeholder="Username"
-    value={username}
-    onChangeText={setUsername}
-    autoCapitalize="none"
+   style={styles.inputText}
+   placeholder="Username"
+   value={username}
+   onChangeText={setUsername}
+   autoCapitalize="none"
   />
   </View>
   </View>
 
   {/* DOB Selection */}
-   <View style={styles.inputWrapper}>
+  <View style={styles.inputWrapper}>
   <TouchableOpacity style={styles.inputContainer} onPress={() => setShowDatePicker(true)}>
   <Ionicons name="calendar" size={20} color="#000" style={styles.icon} />
   <Text style={[styles.inputText, !dob && { color: '#000' }]}> {dob || 'Select Date of Birth'} </Text>
@@ -172,10 +172,10 @@ return (
   ))}
   </View>
 
-   {/* Submit Button */}
-   <View style={styles.buttoncontainer}>
+  {/* Submit Button */}
+  <View style={styles.buttoncontainer}>
   <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={uploading}>
-    <Text style={styles.buttonText}>Continue</Text>
+   <Text style={styles.buttonText}>Continue</Text>
   </TouchableOpacity>
   </View>
  

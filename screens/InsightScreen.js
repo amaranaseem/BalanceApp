@@ -65,10 +65,10 @@ const InsightScreen = () => {
     const moodEntries = snapshot.docs.map(doc => doc.data());
     setAllCheckins(moodEntries);
     setLoading(false);
-   } catch (error) {
+  } catch (error) {
     console.error('Error fetching mood data:', error);
     setLoading(false);
-   }
+  }
    }; 
     fetchMoodData();
   }, []);
@@ -110,7 +110,7 @@ const InsightScreen = () => {
   });
     setLoggedDaysCount(daySet.size);
 
-// Determine top mood
+  // Determine top mood
     const flat = Object.entries(moodTrends).flatMap(([label, values]) =>
      values.map(v => (v !== null ? label : null)).filter(Boolean)
    );
@@ -123,7 +123,7 @@ const InsightScreen = () => {
     const top = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
     setTopEmotion(top);
 
-// Mood consistency score
+  // Mood consistency score
     const total = Object.values(moodCounts).reduce((a, b) => a + b, 0);
     const avg = total / Object.keys(moodCounts).length || 0;
     let variation = 0;

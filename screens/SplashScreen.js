@@ -3,28 +3,25 @@ import { Text, StyleSheet, View, Image, ImageBackground} from 'react-native';
 
 export default function SplashScreen({navigation}) {
 
-   useEffect(() => {
-    const timeout = setTimeout(() => {
-      navigation.replace('Login'); 
-    }, 4000); 
-  }, []);
+useEffect(() => {
+  const timeout = setTimeout(() => {
+   navigation.replace('Login'); 
+ }, 4000); 
+}, []);
     
-  return (
-    <ImageBackground
-      source={require('../assets/bkgimage.jpg')}
-      style={styles.background}
-      resizeMode="cover">
+return (
+ <ImageBackground
+ source={require('../assets/bkgimage.jpg')}
+ style={styles.background}
+ resizeMode="cover">
 
-      <View style={styles.container}>
-          <Image 
-            source={require("../assets/logo.jpg")} 
-            style={styles.logo} 
-            resizeMode="contain" />
-          <Text style={styles.logoText}>Balance</Text>
-      </View>
-      </ImageBackground>
-    );
-  }
+  <View style={styles.container}>
+  <Image source={require("../assets/logo.jpg")} style={styles.logo} resizeMode="contain" />
+   <Text style={styles.logoText}>Balance</Text>
+  </View>
+  </ImageBackground>
+   );
+}
   
   
 const styles = StyleSheet.create({
@@ -58,6 +55,5 @@ background: {
   justifyContent: 'center',
 },
  
-  
 });
   
