@@ -13,12 +13,24 @@ const user = auth.currentUser;
 
 
 const handleLogout = async () => {
+Alert.alert("Logout", "Are you sure you want to logout?", [
+  { text: 'cancel', style: 'cancel' }, 
+
+  {text: 'OK', onPress: async () => {
+
 try {
+    const email = user?.email;
     await signOut(auth);
+    console.log('User logged out:', email);
+
     navigation.replace('Login'); 
  } catch (error) {
     console.error('Logout error:', error);
- }
+   Alert.alert("Error", "Failed to log out. Please try again.");
+        }
+      }
+    }
+  ]);
 };
 
 const handleDeleteAccount = () => {
