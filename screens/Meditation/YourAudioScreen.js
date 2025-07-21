@@ -83,19 +83,19 @@ const renderItem = ({ item }) => (
     <Text style={styles.subtitle}>{item.duration}s</Text>
    </View>
 
-   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20}}>
    <TouchableOpacity onPress={() => navigation.navigate('AudioPlayerScreen', {
     title: item.title,
     url: item.audioURL,
     imgURL:'https://res.cloudinary.com/dstxsoomq/image/upload/v1752538325/audioplaceholder_tqxloj.jpg'
-   })}
+   })} style={styles.playBtn}
    >
-    <Ionicons name="play" size={28} color="#50483D" />
+    <Ionicons name="play" size={22} color="#fff" />
     </TouchableOpacity>
 
-    <TouchableOpacity onPress={() => confirmDelete(item.id)}>
-  <Ionicons name="trash" size={22} color="#E94F4F" />
-  </TouchableOpacity>
+   <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteBtn}>
+   <Ionicons name="trash" size={22} color="#E94F4F" />
+   </TouchableOpacity>
 
   </View>
   </View>
@@ -119,8 +119,8 @@ return (
    <FlatList
    data={userMeditations}
    keyExtractor={(item) => item.id}
-    renderItem={renderItem}
-    ListEmptyComponent={<Text style={styles.placeholder}>No audio entry yet. Start recording!</Text>}
+   renderItem={renderItem}
+   ListEmptyComponent={<Text style={styles.placeholder}>No audio entry yet. Start recording!</Text>}
    contentContainerStyle={{ paddingBottom: 100 }}
     />
    )}
@@ -176,14 +176,6 @@ closeCircle: {
   alignItems: 'center',
   backgroundColor: '#FAEDDD',
   opacity: 0.8,
-},
-
-audio: {
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  marginTop: 4,
-  gap: 6,
 },
 
 audioText: {
@@ -247,6 +239,27 @@ placeholder:{
   marginTop: 100, 
   color: '#777', 
   fontSize: 17,
-}
+}, 
+
+playBtn:{
+  backgroundColor: '#007272', 
+  borderRadius: 20, 
+  width: 35, 
+  height: 35, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 3
+}, 
+
+deleteBtn:{
+  backgroundColor: '#fff', 
+  borderRadius: 20, 
+  width: 35, 
+  height: 35, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 3
+}, 
+
 
 });

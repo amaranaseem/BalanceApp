@@ -8,7 +8,7 @@ return (
   
   {/* Header */}
   <View style={styles.topRow}>   
-  <Text style={styles.headerTextInput}>FAQs</Text>
+  <Text style={styles.headerText}>FAQs</Text>
   <TouchableOpacity onPress={() => navigation.navigate('SettingScreen')}>
   <Ionicons name="chevron-back-outline" size={26} color="black" />
   </TouchableOpacity>
@@ -89,11 +89,11 @@ topRow: {
   marginBottom: 60,
 },
 
-headerTextInput: {
+headerText: {
   fontSize: 26,
   fontWeight: 'bold',
   flex: 1,
-  color: '#000',
+  color: '#50483D'
 },
 
 title: {

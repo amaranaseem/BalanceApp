@@ -126,7 +126,9 @@ return (
     <Text style={styles.title}>{item.title}</Text>
     <Text style={styles.subtitle}>{item.duration}</Text>
     </View>
-    <Ionicons name="play" size={24} color="#50483D" />
+    <View style={styles.featurePlayBtn}>
+     <Ionicons name="play" size={22} color="#fff" />
+    </View>
     </TouchableOpacity>
     ))}
 
@@ -143,7 +145,7 @@ return (
     })
     }
   >
-    <View style={styles.sessionCardContent}>
+    <View>
     {session.imgURL && (
     <Image source={{ uri: session.imgURL }} style={styles.sessionImage} />
     )}
@@ -154,7 +156,10 @@ return (
     ) : null}
     </View>
     </View>
-    <Ionicons name="chevron-forward" size={22} color="#000" />
+    <View style={styles.sessionBtn}>
+     <Ionicons name="chevron-forward" size={22} color="#fff" />
+    </View>
+    
     </TouchableOpacity>
     ))}
 
@@ -181,7 +186,11 @@ return (
     <Text style={styles.title}>{item.title?.trim() ? item.title : 'Untitled'}</Text>
     <Text style={styles.subtitle}>{item.duration} sec</Text>
     </View>
-    <Ionicons name="play" size={24} color="#50483D"/>
+
+    <View style={styles.audioPlayBtn}>
+     <Ionicons name="play" size={22} color="#fff" />
+    </View>
+
     </TouchableOpacity>
     ))
     )}
@@ -284,4 +293,35 @@ userCard: {
   justifyContent: 'space-between',
   flexDirection: 'row'
 },
+
+audioPlayBtn:{
+  backgroundColor: '#007272', 
+  borderRadius: 20, 
+  width: 35, 
+  height: 35, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 3
+}, 
+
+featurePlayBtn:{
+  backgroundColor: '#6E1E2B', 
+  borderRadius: 20, 
+  width: 35, 
+  height: 35, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 3
+},
+
+sessionBtn:{
+  backgroundColor: '#2C3E50', 
+  borderRadius: 20, 
+  width: 35, 
+  height: 35, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 3
+},
+
 });

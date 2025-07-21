@@ -8,7 +8,7 @@ const ContactSupportScreen = ({navigation}) => {
   
   {/* Header */}
   <View style={styles.topRow}>   
-  <Text style={styles.headerTextInput}>Customer Support</Text>
+  <Text style={styles.headerText}>Customer Support</Text>
   <TouchableOpacity onPress={() => navigation.navigate('SettingScreen')}>
   <Ionicons name="chevron-back-outline" size={26} color="black" />
   </TouchableOpacity>
@@ -53,15 +53,15 @@ topRow: {
   flexDirection: 'row-reverse',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 60,
+  gap: 55,
   marginBottom: 60,
 },
 
-headerTextInput: {
-  fontSize: 24,
+headerText: {
+  fontSize: 26,
   fontWeight: 'bold',
   flex: 1,
-  color: '#000',
+  color: '#50483D',
 },
 
 heading: {
@@ -84,13 +84,13 @@ para:{
 }, 
 
 questionContainer:{
-  borderWidth: 0.5,
+  borderWidth: 0.8,
   borderColor: 'black',
   width: '100%',
   padding: 12,
   marginBottom: 12,
   borderRadius: 10, 
-  alignItems: 'center'
+  alignItems: 'center', 
 },
 
 row: {

@@ -64,7 +64,7 @@ return (
     imgURL: sessionData?.imgURL,
    })
    } style={styles.trackPlayBtn}>
-    <Ionicons name="play-circle" size={30} color="#3C4F46" />
+    <Ionicons name="play" size={20} color="#fff" />
    </TouchableOpacity>
   </View>
   ))}
@@ -113,41 +113,41 @@ image: {
   width: '100%',
   height: 200,
   borderRadius: 12,
-  marginBottom: 16
-},
-
-title: {
-  fontSize: 22,
-  fontWeight: 'bold',
-  marginBottom: 16
+  marginBottom: 16, 
+  alignContent: 'center', 
+  elevation: 3
 },
 
 trackItem: {
   flexDirection: 'row',
   justifyContent: 'space-between',
-  paddingVertical: 12,
-  borderBottomWidth: 0.5,
-  borderBottomColor: '#ccc', 
   alignItems: 'center',
   paddingHorizontal: 16,
   backgroundColor: '#F0F0F0',
   borderRadius: 10,
   marginBottom: 10,
+  height: 65
 },
   
 trackTitle: {
-  fontSize: 16, 
+  fontSize: 14, 
   fontWeight: 'bold',
-  color: '#3C4F46',
+  color: '#000',
 },
   
 trackDuration: {
- fontSize: 14,
+  fontSize: 14,
   color: '#777',
   marginTop: 4,
 },
 
 trackPlayBtn: {
-  paddingLeft: 10,
+  backgroundColor: '#2C3E50', 
+  borderRadius: 20, 
+  width: 30, 
+  height: 30, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 3,
 }
 });

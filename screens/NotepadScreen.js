@@ -328,7 +328,7 @@ topRow: {
 },
 
 headerTextInput: {
-  fontSize: 24,
+  fontSize: 26,
   fontWeight: 'bold',
   flex: 1,
   color: '#50483D',

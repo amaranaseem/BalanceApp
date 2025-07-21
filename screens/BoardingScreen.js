@@ -197,9 +197,9 @@ const styles = StyleSheet.create({
 },
 
 headerText:{
-  fontSize: 30,
+  fontSize: 26,
   fontWeight: '900',
-  color: '#000',
+  color: '#50483D',
   alignSelf: 'flex-start',
   marginBottom: 30,
   marginTop: 30,

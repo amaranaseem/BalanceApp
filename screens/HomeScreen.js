@@ -380,6 +380,8 @@ h2: {
   fontSize: 26,
   fontWeight: '900',
   color: 'black',
+  fontStyle: 'italic', 
+  color: '#50483D'
 },
 
 subtitle: {

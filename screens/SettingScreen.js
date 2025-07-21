@@ -65,7 +65,7 @@ return (
     
 {/* Header */}
 <View style={styles.topRow}>   
-<Text style={styles.headerTextInput}>Settings</Text>
+<Text style={styles.headerText}>Settings</Text>
 <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
 <Ionicons name="chevron-back-outline" size={26} color="black" />
 </TouchableOpacity>
@@ -118,8 +118,8 @@ topRow: {
   marginBottom: 60,
 },
 
-headerTextInput: {
-  fontSize: 28,
+headerText: {
+  fontSize: 26,
   fontWeight: 'bold',
   flex: 1,
   color: '#000',

@@ -86,8 +86,8 @@ return (
   <TouchableOpacity onPress={playAudio}>
   <Ionicons
     name={isPlaying ? 'pause-circle' : 'play-circle'}
-    size={48}
-    color="#D8CAB8"
+    size={46}
+    color="#50483D"
   />
   </TouchableOpacity>
   <Text style={styles.audioText}>
@@ -124,7 +124,7 @@ topRow: {
 },
 
 title: {
-  fontSize: 24,
+  fontSize: 26,
   fontWeight: 'bold',
   color: '#50483D',
   flex: 1,

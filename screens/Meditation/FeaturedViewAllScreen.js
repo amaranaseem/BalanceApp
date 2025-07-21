@@ -66,7 +66,9 @@ return (
   <Text style={styles.featuredTitle}>{item.title}</Text>
   <Text style={styles.featuredSubtitle}>{item.duration}</Text>
   </View>
-    <Ionicons name="play" size={24} color="#50483D" />
+  <View style={styles.playBtn}>
+    <Ionicons name="play" size={22} color="#fff" />
+    </View>
     </TouchableOpacity>
    ))}
     </ScrollView>
@@ -119,7 +121,7 @@ featuredItem: {
 
 featuredTitle: {
   fontSize: 16,
-  fontWeight: '500',
+  fontWeight: '600',
   color: '#000',
 },
 
@@ -129,5 +131,15 @@ featuredSubtitle: {
   marginTop: 4,
   color: '#000',
 },
+
+playBtn:{
+  backgroundColor: '#6E1E2B', 
+  borderRadius: 20, 
+  width: 35, 
+  height: 35, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 3
+}, 
 
 });

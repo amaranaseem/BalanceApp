@@ -15,7 +15,7 @@ const achievements = [
 const AchievementItem = ({ icon, text }) => (
   <View style={styles.achievementItem}>
     <Text style={styles.icon}>{icon}</Text>
-    <Text style={styles.achievementLabel}>{text}</Text>
+    <Text style={styles.achievementText}>{text}</Text>
   </View>
 );
 
@@ -230,13 +230,6 @@ topRow: {
   gap: 12,
   marginBottom: 10,
 },
-
-headerTextInput: {
-  fontSize: 24,
-  fontWeight: 'bold',
-  flex: 1,
-  color: '#50483D',
-},
   
 closeCircle: {
   width: 34,
@@ -266,7 +259,7 @@ profileInfo: {
 },
 
 name: {
-  fontSize: 20,
+  fontSize: 22,
   fontWeight: '600',
   color: '#50483D',
   marginTop: 10,
@@ -285,7 +278,6 @@ editIconWrapper: {
   borderRadius: 20,
   padding: 6,
 },
-
 
 statsBox: {
   backgroundColor: '#FAEDDD',
@@ -390,7 +382,7 @@ icon: {
   marginRight: 10,
 },
 
-achievementLabel: {
+achievementText: {
   fontSize: 14,
   color: '#333',
 },
