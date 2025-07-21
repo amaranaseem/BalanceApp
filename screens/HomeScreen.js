@@ -350,7 +350,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
 container: {
   flex: 1,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
   paddingHorizontal: 20,
   paddingTop: 60,
 },
@@ -360,16 +360,6 @@ topRow: {
   justifyContent: 'space-between',
   marginBottom: 20,
   alignItems: 'center',
-},
-
-notificationCircle: {
-  width: 38,
-  height: 38,
-  borderRadius: 19,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#D8CAB8', 
-  opacity: 0.8,
 },
 
 welcomecard: {
@@ -436,7 +426,7 @@ moodLetter: {
 },
 
 moodCard: {
-  backgroundColor: '#F4E9DA',
+  backgroundColor: '#FAEDDD',
   padding: 16,
   borderRadius: 9,
   marginTop: 20,

@@ -316,7 +316,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingBottom: 10,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 topRow: {
@@ -340,7 +340,7 @@ closeCircle: {
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   opacity: 0.8,
 },
 
@@ -397,7 +397,7 @@ input: {
   height: 270,
   backgroundColor: '#fff',
   borderRadius: 12,
-  borderColor: '#D8CAB8',
+  borderColor: '#50483D',
   borderWidth: 1,
   padding: 14,
   textAlignVertical: 'top',
@@ -422,7 +422,7 @@ footerRow: {
 },
 
 iconBtn: {
-  backgroundColor: '#E6E1D7',
+  backgroundColor: '#FAEDDD',
   padding: 12,
   borderRadius: 50,
   width: 56,
@@ -432,7 +432,7 @@ iconBtn: {
 },
 
 saveBtn: {
-  backgroundColor: '#A58E74',
+  backgroundColor: '#A8D5BA',
   paddingVertical: 14,
   paddingHorizontal: 32,
   borderRadius: 18,
@@ -440,7 +440,7 @@ saveBtn: {
   
 saveText: {
   fontWeight: 'bold',
-  color: 'white',
+  color: 'black',
   fontSize: 16,
 },
 

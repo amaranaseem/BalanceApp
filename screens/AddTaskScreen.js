@@ -19,11 +19,10 @@ const AddTaskScreen = ({ closeModal }) => {
   const [target, setTarget] = useState('');
   const [saveError, setSaveError] = useState('');
 
-const saveTask = async () => {
+ const saveTask = async () => {
   const auth = getAuth();
   const user = auth.currentUser;
   setSaveError('');
-
 
   if (!user) 
   return;

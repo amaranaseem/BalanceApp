@@ -134,16 +134,6 @@ container: {
   width: '100%',
 },
 
-closeCircle: {
-  width: 38,
-  height: 38,
-  borderRadius: 19,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#D8CAB8',
-  opacity: 0.8,
-},
-
 header: {
   flexDirection: 'row',
   alignItems: 'center',
@@ -173,7 +163,7 @@ editIconWrapper: {
   position: 'absolute',
   right: 90, 
   bottom: 5,
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   borderRadius: 20,
   padding: 6,
 },

@@ -23,7 +23,7 @@ const AudioRecorderModal = ({ closeModal, onSave }) => {
   const [autoStopTimeout, setAutoStopTimeout] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
-
+  
 {/* Timer function */}
  useEffect(() => {
   let timer;
@@ -156,7 +156,9 @@ const AudioRecorderModal = ({ closeModal, onSave }) => {
 
 {/* Save function */}
  const handleSave = async () => {
-  if (!audioURI) return;
+  if (!audioURI) {
+     Alert.alert('Audio Needed','Please record audio before saving.');
+    return};
 
   try {
     const user = getAuth().currentUser;
@@ -172,6 +174,7 @@ const AudioRecorderModal = ({ closeModal, onSave }) => {
       audioURL,
       duration: recordingTime,
       createdAt: serverTimestamp(),
+      title: title?.trim() || 'Untitled', 
     });
 
     Alert.alert('Success', 'Audio saved successfully!');
@@ -308,19 +311,9 @@ footerRow: {
   alignItems: 'center',
   marginTop: 30,
 },
-
-recordBtn: {
-  backgroundColor: '#E6E1D7',
-  padding: 14,
-  borderRadius: 50,
-  width: 56,
-  height: 56,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
   
 saveBtn: {
-  backgroundColor: '#B7E2CE',
+  backgroundColor: '#A8D5BA',
   paddingVertical: 14,
   paddingHorizontal: 32,
   borderRadius: 14,
@@ -345,7 +338,7 @@ inlineTimer: {
 },
 
 iconBtn: {
-  backgroundColor: '#E6E1D7',
+  backgroundColor: '#FAEDDD',
   padding: 12,
   borderRadius: 50,
   width: 56,

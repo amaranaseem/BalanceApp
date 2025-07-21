@@ -69,7 +69,6 @@ const handlePasswordReset = async () => {
     alert('Please enter your email');
     return;
   }
-
   try {
     await sendPasswordResetEmail(auth, email);
     console.log('Password reset email sent to:', email);
@@ -111,7 +110,7 @@ return (
   <View style={styles.inputWrapper}>
   <Text style={styles.inputLabel}>Email</Text>
   <View style={styles.inputContainer}>
-    <Ionicons name="mail-outline" size={20} color="#6E665B" style={styles.icon} />
+    <Ionicons name="mail-outline" size={20} color="#A58E74" style={styles.icon} />
   <TextInput
     style={styles.inputText}
     placeholder="abc@gmail.com"
@@ -127,7 +126,7 @@ return (
   <View style={styles.inputWrapper}>
   <Text style={styles.inputLabel}>Password</Text>
   <View style={styles.inputContainer}>
-    <Ionicons name="lock-closed-outline" size={20} color="#6E665B" style={styles.icon} />
+    <Ionicons name="lock-closed-outline" size={20} color="#A58E74" style={styles.icon} />
   <TextInput
     style={styles.inputText}
     placeholder="*******"
@@ -136,7 +135,7 @@ return (
     secureTextEntry={!showPassword}
   />
   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-      <Ionicons name={!showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#6E665B" />
+      <Ionicons name={!showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#A58E74" />
   </TouchableOpacity>
 
   {/* Forgot Password Link */}
@@ -171,7 +170,7 @@ const styles = StyleSheet.create({
 container: {
   flex: 1,
   justifyContent: 'flex-start',
-  backgroundColor: '#FAF9F6', 
+  backgroundColor: '#ffffff', 
   paddingHorizontal: 5,
   paddingTop: 90,
 },
@@ -190,9 +189,9 @@ logoContainer: {
 },
 
 logo: {
-  width: 50,
+  width: 60,
   height: 60,
-  borderRadius: 20,
+  borderRadius: 100,
   marginRight: 10,
 },
 
@@ -234,7 +233,7 @@ inputContainer: {
   alignItems: 'center',
   width: '100%',
   height: 50,
-  backgroundColor: '#EFE8DD',
+  backgroundColor: '#FAEDDD',
   borderRadius: 20,
   paddingHorizontal: 15,
   marginBottom: 10,
@@ -248,7 +247,8 @@ icon: {
 inputText: {
   fontSize: 14,
   color: 'black',
-  flex: 1
+  flex: 1, 
+  width: '100%'
 },
 
 forgotTextContainer: {
@@ -264,7 +264,7 @@ forgotText: {
 
 buttonText: {
   fontSize: 16,
-  color: '#3C4F46',
+  color: '#000',
   fontWeight: 'bold',
 },
 

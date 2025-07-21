@@ -107,7 +107,7 @@ container: {
   marginTop: 40,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 content: {
@@ -136,7 +136,7 @@ closeCircle: {
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   opacity: 0.8,
 },
 

@@ -46,7 +46,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 topRow: {

@@ -16,7 +16,6 @@ import YourAudioScreen from './screens/Meditation/YourAudioScreen';
 import AudioPlayer from './screens/Meditation/AudioPlayerScreen';
 import FeaturedViewAllScreen from './screens/Meditation/FeaturedViewAllScreen';
 import MeditationSessionDetail from './screens/Meditation/MeditationSessionDetail';
-import SessionsAudioPlayerScreen from './screens/Meditation/SessionsAudioPlayerScreen';
 import AudioRecorderModal from './screens/Meditation/AudioRecorderModal';
 import ProfileScreen from './screens/ProfileScreen'; 
 import EditProfileScreen from './screens/EditProfileScreen';
@@ -46,7 +45,6 @@ export default function App() {
       <Stack.Screen name="AudioPlayerScreen" component={AudioPlayer}/>
       <Stack.Screen name="FeaturedViewAll" component={FeaturedViewAllScreen}/>
       <Stack.Screen name="MeditationSessionDetail" component={MeditationSessionDetail}/> 
-      <Stack.Screen name="SessionsAudioPlayerScreen" component={SessionsAudioPlayerScreen}/>
       <Stack.Screen name="AudioRecordedModal" component={AudioRecorderModal}/>
       <Stack.Screen name="ProfileScreen" component={ProfileScreen}/>
       <Stack.Screen name="SettingScreen" component={SettingScreen}/>

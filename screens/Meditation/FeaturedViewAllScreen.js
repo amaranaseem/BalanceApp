@@ -80,7 +80,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 topRow: {
@@ -97,7 +97,7 @@ closeCircle: {
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   opacity: 0.8,
 },
 
@@ -120,14 +120,14 @@ featuredItem: {
 featuredTitle: {
   fontSize: 16,
   fontWeight: '500',
-   color: '#000',
+  color: '#000',
 },
 
 featuredSubtitle: {
   fontSize: 14,
   color: '#666',
   marginTop: 4,
-   color: '#000',
+  color: '#000',
 },
 
 });

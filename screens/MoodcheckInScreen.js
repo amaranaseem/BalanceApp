@@ -202,149 +202,151 @@ return (
 export default MoodCheckInScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FAF9F6', 
+container: {
+  flex: 1,
+  backgroundColor: '#fff', 
+},
+
+topRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 20,
+},
+
+closeCircle: {
+  width: 38,
+  height: 38,
+  borderRadius: 19,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#FAEDDD',
+  opacity: 0.8,
+},
+
+headerText: {
+  fontSize: 26,
+  fontWeight: 'bold',
+  color: '#50483D',
+},
+
+dateRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  borderColor: '#DDD2C1',
+  borderWidth: 1,
+  padding: 10,
+  borderRadius: 12,
+  marginTop: 10,
+  marginBottom: 20,
+  width: '100%',
+  justifyContent: 'center',
+},
+
+dateText: {
+  marginLeft: 8,
+  color: 'black',
+  fontWeight: '600',
+},
+
+heading: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#50483D',
+  marginTop: 16,
+  marginBottom: 10,
+},
+
+moodScroll: {
+  maxHeight: 100,
+  marginBottom: 10,
+},
+
+moodItem: {
+  backgroundColor: '#F0ECE6',
+  paddingVertical: 10,
+  paddingHorizontal: 12,
+  borderRadius: 14,
+  marginRight: 10,
+  alignItems: 'center',
+  width: 85,
+  height: 90,
+},
+
+emoji: {
+  fontSize: 24,
+},
+
+moodLabel: {
+  fontSize: 12,
+  marginTop: 9,
+  fontWeight: 'bold',
+  color: 'black',
+  textTransform: 'capitalize',
+},
+
+saveBtn: {
+  marginTop: 20,
+  backgroundColor: '#A8D5BA',
+  padding: 14,
+  borderRadius: 15,
+  alignItems: 'center',
+},
+
+saveText: {
+  fontWeight: 'bold',
+  color: 'black',
+},
+
+tagcontainer: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: 8,
+},
+
+tag: {
+  backgroundColor: '#F0ECE6',
+  paddingHorizontal: 14,
+  paddingVertical: 6,
+  borderRadius: 20,
+},
+
+selectedTag: {
+  backgroundColor: '#A58E74',
+},
+
+selectedTagText: {
+  color: '#fff',
+  fontStyle: 'italic',
+  fontWeight: 'bold',
+},
+
+input: {
+  height: 100,
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 14,
+  textAlignVertical: 'top',
+  marginTop: 8,
+  opacity:0.9,
+  borderColor: '#000', 
+  borderWidth: 0.5, 
   },
 
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 20,
-  },
-
-  closeCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#D8CAB8',
-    opacity: 0.8,
-  },
-
-  headerText: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#50483D',
-  },
-
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#DDD2C1',
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 12,
-    marginTop: 10,
-    marginBottom: 20,
-    width: '100%',
-    justifyContent: 'center',
-  },
-
-  dateText: {
-    marginLeft: 8,
-    color: 'black',
-    fontWeight: '600',
-  },
-
-  heading: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#50483D',
-    marginTop: 16,
-    marginBottom: 10,
-  },
-
-  moodScroll: {
-    maxHeight: 100,
-    marginBottom: 10,
-  },
-
-  moodItem: {
-    backgroundColor: '#F0ECE6',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    marginRight: 10,
-    alignItems: 'center',
-    width: 85,
-    height: 90,
-  },
-
-  emoji: {
-    fontSize: 24,
-  },
-
-  moodLabel: {
-    fontSize: 12,
-    marginTop: 9,
-    fontWeight: 'bold',
-    color: 'black',
-    textTransform: 'capitalize',
-  },
-
-  saveBtn: {
-    marginTop: 20,
-    backgroundColor: '#A8D5BA',
-    padding: 14,
-    borderRadius: 15,
-    alignItems: 'center',
-  },
-
-  saveText: {
-    fontWeight: 'bold',
-    color: 'black',
-  },
-
-  tagcontainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-
-  tag: {
-    backgroundColor: '#F0ECE6',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-
-  selectedTag: {
-    backgroundColor: '#A58E74',
-  },
-
-  selectedTagText: {
-    color: '#fff',
-    fontStyle: 'italic',
-    fontWeight: 'bold',
-  },
-
-   input: {
-    height: 100,
-    backgroundColor: '#F4E9DA',
-    borderRadius: 12,
-    padding: 14,
-    textAlignVertical: 'top',
-    marginTop: 8,
-    opacity:0.9,
-  },
-
-  counter: {
-    textAlign: 'right',
-    marginTop: 4,
-    color: '#888',
-    fontSize: 12,
-  },
+counter: {
+  textAlign: 'right',
+  marginTop: 4,
+  color: '#888',
+  fontSize: 12,
+},
 
 errorText: {
-    color: '#E94F4F',
-    marginTop: 6,
-    marginBottom: 4,
-    fontSize: 13,
-    fontWeight: '500',
-    fontStyle: 'italic',
-  },
+  color: '#E94F4F',
+  marginTop: 6,
+  marginBottom: 4,
+  fontSize: 13,
+  fontWeight: '500',
+  fontStyle: 'italic',
+},
 });

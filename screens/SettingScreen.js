@@ -34,25 +34,23 @@ try {
 };
 
 const handleDeleteAccount = () => {
-Alert.alert( 'Delete Account','Are you sure you want to permanently delete your account and all your data?',
-[{ text: 'Cancel', 
-   style: 'cancel' 
-    },
-    { text: 'Delete',
-      style: 'destructive',
-      onPress: async () => {
-
+  Alert.alert( 'Delete Account','Are you sure you want to permanently delete your account and all your data?',
+  [{ text: 'Cancel', style: 'cancel'},
+    { text: 'Delete', style: 'destructive', onPress: async () => {
     try {
-    if (user) {
+      if (user) {
 
-    // Delete Firestore user data
-    await deleteDoc(doc(db, 'users', user.uid));
+      // Delete Firestore user data
+      await deleteDoc(doc(db, 'users', user.uid));
+      console.log('User deleted from Firebase.');
 
-    // Delete Auth user
-    await deleteUser(user);
+      // Delete Auth user
+      await deleteUser(user);
 
-    navigation.replace('Login');
-    }
+      console.log('Account deleted.');
+
+      navigation.replace('Login');
+         }
     } catch (error) {
     console.error('Delete error:', error);
     Alert.alert('Error', 'Could not delete account. Try logging out and logging back in.');
@@ -75,7 +73,7 @@ return (
 
 {/* FAQ */}
 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FAQsScreen')}>
-<Ionicons name="information-circle-outline" size={20} color="#000" />
+<Ionicons name="information-circle-outline" size={23} color="#000" />
 <Text style={styles.text}>FAQs</Text>
 </TouchableOpacity>
 
@@ -87,13 +85,14 @@ return (
 
 {/* Delete Account */}
 <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteAccount}>
+  <Ionicons name="trash-outline" size={20} color="#E94F4F" />
 <Text style={styles.deleteText}>Delete Account</Text>
 </TouchableOpacity>
 
 
 {/* Logout */}
 <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-<Ionicons name="log-out-outline" size={20} color="#fff" />
+<Ionicons name="log-out-outline" size={20} color="#000" />
 <Text style={styles.btnText}>Logout</Text>
 </TouchableOpacity>
 </View>
@@ -108,7 +107,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#ffffff',
 },
 
 topRow: {
@@ -123,7 +122,7 @@ headerTextInput: {
   fontSize: 28,
   fontWeight: 'bold',
   flex: 1,
-  color: '#50483D',
+  color: '#000',
   alignSelf: 'center'
 },
 
@@ -131,8 +130,8 @@ button: {
   padding: 12,
   borderRadius: 10,
   flexDirection: 'row',
+  alignItems: 'flex-start',
   justifyContent: 'center',
-  alignItems: 'center',
   gap: 12, 
   borderWidth: 1,
   borderColor: '#000',
@@ -140,28 +139,27 @@ button: {
 },
 
 logoutBtn: {
-  backgroundColor: '#3C4F46',
+  backgroundColor: '#A8D5BA',
   padding: 12,
   borderRadius: 10,
   flexDirection: 'row',
-  justifyContent: 'center',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: 12, 
   marginBottom: 20,
-
 },
 
 text: {
   color: '#000',
   fontSize: 16,
-  fontWeight: 'bold', 
+  fontWeight: '500', 
 }, 
 
 btnText: {
-  color: '#fff',
+  color: '#000',
   fontSize: 16,
   marginLeft: 6,
-  fontWeight: 'bold'
+  fontWeight: '500'
 },  
 
 deleteBtn: {
@@ -169,17 +167,18 @@ deleteBtn: {
   padding: 12,
   borderRadius: 10,
   flexDirection: 'row',
-  justifyContent: 'center',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: 12, 
   marginBottom: 20,
+  marginTop: 40
 },
 
 deleteText:{
   color: '#E94F4F',
   fontSize: 16,
   marginLeft: 6,
-  fontWeight: 'bold'
+  fontWeight: '500'
 }
 
 })

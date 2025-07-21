@@ -128,7 +128,7 @@ return (
   style={styles.fab}
   onPress={() => navigation.navigate('Notepad')}
   >
-   <Ionicons name="add" size={28} color="white" />
+   <Ionicons name="add" size={28} color="black" />
   </TouchableOpacity>
    </View>
   );
@@ -160,18 +160,8 @@ headerText: {
   marginBottom: 20,
 },
 
-closeCircle: {
-  width: 38,
-  height: 38,
-  borderRadius: 19,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#D8CAB8',
-  opacity: 0.8,
-},
-
 card: {
-  backgroundColor: '#F6EFE6',
+  backgroundColor: '#FAEDDD',
   borderColor: '#D8CAB8',
   borderWidth: 1,
   borderRadius: 20,
@@ -234,7 +224,7 @@ fab: {
   position: 'absolute',
   right: 30,
   bottom: 30,
-  backgroundColor: '#A58E74',
+  backgroundColor: '#A8D5BA',
   borderRadius: 40,
   padding: 18,
   elevation: 5,

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Modal } from 'react-native';
-import { Checkbox } from 'react-native-paper';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import AddTaskScreen from './AddTaskScreen';

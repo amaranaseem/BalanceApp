@@ -120,7 +120,7 @@ container: {
   flexGrow: 1,
   paddingTop: 80,
   alignItems: 'center',
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 topRow: {
@@ -145,7 +145,7 @@ closeCircle: {
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#ccc',
+  backgroundColor: '#FAEDDD',
   opacity: 0.8,
 },
 

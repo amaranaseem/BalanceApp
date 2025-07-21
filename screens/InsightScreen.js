@@ -236,7 +236,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6', 
+  backgroundColor: '#fff', 
 },
 
 scrollList: {
@@ -322,7 +322,7 @@ card: {
   alignItems: 'center',
   justifyContent: 'center',
   borderColor: '#50483D', 
-  borderWidth: 1,
+  borderWidth: 0.5,
 
 },
 

@@ -9,6 +9,7 @@ const MeditationSessionDetail = ({ route, navigation }) => {
   const [sessionData, setSessionData] = useState(null);
   const [tracks, setTracks] = useState([]);
 
+  // Fetching Session from Firebase
   useEffect(() => {
     const fetchSession = async () => {
     const docRef = doc(db, 'meditationSessions', sessionId);
@@ -21,6 +22,7 @@ const MeditationSessionDetail = ({ route, navigation }) => {
     fetchSession();
   }, [sessionId]);
 
+  // Fetching Tracks from Firebase
   useEffect(() => {
     const fetchTracks = async () => {
      const tracksRef = collection(db, 'meditationSessions', sessionId, 'Tracks');
@@ -35,15 +37,6 @@ const MeditationSessionDetail = ({ route, navigation }) => {
     fetchTracks();
   }, [sessionId]);
 
- const playAll = () => {
-   if (tracks.length > 0) {
-    navigation.navigate('SessionsAudioPlayerScreen', {
-      title: sessionData?.title,
-      tracks,
-      imgURL: sessionData?.imgURL
-    });
-  }
-  };
 
 return (
  <View style={styles.container}>
@@ -60,15 +53,19 @@ return (
   <Image source={{ uri: sessionData.imgURL }} style={styles.image} />
   )}
 
-  <TouchableOpacity style={styles.playAllBtn} onPress={playAll}>
-  <Ionicons name="play" size={20} color="#fff" />
-  <Text style={styles.playAllText}>Play All</Text>
-  </TouchableOpacity>
-
   {tracks.map((track) => (
   <View key={track.id} style={styles.trackItem}>
   <Text style={styles.trackTitle}>{track.title?.trim() || 'Untitled'}</Text>
   <Text style={styles.trackDuration}>{track.duration} m</Text>
+
+  <TouchableOpacity onPress={() => navigation.navigate('AudioPlayerScreen', {
+    title: track.title,
+    url: track.url,
+    imgURL: sessionData?.imgURL,
+   })
+   } style={styles.trackPlayBtn}>
+    <Ionicons name="play-circle" size={30} color="#3C4F46" />
+   </TouchableOpacity>
   </View>
   ))}
   </ScrollView>
@@ -85,7 +82,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 topRow: {
@@ -102,7 +99,7 @@ closeCircle: {
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   opacity: 0.8,
 },
 
@@ -125,36 +122,32 @@ title: {
   marginBottom: 16
 },
 
-playAllBtn: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  backgroundColor: '#50483D',
-  padding: 12,
-  borderRadius: 8,
-  marginBottom: 20,
-  alignSelf: 'flex-start'
-},
-
-playAllText: {
-  color: '#fff',
-  marginLeft: 8,
-  fontWeight: '600'
-},
-
 trackItem: {
   flexDirection: 'row',
   justifyContent: 'space-between',
   paddingVertical: 12,
   borderBottomWidth: 0.5,
-  borderBottomColor: '#ccc'
+  borderBottomColor: '#ccc', 
+  alignItems: 'center',
+  paddingHorizontal: 16,
+  backgroundColor: '#F0F0F0',
+  borderRadius: 10,
+  marginBottom: 10,
 },
   
 trackTitle: {
-  fontSize: 16
+  fontSize: 16, 
+  fontWeight: 'bold',
+  color: '#3C4F46',
 },
   
 trackDuration: {
-  fontSize: 12,
-  color: '#666'
+ fontSize: 14,
+  color: '#777',
+  marginTop: 4,
+},
+
+trackPlayBtn: {
+  paddingLeft: 10,
 }
 });

@@ -113,14 +113,14 @@ return (
   <View style={styles.imageWrapper}>
   <Image source={image ? { uri: image } : require('../assets/profilepic.png')} style={styles.image} />
   <TouchableOpacity style={styles.editIcon} onPress={pickImage}>
-  <Ionicons name="pencil" size={20} color="#fff" />
+  <Ionicons name="pencil" size={20} color="#000" />
   </TouchableOpacity>
   </View>
 
   {/* Name Field */}
   <View style={styles.inputWrapper}>
   <View style={styles.inputContainer}>
-    <Ionicons name="person-outline" size={20} color="#00" style={styles.icon} />
+    <Ionicons name="person-outline" size={20} color="#A58E74" style={styles.icon} />
   <TextInput
    style={styles.inputText}
    placeholder="Full Name"
@@ -134,7 +134,7 @@ return (
   {/* username Field */}
   <View style={styles.inputWrapper}>
   <View style={styles.inputContainer}>
-    <Ionicons name="person-outline" size={20} color="#000" style={styles.icon} />
+    <Ionicons name="person-outline" size={20} color="#A58E74" style={styles.icon} />
   <TextInput
    style={styles.inputText}
    placeholder="Username"
@@ -148,7 +148,7 @@ return (
   {/* DOB Selection */}
   <View style={styles.inputWrapper}>
   <TouchableOpacity style={styles.inputContainer} onPress={() => setShowDatePicker(true)}>
-  <Ionicons name="calendar" size={20} color="#000" style={styles.icon} />
+  <Ionicons name="calendar-outline" size={20} color="#A58E74" style={styles.icon} />
   <Text style={[styles.inputText, !dob && { color: '#000' }]}> {dob || 'Select Date of Birth'} </Text>
   </TouchableOpacity>
   {showDatePicker && (
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   paddingTop: 40,
   paddingHorizontal: 20,
   paddingBottom: 10,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
   alignItems: 'center'
 },
 
@@ -222,9 +222,9 @@ editIcon: {
   position: 'absolute',
   right: 0,
   bottom: 0,
-  backgroundColor: '#3C4F46',
+  backgroundColor: '#FAEDDD',
   padding: 6,
-  borderRadius: 12,
+  borderRadius: 100,
 },
 
 icon: {
@@ -242,7 +242,7 @@ inputContainer: {
   alignItems: 'center',
   width: '100%',
   height: 50,
-  backgroundColor: '#EFE8DD',
+  backgroundColor: '#FAEDDD',
   borderRadius: 14,
   paddingHorizontal: 15,
 },
@@ -250,6 +250,7 @@ inputContainer: {
 inputText: {
   fontSize: 14,
   color: 'black',
+  width: '100%'
 },
 
 button:{
@@ -266,7 +267,7 @@ button:{
 
 buttonText: {
   fontSize: 16,
-  color: '#3C4F46',
+  color: '#000',
   fontWeight: 'bold',
 },
 

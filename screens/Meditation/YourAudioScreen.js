@@ -1,8 +1,8 @@
 import React, {useState, useCallback} from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, Modal} from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, Modal, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, deleteDoc, doc} from 'firebase/firestore';
 import app from '../../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import {query, orderBy} from 'firebase/firestore';
@@ -17,8 +17,32 @@ const YourAudioScreen = () => {
   const [userMeditations, setUserMeditations] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const user = getAuth().currentUser;
 
- 
+
+ // delete task
+  const deleteAudio = async (id) => {
+   try {
+    await deleteDoc(doc(db, 'users', user.uid, 'userMeditations', id));
+    fetchUserMeditations();
+   } catch (error) {
+   console.error('Error deleting audio:', error);
+   }
+  };
+
+  // confirm delete task
+  const confirmDelete = (id) => {
+   Alert.alert(
+    '❌ Delete Task',
+    'Are you sure you want to delete this task?',
+  [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Delete', style: 'destructive', onPress: () => deleteAudio(id) },
+    ]
+   );
+  };
+
+ //Fetching user meditation from firebase
   const fetchUserMeditations = async () => {
   try {
   const user = getAuth().currentUser;
@@ -58,6 +82,8 @@ const renderItem = ({ item }) => (
     <Text style={styles.title}>{item.title}</Text>
     <Text style={styles.subtitle}>{item.duration}s</Text>
    </View>
+
+   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
    <TouchableOpacity onPress={() => navigation.navigate('AudioPlayerScreen', {
     title: item.title,
     url: item.audioURL,
@@ -66,6 +92,12 @@ const renderItem = ({ item }) => (
    >
     <Ionicons name="play" size={28} color="#50483D" />
     </TouchableOpacity>
+
+    <TouchableOpacity onPress={() => confirmDelete(item.id)}>
+  <Ionicons name="trash" size={22} color="#E94F4F" />
+  </TouchableOpacity>
+
+  </View>
   </View>
   </View>
 );
@@ -92,7 +124,7 @@ return (
    contentContainerStyle={{ paddingBottom: 100 }}
     />
    )}
-        
+
   {/* Add Tasks Button */}
   <TouchableOpacity style={styles.saveBtn} onPress={() => setModalVisible(true)}>
     <Text style={styles.saveText}>+ Add</Text>
@@ -118,7 +150,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 topRow: {
@@ -142,40 +174,8 @@ closeCircle: {
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   opacity: 0.8,
-},
-
-card: {
-  backgroundColor: '#F6EFE6',
-  borderColor: '#D8CAB8',
-  borderWidth: 1,
-  borderRadius: 20,
-  padding: 16,
-  marginBottom: 16,
-},
-
-cardHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  marginBottom: 6,
-},
-
-cardTitle: {
-  fontSize: 16,
-  fontWeight: 'bold',
-  color: '#50483D',
-},
-
-cardDate: {
-  fontSize: 13,
-  color: '#7A6F5F',
-},
-
-cardText: {
-  fontSize: 13,
-  color: '#50483D',
-  marginBottom: 8,
 },
 
 audio: {
@@ -227,7 +227,7 @@ audioCard: {
   backgroundColor: '#E9F1F0',
   padding: 16,
   borderRadius: 12,
-  marginBottom: '12',
+  marginBottom: 12,
   width: '100%'
 },
 
@@ -241,5 +241,12 @@ subtitle: {
   color: '#666',
 },
 
+placeholder:{
+  justifyContent: 'center', 
+  textAlign: 'center', 
+  marginTop: 100, 
+  color: '#777', 
+  fontSize: 17,
+}
 
 });

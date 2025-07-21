@@ -104,7 +104,7 @@ return (
   </View>
 
   {/* Featured Meditation */}
-<ScrollView>
+  <ScrollView>
     <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>Featured</Text>
     <TouchableOpacity onPress={() => navigation.navigate('FeaturedViewAll')}>
@@ -199,7 +199,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
 },
 
 topRow: {

@@ -111,7 +111,7 @@ return (
 {/* Header */}
 <View style={styles.topRow}>
 <TouchableOpacity  style={styles.closeCircle} onPress={() => navigation.navigate('SettingScreen')}>
-  <Ionicons name="settings-outline" size={22} color="#50483D" />
+  <Ionicons name="settings-outline" size={22} color="black" />
 </TouchableOpacity>
 
 <TouchableOpacity onPress={() => navigation.navigate('BottomNavTab', { screen: 'HomeScreen' })}>
@@ -144,21 +144,21 @@ return (
 
 {/* Check-ins */}
 <View style={styles.statCard}>
-<Ionicons name="checkbox-outline" size={22} color="#50483D" />
+<Ionicons name="checkbox-outline" size={22} color="#A58E74" />
 <Text style={styles.statLabel}>Check-ins</Text>
 <Text style={styles.statNumber}>{checkInCount}</Text>
 </View>
 
 {/* Journal */}
 <View style={styles.statCard}>
-<Ionicons name="book-outline" size={22} color="#50483D" />
+<Ionicons name="book-outline" size={22} color="#A58E74" />
 <Text style={styles.statLabel}>Journal</Text>
 <Text style={styles.statNumber}>{journalCount}</Text>
 </View>
 
 {/* Streaks */}
 <View style={styles.statCard}>
-<Ionicons name="ribbon-outline" size={22} color="#50483D" />
+<Ionicons name="ribbon-outline" size={22} color="#A58E74" />
 <Text style={styles.statLabel}>Streaks</Text>
 <Text style={styles.statNumber}>{streakCount}</Text>
 </View>
@@ -167,14 +167,14 @@ return (
 <View style={styles.gridRow}>
 {/* Top Mood */}
 <View style={styles.statCard}>
-<Ionicons name="happy-outline" size={22} color="#50483D" />
+<Ionicons name="happy-outline" size={22} color="#A58E74" />
 <Text style={styles.statLabel}>Top Mood</Text>
-<Text style={styles.statNumber}>{topMood}</Text>
+<Text style={styles.statNumber}>{topMood || '-'} </Text>
 </View>
 
 {/* Streaks */}
 <View style={styles.statCard}>
-<Ionicons name="analytics-outline" size={22} color="#50483D" />
+<Ionicons name="analytics-outline" size={22} color="#A58E74" />
 <Text style={styles.statLabel}>Consistency</Text>
 <Text style={styles.statNumber}>{consistency}%</Text>
 </View>
@@ -220,7 +220,7 @@ container: {
   paddingTop: 60,
   paddingHorizontal: 20,
   paddingVertical: 20,
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#ffff',
 },
 
 topRow: {
@@ -244,7 +244,7 @@ closeCircle: {
   borderRadius: 19,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   opacity: 0.8,
 },
 
@@ -281,14 +281,14 @@ editIconWrapper: {
   position: 'absolute',
   right: 260, 
   bottom: 5,
-  backgroundColor: '#D8CAB8',
+  backgroundColor: '#FAEDDD',
   borderRadius: 20,
   padding: 6,
 },
 
 
 statsBox: {
-  backgroundColor: '#F1E7D7',
+  backgroundColor: '#FAEDDD',
   padding: 16,
   borderRadius: 10,
   flexDirection: 'row',
@@ -319,7 +319,7 @@ gridRow: {
 },
 
 statCard: {
-  backgroundColor: '#F1E7D7',
+  backgroundColor: '#FAEDDD',
   width: '30%',
   paddingVertical: 16,
   borderRadius: 12,
@@ -367,7 +367,7 @@ achievementContainer: {
 },
 
 achievementItem: {
-  backgroundColor: '#F1E7D7',
+  backgroundColor: '#FAEDDD',
   flexDirection: 'row',
   alignItems: 'center',
   marginVertical: 5,
