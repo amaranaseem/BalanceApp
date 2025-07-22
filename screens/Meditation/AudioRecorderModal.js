@@ -157,7 +157,7 @@ const AudioRecorderModal = ({ closeModal, onSave }) => {
 {/* Save function */}
  const handleSave = async () => {
   if (!audioURI) {
-     Alert.alert('Audio Needed','Please record audio before saving.');
+     Alert.alert('🎤Audio Needed','Please record audio before saving.');
     return};
 
   try {
@@ -177,7 +177,7 @@ const AudioRecorderModal = ({ closeModal, onSave }) => {
       title: title?.trim() || 'Untitled', 
     });
 
-    Alert.alert('Success', 'Audio saved successfully!');
+    Alert.alert('🎉Success', 'Audio saved successfully!');
 
     // Reset state
     setAudioURI(null);

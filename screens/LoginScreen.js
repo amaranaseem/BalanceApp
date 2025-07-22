@@ -13,6 +13,11 @@ const LoginScreen = ({ navigation }) => {
   const [showPassword,setShowPassword ]= useState(false);
 
 
+// References:
+// Login logic influenced by React Native Firebase and "Super Easy React Native Authentication with Firebase" youtube video. timestamp: 7:00 
+// Video Link: https://www.youtube.com/watch?v=ONAVmsGW6-M&t=439s 
+// Document Link: https://rnfirebase.io/auth/usage#emailpassword-sign-in 
+
 {/*User Authentication with error handling*/}
 const handleLogin = async () => {
   if (!email || !password) {
@@ -63,6 +68,10 @@ const handleLogin = async () => {
 
 };
 
+// Reference:
+// Password reset logic influence by Firebase documentation 
+// link: https://firebase.google.com/docs/auth/web/manage-users#send_a_password_reset_email
+
 {/* Password reset  */}
 const handlePasswordReset = async () => {
   if (!email) {
@@ -104,7 +113,6 @@ return (
   </View>
 
   <Text style={styles.headerText}>Login</Text>
-  <Text style={styles.subText}>Get started for free</Text>
          
   {/* Email Field */}
   <View style={styles.inputWrapper}>
@@ -152,12 +160,13 @@ return (
   </TouchableOpacity>
   </View>
 
-  {/* Signup Link */}
-  <View style={styles.linkcontainer}>
-  <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-  <Text style={styles.linkText}>Not a member? Register</Text>
+  {/* Signup Button */}  
+  <View style={styles.siginContainer}>
+  <TouchableOpacity style={styles.signinButton} onPress={() => navigation.navigate('Register')}>
+  <Text style={styles.buttonText}>Sign Up</Text>
   </TouchableOpacity>
   </View>
+
   </ScrollView>
   </TouchableWithoutFeedback>
   </KeyboardAvoidingView>
@@ -172,7 +181,7 @@ container: {
   justifyContent: 'flex-start',
   backgroundColor: '#ffffff', 
   paddingHorizontal: 5,
-  paddingTop: 90,
+  paddingTop: 80,
 },
 
 scrollcontainer:{
@@ -206,15 +215,8 @@ headerText:{
   fontWeight: 'bold',
   color: '#50483D',
   alignSelf: 'flex-start',
+  marginBottom: 45
 }, 
-
-subText:{
-  fontSize: 14,
-  color: '#7A6F5F',
-  marginBottom: 25,
-  alignSelf: 'flex-start',
-  marginTop: 15,
-},
 
 inputWrapper: {
   width: '100%',
@@ -284,19 +286,25 @@ button:{
   borderRadius: 14,
   marginTop: 40,
   marginBottom: 30,
-  elevation: 2,
 },
 
-linkText:{
-  fontSize: 14,
-  marginTop: 20,
-  textAlign: 'left',
-}, 
-
-linkcontainer:{
-  alignSelf: 'flex-start',
-  marginTop: 35,
-  marginLeft: 10,
+siginContainer:{
+  width: '100%',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 30,
 },
+
+signinButton:{
+  padding: 12,
+  borderColor: '#A8D5BA',
+  width: '100%',
+  alignItems: 'center',
+  borderRadius: 14,
+  marginTop: 15,
+  marginBottom: 30,
+  borderWidth: 1,
+},
+
 
 });

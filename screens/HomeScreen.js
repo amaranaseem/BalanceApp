@@ -193,7 +193,7 @@ const toggleTask = async (id) => {
   await updatedCheckedTasks(updatedChecked);
     
   if(updatedChecked.length === tasks.length && tasks.length > 0 ){
-    Alert.alert ('Great Job!', 'All tasks completed for today.');
+    Alert.alert ('🎉Great Job!', 'All tasks completed for today.');
   }
     
  //update goal progress
@@ -365,10 +365,13 @@ topRow: {
 welcomecard: {
   backgroundColor: '#FFE2D0',
   padding: 20,
-  borderRadius: 20,
+  borderRadius: 10,
   marginTop: 30,
   flexDirection: 'row',
   justifyContent: 'space-between',
+  borderWidth: 1,
+  borderColor: '#FFE2D0',
+  elevation: 2
 },
 
 textContainer: {
@@ -408,7 +411,6 @@ moodBar:{
   borderRadius: 16, 
   borderWidth: 1,
   height: 55,
-  backgroundColor:'#fff'
 },
 
 moodCircle: {
@@ -457,9 +459,11 @@ h3: {
 },
 
 progressCard: {
-  backgroundColor: '#fff',
+  backgroundColor: '#FAF9F6',
   padding: 16,
   borderRadius: 16,
+  borderColor: '#FFA177', 
+  borderWidth: 0.5,
 },
 
 progressTextRow: {
@@ -480,7 +484,7 @@ taskList: {
 
 taskItem: {
   flexDirection: 'row',
-  backgroundColor: '#FAF9F6',
+  backgroundColor: 'transparent',
   padding: 16,
   borderRadius: 12,
   alignItems: 'center',

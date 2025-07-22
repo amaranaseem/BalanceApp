@@ -85,7 +85,7 @@ const handleSave = async() => {
   });
 
   if(alreadyLoggedToday){
-    Alert.alert('Mood Already Logged', "You've already logged your mood for today.");
+    Alert.alert('😊Mood Already Logged', "You've already logged your mood for today.");
     return;
   }
 
@@ -99,7 +99,7 @@ const handleSave = async() => {
     score: selectedMood.score,
   });
 
-  Alert.alert("Well done!", "You've successfully logged your mood.", [
+  Alert.alert("🎉Well done!", "You've successfully logged your mood.", [
   { text: "OK", onPress: () => navigation.navigate('HomeTabs'), }
   ]);
   

@@ -12,6 +12,9 @@ const RegisterScreen = ({ navigation }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+// References:
+// Login logic influenced by React Native Firebase 
+// Link: https://rnfirebase.io/auth/usage#emailpassword-sign-in 
 
  {/*User Authentication with error handling*/}
  const handleRegister = async () => {
@@ -20,9 +23,11 @@ const RegisterScreen = ({ navigation }) => {
     return;
   }
 
+  //Email format: checks for whitespace, @ and domain ".com"
+  // fomat: example@domain.com 
  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    alert('Please enter a valid email');
+    alert('Invalid Email: example@domain.com format should be followed');
     return;
   }
 
@@ -125,12 +130,13 @@ return (
   </TouchableOpacity>
   </View>
 
-  {/* Login Link */}
-  <View style={styles.linkcontainer}>
-  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-  <Text style={styles.linkText}>Already a member? Login</Text>
+  {/* Register Button */}  
+  <View style={styles.loginContainer}>
+  <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
+  <Text style={styles.buttonText}>Login</Text>
   </TouchableOpacity>
   </View>
+
   </ScrollView>
   </TouchableWithoutFeedback>
   </KeyboardAvoidingView>
@@ -145,7 +151,7 @@ container: {
   justifyContent: 'flex-start',
   backgroundColor: '#FFFFFF', 
   paddingHorizontal: 5,
-  paddingTop: 90,
+  paddingTop: 80,
 },
 
 logoContainer: {
@@ -218,13 +224,14 @@ buttonText: {
   fontSize: 16,
   color: '#000',
   fontWeight: 'bold',
+  alignItems: 'center'
 },
 
 buttoncontainer:{
   width: '100%',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: 30,
+  marginTop: 40,
 },
 
 button:{
@@ -236,19 +243,6 @@ button:{
   borderRadius: 14,
   marginTop: 40,
   marginBottom: 30,
-  elevation: 2,
-},
-
-linkText:{
-  fontSize: 14,
-  marginTop: 20,
-  textAlign: 'left',
-}, 
-
-linkcontainer:{
-  alignSelf: 'flex-start',
-  marginTop: 35,
-  marginLeft: 10,
 },
 
 scrollcontainer:{
@@ -259,6 +253,24 @@ scrollcontainer:{
 
 icon:{
   marginRight: 10
-}
+}, 
+
+loginButton:{
+  padding: 12,
+  borderColor: '#A8D5BA',
+  width: '100%',
+  alignItems: 'center',
+  borderRadius: 14,
+  marginTop: 40,
+  marginBottom: 30,
+  borderWidth: 1,
+}, 
+
+loginContainer:{
+  width: '100%',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 10,
+},
 
 });

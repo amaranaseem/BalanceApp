@@ -205,7 +205,7 @@ const NotepadScreen = () => {
 
   console.log("Entry saved to Firestore");
 
-  Alert.alert("Saved!", "Your journal entry is saved.", [
+  Alert.alert("🎉Saved!", "Your journal entry is saved.", [
   { text: "OK",
     onPress: () => {
     setTitle('');

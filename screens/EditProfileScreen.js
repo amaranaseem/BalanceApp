@@ -69,7 +69,7 @@ const handleSubmit = async () => {
   username: newUsername,
   }));
 
-  Alert.alert('Success', 'Profile updated');
+  Alert.alert('🎉Success', 'Profile updated');
    closeModal();
   } catch (err) {
     console.error('Error updating profile:', err);
