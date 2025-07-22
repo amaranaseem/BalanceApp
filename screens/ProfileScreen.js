@@ -1,118 +1,91 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, Modal } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, Modal, Alert} from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { getAuth } from 'firebase/auth';
+import { getAuth, signOut, deleteUser} from 'firebase/auth';
 import { Ionicons} from '@expo/vector-icons';
-import { doc, getDoc, collection, getDocs, query, orderBy} from 'firebase/firestore';
+import {getFirestore, doc, getDoc, getDocs, deleteDoc} from 'firebase/firestore';
 import { db } from '../firebase';
 import EditProfileScreen from './EditProfileScreen';
 
-const achievements = [
-  { icon: "🎉", text: "3 habits maintained for 7 days in a row!" },
-  { icon: "🥇", text: "You completed 85% of your May goals" },
-  { icon: "🔥", text: "You're on a 10-day streak!" },
-];
 
-const AchievementItem = ({ icon, text }) => (
-  <View style={styles.achievementItem}>
-    <Text style={styles.icon}>{icon}</Text>
-    <Text style={styles.achievementText}>{text}</Text>
-  </View>
-);
 
 const ProfileScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
-  const [checkInCount, setCheckInCount] = useState(0);
-  const [journalCount, setJournalCount] = useState(0);
-  const [streakCount, setStreakCount] = useState(0);
   const [editProfileModalVisible, setEditProfileModalVisible] = useState(false);
-  const [consistency, setMoodConsistency] = useState(0);
-  const [topMood, setTopMood] = useState('');
   
+  const auth = getAuth();
   const user = getAuth().currentUser;
 
-const fetchProfileData = async () => {
+  useEffect(() => {
+  const fetchProfileData = async () => {
   if (!user) return;
 
   try {
-  const userRef = doc(db, 'users', user.uid);
-  const docSnap = await getDoc(userRef);
-  if (docSnap.exists()) {
-  setUserData(docSnap.data());
-  }
-
-{/*getting check-ins, journal and streaks overview from firebase */}
-  
-  const checkInsSnap = await getDocs(collection(db, 'users', user.uid, 'moodCheckins'));
-  const journalsSnap = await getDocs(collection(db, 'users', user.uid, 'entries'));
-
-  setCheckInCount(checkInsSnap.size);
-  setJournalCount(journalsSnap.size);
-
-  const datesSet = new Set();
-  checkInsSnap.forEach(doc => {
-  const data = doc.data();
-  const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
-  datesSet.add(createdAt.toDateString());
-  });
-
-  let streak = 0;
-  const today = new Date();
-  for (let i = 0; i < 30; i++) {
-  const date = new Date(today);
-  date.setDate(today.getDate() - i);
-  if (datesSet.has(date.toDateString())) {
-  streak++;
-  } else {
-  break;
-  }
- }
-  setStreakCount(streak);
-
-{/*getting moods overview from firebase */}
-
-const moodRef = collection(db, 'users', user.uid, 'moodCheckins');
-const q = query(moodRef, orderBy('createdAt'));
-const snapshot = await getDocs(q);
-
-const moodCounts = {};
-snapshot.forEach(doc => {
-  const data = doc.data();
-  const mood = data.mood;
-  if (mood) {
-    moodCounts[mood] = (moodCounts[mood] || 0) + 1;
-  }
-});
-
-const total = Object.values(moodCounts).reduce((a, b) => a + b, 0);
-const avg = total / Object.keys(moodCounts).length || 0;
-
-let variation = 0;
-Object.values(moodCounts).forEach(count => {
-  variation += Math.abs(count - avg);
-});
-
-const consistency = total ? Math.max(0, 100 - Math.floor((variation / total) * 100)) : 0;
-setMoodConsistency(consistency);
-
-const top = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-setTopMood(top);
-} catch (err) {
+   const userRef = doc(db, 'users', user.uid);
+   const docSnap = await getDoc(userRef);
+   if (docSnap.exists()) {
+   setUserData(docSnap.data());
+   }
+  } catch (err) {
   console.error('Error fetching profile data:', err);
   }
-};
- useEffect(() => {
-  fetchProfileData();
-}, []);
+ };
 
+  fetchProfileData();
+ }, []);
+
+ // Reference:
+ // Logout logic inspired from React Native Firebase Documentation
+ // Link: https://rnfirebase.io/auth/usage#emailpassword-sign-in
+ 
+ const handleLogout = async () => {
+  Alert.alert("🔒Logout", "Are you sure you want to logout?", [
+  {text: 'cancel', style: 'cancel' }, 
+  {text: 'OK', onPress: async () => {
+ 
+ try {
+  const email = user?.email;
+  await signOut(auth);
+  console.log('User logged out:', email);
+ 
+  navigation.replace('Login'); 
+ } catch (error) {
+    console.error('Logout error:', error);
+    Alert.alert("Error", "Failed to log out. Please try again.");
+    }
+  }
+  }
+ ]);
+ };
+ 
+ const handleDeleteAccount = () => {
+  Alert.alert( '⚠️ Delete Account','Are you sure you want to permanently delete your account and all your data?',
+  [{ text: 'Cancel', style: 'cancel'},
+  { text: 'Delete', style: 'destructive', onPress: async () => {
+  try {
+  if (user) {
+  // Delete Firestore user data
+   await deleteDoc(doc(db, 'users', user.uid));
+   console.log('User deleted from Firebase.');
+ 
+   // Delete Auth user
+   await deleteUser(user);
+   console.log('Account deleted.');
+
+   navigation.replace('Login');
+   }
+  }catch (error) {
+   console.error('Delete error:', error);
+   Alert.alert('Error', 'Could not delete account. Try logging out and logging back in.');
+     }
+   },
+ },]);
+ };
 
 return (
 <View style={styles.container}>
 
 {/* Header */}
 <View style={styles.topRow}>
-<TouchableOpacity  style={styles.closeCircle} onPress={() => navigation.navigate('SettingScreen')}>
-  <Ionicons name="settings-outline" size={22} color="black" />
-</TouchableOpacity>
 
 <TouchableOpacity onPress={() => navigation.navigate('BottomNavTab', { screen: 'HomeScreen' })}>
   <Ionicons name="chevron-back-outline" size={24} color="black" />
@@ -123,76 +96,49 @@ return (
 
 {/*Profile pic and information */}
 {userData && (
- <>
-<View style={styles.profileRow}>
+<View style={styles.profileContainer}>
 <Image
   source={userData.profileImage ? { uri: userData.profileImage } : require('../assets/profilepic.png')}
   style={styles.profileImage}
 />
-<TouchableOpacity style={styles.editIconWrapper} onPress={() => setEditProfileModalVisible(true)}>
-   <Ionicons name="pencil" size={16} color="#000"/>
-</TouchableOpacity>
-
 <View style={styles.profileInfo}>
 <Text style={styles.name}>{userData.name}</Text>
 <Text style={styles.username}>@{userData.username}</Text>
 </View>
 </View>
-
-{/* Status Overview */}
-<View style={styles.gridRow}>
-
-{/* Check-ins */}
-<View style={styles.statCard}>
-<Ionicons name="checkbox-outline" size={22} color="#A58E74" />
-<Text style={styles.statLabel}>Check-ins</Text>
-<Text style={styles.statNumber}>{checkInCount}</Text>
-</View>
-
-{/* Journal */}
-<View style={styles.statCard}>
-<Ionicons name="book-outline" size={22} color="#A58E74" />
-<Text style={styles.statLabel}>Journal</Text>
-<Text style={styles.statNumber}>{journalCount}</Text>
-</View>
-
-{/* Streaks */}
-<View style={styles.statCard}>
-<Ionicons name="ribbon-outline" size={22} color="#A58E74" />
-<Text style={styles.statLabel}>Streaks</Text>
-<Text style={styles.statNumber}>{streakCount}</Text>
-</View>
-</View>
-
-<View style={styles.gridRow}>
-{/* Top Mood */}
-<View style={styles.statCard}>
-<Ionicons name="happy-outline" size={22} color="#A58E74" />
-<Text style={styles.statLabel}>Top Mood</Text>
-<Text style={styles.statNumber}>{topMood || '-'} </Text>
-</View>
-
-{/* Streaks */}
-<View style={styles.statCard}>
-<Ionicons name="analytics-outline" size={22} color="#A58E74" />
-<Text style={styles.statLabel}>Consistency</Text>
-<Text style={styles.statNumber}>{consistency}%</Text>
-</View>
-</View>
-
-</>
 )}
 
-{/* Achievements Section*/}
-<Text style={styles.sectionTitle}>Achievements</Text>
-<View style={styles.achievementContainer}>
-{achievements.map((item, index) => (
-<AchievementItem key={index} icon={item.icon} text={item.text} />
-))}
-<Text style={styles.unachievedItem}>💡 Started your first self-care habit</Text>
-<Text style={styles.unachievedItem}>⏰ You didn't miss a reminder this week!</Text>
-<Text style={styles.unachievedItem}>💯 Maintained full consistency for 1 week!</Text>
-</View>
+{/* Edit Profile */}
+<TouchableOpacity style={styles.button} onPress={() => setEditProfileModalVisible(true)}>
+<Ionicons name="pencil" size={16} color="#000"/>
+<Text style={styles.text}>Edit Profile</Text>
+</TouchableOpacity>
+
+{/* FAQ */}
+<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FAQsScreen')}>
+<Ionicons name="information-circle-outline" size={23} color="#000" />
+<Text style={styles.text}>FAQs</Text>
+</TouchableOpacity>
+
+{/* Contact Support */}
+<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ContactSupportScreen')}>
+<Ionicons name="headset-outline" size={20} color="#000" />
+<Text style={styles.text}>Contact Support</Text>
+</TouchableOpacity>
+
+{/* Delete Account */}
+<TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteAccount}>
+  <Ionicons name="trash" size={20} color="#E94F4F" />
+<Text style={styles.deleteText}>Delete Account</Text>
+</TouchableOpacity>
+
+
+{/* Logout */}
+<TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+<Ionicons name="log-out-outline" size={20} color="#000" />
+<Text style={styles.btnText}>Logout</Text>
+</TouchableOpacity>
+</ScrollView>
 
 {/* Modal for editing profile*/}
 <Modal visible={editProfileModalVisible} animationType="fade" transparent>
@@ -206,8 +152,6 @@ return (
 </View>
 </View>
 </Modal>
-
-</ScrollView>
 </View>
 );
 };
@@ -224,111 +168,37 @@ container: {
 },
 
 topRow: {
-  flexDirection: 'row-reverse',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 12,
-  marginBottom: 10,
-},
-  
-closeCircle: {
-  width: 34,
-  height: 34,
-  borderRadius: 19,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#FAEDDD',
-  opacity: 0.8,
-},
-
-profileImage: {
-  width: 80,
-  height: 80,
-  borderRadius: 50,
-  borderWidth: 0.5,
-},
-
-profileRow: {
   flexDirection: 'row',
   alignItems: 'center',
-  marginBottom: 20,
+  justifyContent: 'space-between',
+},
+  
+profileImage: {
+  width: 180,
+  height: 180,
+  borderRadius: 100,
+  borderWidth: 0.5,
+  marginBottom: 10
 },
 
-profileInfo: {
-  marginLeft: 18,
+profileContainer:{
+  alignItems: 'center',
+  marginTop: 30,
 },
 
 name: {
-  fontSize: 22,
+  fontSize: 26,
   fontWeight: '600',
   color: '#50483D',
   marginTop: 10,
+  textAlign: 'center'
 },
 
 username: {
-  fontSize: 14,
+  fontSize: 16,
   color: '#7F7B73',
-},
-
-editIconWrapper: {
-  position: 'absolute',
-  right: 260, 
-  bottom: 5,
-  backgroundColor: '#FAEDDD',
-  borderRadius: 20,
-  padding: 6,
-},
-
-statsBox: {
-  backgroundColor: '#FAEDDD',
-  padding: 16,
-  borderRadius: 10,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 20,
-},
-
-statsLabel: {
-  fontSize: 16,
-  color: '#50483D',
-  flex: 1,
-  marginLeft: 10,
-},
-
-statsValue: {
-  fontSize: 18,
-  fontWeight: '600',
-  color: '#50483D',
-},
-
-gridRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-evenly',
-  marginBottom: 15,
-  marginTop: 15,
-  alignItems: 'center'
-},
-
-statCard: {
-  backgroundColor: '#FAEDDD',
-  width: '30%',
-  paddingVertical: 16,
-  borderRadius: 12,
-  alignItems: 'center',
-},
-
-statLabel: {
-  fontSize: 14,
-  color: '#50483D',
-  marginTop: 8,
-},
-
-statNumber: {
-  fontSize: 16,
-  fontWeight: 'bold',
-  color: '#50483D',
-  marginTop: 4,
+  textAlign: 'center', 
+  marginBottom: 50
 },
 
 modalBackground: {
@@ -345,46 +215,57 @@ modalContainer: {
   padding: 20,
 },
 
-sectionTitle: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#50483D',
-  marginBottom: 10,
-  marginTop: 20
-},
-
-achievementContainer: {
-  marginTop: 16,
-  alignContent: 'space-evenly',
-},
-
-achievementItem: {
-  backgroundColor: '#FAEDDD',
+button: {
+  padding: 12,
+  borderRadius: 10,
   flexDirection: 'row',
-  alignItems: 'center',
-  marginVertical: 5,
-  borderRadius: 30,
-  padding: 14
+  justifyContent: 'flex-start',
+  gap: 12, 
+  borderWidth: 1,
+  borderColor: '#000',
+  marginBottom: 20,
 },
 
-unachievedItem:{
-  backgroundColor: '#D9D9D9',
+logoutBtn: {
+  padding: 12,
+  borderRadius: 10,
   flexDirection: 'row',
-  alignItems: 'center',
-  marginVertical: 5,
-  borderRadius: 30,
-  padding: 14, 
-  opacity: 0.4
+  justifyContent: 'flex-start',
+  gap: 12, 
+  marginBottom: 20,
+  backgroundColor: '#bee1ccff', 
 },
 
-icon: {
+text: {
+  color: '#000',
   fontSize: 16,
-  marginRight: 10,
+  fontWeight: '500', 
+}, 
+
+btnText: {
+  color: '#000',
+  fontSize: 16,
+  marginLeft: 6,
+  fontWeight: '500'
+},  
+
+deleteBtn: {
+  backgroundColor: '#D9D9D9',
+  padding: 12,
+  paddingLeft: 16,
+  borderRadius: 10,
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  gap: 12, 
+  marginBottom: 20,
+  marginTop: 10, 
 },
 
-achievementText: {
-  fontSize: 14,
-  color: '#333',
-},
+deleteText:{
+  color: '#E94F4F',
+  fontSize: 16,
+  marginLeft: 6,
+  fontWeight: '500', 
+}
 
 });
