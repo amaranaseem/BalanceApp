@@ -459,11 +459,11 @@ h3: {
 },
 
 progressCard: {
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#fff',
   padding: 16,
   borderRadius: 16,
   borderColor: '#FFA177', 
-  borderWidth: 0.5,
+  borderWidth: 1,
 },
 
 progressTextRow: {
