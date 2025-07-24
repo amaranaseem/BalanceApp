@@ -9,6 +9,54 @@ import { getAuth } from 'firebase/auth';
 
 const db = getFirestore(app);
 
+const motivationalMessages = {
+  joy: [
+    "You're doing great! Celebrate the little moments.",
+    "Keep shining — your positivity is powerful!",
+    "Savor this joy, and share your smile."
+  ],
+
+  sad: [
+    "It’s okay to feel sad — be gentle with yourself.",
+    "You’re not alone. Today’s mood doesn’t define you.",
+    "Small steps matter. Just showing up is enough."
+  ],
+
+  angry: [
+    "Pause. Breathe. Let yourself reset.",
+    "Anger is valid. Try journaling it out.",
+    "Channel your energy into something constructive."
+  ],
+
+  anxiety: [
+    "You’ve handled tough moments before — you’ve got this.",
+    "Try a deep breath or a short walk. It can help.",
+    "Let thoughts pass — like clouds in the sky."
+  ],
+
+  calm: [
+    "Protect your peace. You deserve it.",
+    "Enjoy this calm — it's a gift.",
+    "Anchor yourself in the present. You're safe here."
+  ],
+
+  neutral: [
+    "Neutral is okay. Not every day needs a highlight.",
+    "Use this space to recharge or reflect.",
+    "Even stillness can be a form of progress."
+  ]
+};
+
+const alertTitles = {
+  joy: "😊 Keep Shining!",
+  sad: "💙 Take It Easy",
+  angry: "🔥 Pause and Reflect",
+  anxiety: "🌿 You Got This",
+  calm: "🕊️ Peaceful Moment",
+  neutral: "☁️ Steady and Strong"
+};
+
+
 const moods = [
   { emoji: '😁', label: 'joy', color: '#FFE38E', score: 1 },
   { emoji: '😞', label: 'sad', color: '#90C3E6', score: 2 },
@@ -56,6 +104,7 @@ const handleTagPress = (tag) => {
 const handleSave = async() => {
   const auth = getAuth();
   const user = auth.currentUser;
+  const title = alertTitles[selectedMood.label];
 
   if (!user) {
     Alert.alert('Authentication Error', 'You must be logged in to check-in mood.');
@@ -85,7 +134,7 @@ const handleSave = async() => {
   });
 
   if(alreadyLoggedToday){
-    Alert.alert('😊Mood Already Logged', "You've already logged your mood for today.");
+    Alert.alert('😊 Mood Already Logged', "You've already logged your mood for today.");
     return;
   }
 
@@ -99,14 +148,23 @@ const handleSave = async() => {
     score: selectedMood.score,
   });
 
-  Alert.alert("🎉Well done!", "You've successfully logged your mood.", [
-  { text: "OK", onPress: () => navigation.navigate('HomeTabs'), }
-  ]);
+  const message = getMotivationalMessage(selectedMood.label);
+  Alert.alert(title, message, [
+  { text: "OK", onPress: () => navigation.navigate('HomeTabs') }
+]);
   
 } catch (error) {
     console.error("Error saving mood check-in:", error);
     setSaveError('Something went wrong. Try again.');
 }
+};
+
+//Motivational Message logic
+const getMotivationalMessage = (moodLabel) => {
+  const messages = motivationalMessages[moodLabel] || [];
+  if(messages.length === 0) return;
+  const randomIndex = Math.floor(Math.random()* messages.length); //randomly generates a number and rounds it down to valid index 
+  return messages [randomIndex]; 
 };
 
 return (
