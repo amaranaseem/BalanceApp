@@ -9,7 +9,7 @@ return (
   {/* Header */}
   <View style={styles.topRow}>   
   <Text style={styles.headerText}>FAQs</Text>
-  <TouchableOpacity onPress={() => navigation.navigate('SettingScreen')}>
+  <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
   <Ionicons name="chevron-back-outline" size={26} color="black" />
   </TouchableOpacity>
   </View>
@@ -98,7 +98,7 @@ headerText: {
 
 title: {
   fontSize: 16,
-  fontWeight: '600',
+  fontWeight: '800',
   color: 'black',
 },
 
@@ -115,7 +115,7 @@ questionContainer:{
   width: '100%',
   padding: 12,
   marginBottom: 12,
-  borderRadius: 3
+  borderRadius: 10, 
 }, 
 
 bulletPoint: {

@@ -9,7 +9,7 @@ const ContactSupportScreen = ({navigation}) => {
   {/* Header */}
   <View style={styles.topRow}>   
   <Text style={styles.headerText}>Customer Support</Text>
-  <TouchableOpacity onPress={() => navigation.navigate('SettingScreen')}>
+  <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
   <Ionicons name="chevron-back-outline" size={26} color="black" />
   </TouchableOpacity>
   </View>
