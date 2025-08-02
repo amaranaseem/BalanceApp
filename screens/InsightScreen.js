@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, Alert} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { LineChart } from 'react-native-chart-kit';
 import { getFirestore, collection, query, getDocs, orderBy } from 'firebase/firestore';
@@ -73,7 +73,7 @@ const InsightScreen = () => {
     fetchMoodData();
   }, []);
 
-  
+  //Ensure only the present week moods are displayed
   useEffect(() => {
     if(!allCheckins.length) return;
 
@@ -154,7 +154,13 @@ return (
   </View>
 
   <ScrollView style={styles.scrollList}>
+  <View style={styles.insightRow}>
   <Text style={styles.sectionHeader}>Insights</Text>
+   <TouchableOpacity onPress={() => 
+     Alert.alert("📈 Mood Graph","Colors show emotions.\nHigher line = better mood.\nNo line = You skipped check-in.")}>
+     <Ionicons name="information-circle-outline" size={22} color="#000000" />
+   </TouchableOpacity>
+  </View>
 
   {/*Week Navigation */}
   <View style={styles.navigation}>
@@ -352,7 +358,14 @@ navigation:{
   justifyContent: 'center', 
   alignItems: 'center', 
   marginBottom: 10 
-}, 
+},
+
+insightRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 10,
+},
 
 
 });
