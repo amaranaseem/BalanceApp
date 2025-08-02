@@ -1,14 +1,13 @@
 import React, {useState, useCallback} from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator} from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import app from '../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import {query, orderBy} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import EntryPreviewScreen from './EntryPreviewScreen'; 
-
 
 
 const db = getFirestore(app);
@@ -18,56 +17,83 @@ const JournalScreen = () => {
   const [entries, setEntries] = useState([]); 
   const [loading, setLoading] = useState(true);
 
+// getting items from firebase
+ const fetchEntries = async () => {
+  try {
+  const user = getAuth().currentUser;
+  if (!user) return;
+
+  const entriesRef = collection(db, 'users', user.uid, 'entries'); // location of the entries
+  const q = query(entriesRef, orderBy('createdAt', 'desc')); // setting the view order 
+  const snapshot = await getDocs(q);
+
+  const firebaseEntries = snapshot.docs.map((doc) => {
+  const data = doc.data();
+  return { //data to be fetched from firebase
+   id: doc.id,
+   title: data.title || 'Untitled',
+   mood: data.mood,
+   moodColor: data.moodColor,
+   date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
+   description: data.note || '',
+   hasAudio: !!data.audioURL,   // audio link
+   duration: data.duration || '', 
+   audioURL: data.audioURL || null,
+    };
+  });
+
+  setEntries(firebaseEntries);
+  } catch (error) {
+    console.error('Error fetching journal entries:', error);
+   } finally {
+    setLoading(false);
+   } 
+  };
+
+    
+  // delete entry
+  const deleteEntry = async (id) => {
+  try {
+    const user = getAuth().currentUser;
+    if (!user) return;
+ 
+    await deleteDoc(doc(db, 'users', user.uid, 'entries', id));
+    fetchEntries(); //refersh after deletion
+  } catch (error) {
+   console.error('Error deleting entry:', error);
+  }
+  };
+ 
+  // confirm delete entry
+  const confirmDelete = (id) => {
+   Alert.alert(
+    '❌ Delete Entry',
+    'Are you sure you want to delete this entry?',
+  [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Delete', style: 'destructive', onPress: () => deleteEntry(id) },
+   ]);
+  };
+
  useFocusEffect(
   useCallback(() => {
-   const fetchEntries = async () => {
-    try {
-     const user = getAuth().currentUser;
-     if (!user) return;
-
-     const entriesRef = collection(db, 'users', user.uid, 'entries');
-     const q = query(entriesRef, orderBy('createdAt', 'desc'));
-     const snapshot = await getDocs(q);
-
-     const firebaseEntries = snapshot.docs.map((doc) => {
-     const data = doc.data();
-     return {
-      id: doc.id,
-      title: data.title || 'Untitled',
-      mood: data.mood || 'Neutral',
-      moodColor: data.moodColor || '#D8CAB8',
-      date: data.createdAt?.toDate().toLocaleDateString('en-GB') || 'Unknown',
-      description: data.note || '',
-      hasAudio: !!data.audioURL,   // audio link
-      duration: data.duration || '', 
-      audioURL: data.audioURL || null,
-      };
-     });
-
-     setEntries(firebaseEntries);
-     } catch (error) {
-      console.error('Error fetching journal entries:', error);
-     } finally {
-       setLoading(false);
-     } 
-    };
-
-     fetchEntries();
+  fetchEntries();
    }, [])
   );
-
+ 
+  //for viewing the entries made
   const renderItem = ({ item }) => (
-   <TouchableOpacity style= {styles.card} onPress={() => navigation.navigate('EntryPreview', { entry: 
-    {
-      title: item.title, 
-      date: item.date, 
-      mood: item.mood,
-      moodColor: item.moodColor, 
-      description: item.description, 
-      audioURL: item.audioURL, 
-      duration: item.duration
-    }
-   })}>
+  <TouchableOpacity style= {styles.card} onPress={() => navigation.navigate('EntryPreview', { entry: 
+   {
+    title: item.title, 
+    date: item.date, 
+    mood: item.mood,
+    moodColor: item.moodColor, 
+    description: item.description, 
+    audioURL: item.audioURL, 
+    duration: item.duration
+   }
+  })}>
 
   {/* Title and Date*/}
   <View style={styles.cardHeader}>
@@ -90,6 +116,7 @@ const JournalScreen = () => {
   )}
 
  {/* Audio */}
+ <View style={styles.cardBottomRow}>
  {item.hasAudio && (
  <View style={styles.audio}>
  <Ionicons name="play" size={20} color="black" />
@@ -99,6 +126,12 @@ const JournalScreen = () => {
  </Text>
   </View>
   )}
+
+  {/* Delete Button */}
+  <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteButton}>
+  <Ionicons name="trash" size={20} color="#E94F4F" />
+  </TouchableOpacity>
+  </View>
   </TouchableOpacity>
  );
 
@@ -207,6 +240,13 @@ cardText: {
   marginBottom: 8,
 },
 
+cardBottomRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 10,
+},
+
 audio: {
   flexDirection: 'row',
   justifyContent: 'flex-end',
@@ -218,6 +258,11 @@ audio: {
 audioText: {
   fontSize: 12,
   color: '#50483D',
+},
+
+deleteButton: {
+  padding: 4,
+  borderRadius: 8,
 },
 
 fab: {
