@@ -109,7 +109,7 @@ return (
     thumbColor={trackNow ? '#3C4F46' : '#ccc'}
   />
   <TouchableOpacity onPress={() => 
-    Alert.alert("📌Track Task", "You can select this option to view the task on your home screen and track it.")}>
+    Alert.alert("📌 Track Task", "You can select this option to view the task on your home screen and track it.")}>
     <Ionicons name="information-circle-outline" size={20} color="#3C4F46" />
   </TouchableOpacity>
   </View>

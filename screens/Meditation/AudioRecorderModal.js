@@ -202,7 +202,7 @@ return (
   <TouchableOpacity onPress={closeModal}>
   <Ionicons name="close" size={24} color="black" />
   </TouchableOpacity>
-  <Text style={styles.title}>Add Task</Text>
+  <Text style={styles.title}>Record Audio</Text>
   </View>
   
   {/* Input */}

@@ -58,12 +58,12 @@ const alertTitles = {
 
 
 const moods = [
-  { emoji: '😁', label: 'joy', color: '#FFE38E', score: 1 },
-  { emoji: '😞', label: 'sad', color: '#90C3E6', score: 2 },
-  { emoji: '😡', label: 'angry', color: '#E94F4F', score: 3 },
-  { emoji: '😨', label: 'anxiety', color: '#C9B8FF', score: 4 },
-  { emoji: '😌', label: 'calm', color: '#B8E2DC', score: 5 },
-  { emoji: '😐', label: 'neutral', color: '#B7A282', score: 6 },
+  { emoji: '😁', label: 'joy', color: '#FFE38E'},
+  { emoji: '😞', label: 'sad', color: '#90C3E6'},
+  { emoji: '😡', label: 'angry', color: '#E94F4F'},
+  { emoji: '😨', label: 'anxiety', color: '#C9B8FF'},
+  { emoji: '😌', label: 'calm', color: '#B8E2DC'},
+  { emoji: '😐', label: 'neutral', color: '#B7A282'},
 ];
 
 const defaultTags = [
@@ -145,7 +145,6 @@ const handleSave = async() => {
     notes: note,
     createdAt: serverTimestamp(),
     userId: user.uid, 
-    score: selectedMood.score,
   });
 
   const message = getMotivationalMessage(selectedMood.label);

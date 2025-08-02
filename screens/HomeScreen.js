@@ -177,6 +177,7 @@ useEffect(()=> {
   loadTasks();
 }, []);
 
+//stores the data locally so users dont have to remark the tasks everytime they open the app
 const updatedCheckedTasks = async (newTasks) => {
   const today = new Date().toDateString();
   setCheckedTasks(newTasks);
