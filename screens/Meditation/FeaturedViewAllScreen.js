@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, getDocs, query } from 'firebase/firestore';
-import { db, auth } from '../../firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function MeditationScreen({ navigation }) {

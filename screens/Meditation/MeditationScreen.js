@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image} from 'react-native';
 import React, { useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { addDocs, collection, getDocs, query,where } from 'firebase/firestore';
+import { collection, getDocs, query,where } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -166,7 +166,7 @@ return (
   {/* Your Audio Section */}
     <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>Your Audio</Text>
-    <TouchableOpacity onPress={() => navigation.navigate('YourAudioScreen')}>
+    <TouchableOpacity onPress={() => navigation.navigate('UserAudioViewAllScreen')}>
     <Text style={styles.viewAll}>View all</Text>
     </TouchableOpacity>
     </View>

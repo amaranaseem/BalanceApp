@@ -12,7 +12,6 @@ import HabitandGoalScreen from './screens/HabitandGoalScreen';
 import AddTaskScreen from './screens/AddTaskScreen';
 import Toast from 'react-native-toast-message';
 import EntryPreviewScreen from './screens/EntryPreviewScreen';
-import YourAudioScreen from './screens/Meditation/YourAudioScreen';
 import AudioPlayer from './screens/Meditation/AudioPlayerScreen';
 import FeaturedViewAllScreen from './screens/Meditation/FeaturedViewAllScreen';
 import MeditationSessionDetail from './screens/Meditation/MeditationSessionDetail';
@@ -21,6 +20,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import ContactSupportScreen from './screens/ContactSupportScreen';
 import FAQsScreen from './screens/FAQsScreen';
+import UserAudioViewAll from './screens/Meditation/UserAudioViewAllScreen';
 const Stack = createNativeStackNavigator();
 
 
@@ -40,7 +40,7 @@ export default function App() {
       <Stack.Screen name="HabitsandGoals" component={HabitandGoalScreen}/>
       <Stack.Screen name="AddTask" component={AddTaskScreen}/>
       <Stack.Screen name="EntryPreview" component={EntryPreviewScreen}/>
-      <Stack.Screen name="YourAudioScreen" component={YourAudioScreen}/>
+      <Stack.Screen name="UserAudioViewAllScreen" component={UserAudioViewAll}/>
       <Stack.Screen name="AudioPlayerScreen" component={AudioPlayer}/>
       <Stack.Screen name="FeaturedViewAll" component={FeaturedViewAllScreen}/>
       <Stack.Screen name="MeditationSessionDetail" component={MeditationSessionDetail}/> 

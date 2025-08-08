@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Image, ScrollView, Platform, TouchableWithoutFeedback, Keyboard} from 'react-native'
 import { auth, db} from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { sendPasswordResetEmail } from 'firebase/auth';
 import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
@@ -68,39 +67,6 @@ const handleLogin = async () => {
 
 };
 
-// Reference:
-// Password reset logic influence by Firebase documentation 
-// link: https://firebase.google.com/docs/auth/web/manage-users#send_a_password_reset_email
-
-{/* Password reset  */}
-const handlePasswordReset = async () => {
-  if (!email) {
-    alert('Please enter your email');
-    return;
-  }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    console.log('Password reset email sent to:', email);
-  } catch (error) {
-    console.log('Password reset error:', error);
-
-    if (error.code === 'auth/user-not-found') {
-      alert('No account found with this email');
-    } else if (error.code === 'auth/invalid-email') {
-      alert('Invalid email address');
-    } else {
-      alert(error.message);
-    }
-  }
-  
-  Toast.show({
-  type: 'info',
-  text1: 'Password reset link sent!',
-  text2: `Check your inbox: ${email}`,
-});
-};
-
-
 return (
   <KeyboardAvoidingView style={styles.container}  behavior={Platform.OS === 'android' ? 'padding' : 'height'}>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -145,12 +111,7 @@ return (
   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
       <Ionicons name={!showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#A58E74" />
   </TouchableOpacity>
-
-  {/* Forgot Password Link */}
   </View>
-  <TouchableOpacity style={styles.forgotTextContainer} onPress={handlePasswordReset}>
-  <Text style={styles.forgotText}>Forgot Password?</Text>
-  </TouchableOpacity>
   </View>
 
   {/* Login Button */}  
@@ -253,17 +214,6 @@ inputText: {
   width: '100%'
 },
 
-forgotTextContainer: {
-  alignSelf: 'flex-end',
-  marginTop: 6,
-  marginRight: 10,
-},
-
-forgotText: {
-  fontSize: 12,
-  color: 'black',
-},
-
 buttonText: {
   fontSize: 16,
   color: '#000',
@@ -305,6 +255,5 @@ signinButton:{
   marginBottom: 30,
   borderWidth: 1,
 },
-
 
 });

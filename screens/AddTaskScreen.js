@@ -40,7 +40,6 @@ const AddTaskScreen = ({ closeModal }) => {
    createdAt: new Date(),
    userId: user.uid,
    trackNow,
-   completedCount: 0,
    target: category === 'goal' ? 30 : 1,
    progress: category === 'goal' ? 0: null,
   });

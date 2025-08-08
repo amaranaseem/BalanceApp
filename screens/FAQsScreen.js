@@ -18,7 +18,7 @@ return (
 <ScrollView>
 <View style={styles.questionContainer}>
    <Text style={styles.title}>1. What is this app about?</Text>
-   <Text style={styles.para}>Balance App is designed to helps you track your mood, build habits, reflect on your daily experiences and . 
+   <Text style={styles.para}>Balance App is designed to helps you track your mood, build habits, reflect on your daily experiences and 
    support your personal growth.</Text> 
 </View>
 
@@ -26,9 +26,9 @@ return (
 <View style={styles.questionContainer}>
    <Text style={styles.title}>2. How do I get started?</Text>
    <Text style={styles.para}>After signing up, you can start by:</Text> 
-  <Text style={styles.bulletPoint}>- Logging your mood from the home screen.</Text>
-  <Text style={styles.bulletPoint}>- Creating habits or daily tasks.</Text>
-  <Text style={styles.bulletPoint}>- Checking your progress and insights from the dashboard.</Text>
+    <Text style={styles.bulletPoint}>- Logging your mood from the home screen.</Text>
+    <Text style={styles.bulletPoint}>- Creating habits or daily tasks.</Text>
+    <Text style={styles.bulletPoint}>- Checking your progress and insights from the dashboard.</Text>
 
 </View>
 
@@ -36,31 +36,25 @@ return (
 <View style={styles.questionContainer}>
    <Text style={styles.title}>3. Is my data private and secure?</Text>
    <Text style={styles.para}>Yes. Your data is securely stored using Firebase and is only accessible by you. 
-    We do not share your personal information or mood data with any third parties..</Text> 
+    We do not share your personal information or mood data with any third parties.</Text> 
 </View>
 
 {/*Question 4 */}
 <View style={styles.questionContainer}>
-   <Text style={styles.title}>4. Can I reset my progress or delete my account?</Text>
+   <Text style={styles.title}>4. Can I delete my account?</Text>
    <Text style={styles.para}>Yes. You can permanently delete your account and data from the Settings page. 
     This action is irreversible.</Text> 
 </View>
 
+{/*Question 5 */}
+<View style={styles.questionContainer}>
+   <Text style={styles.title}>5. Is the app free to you</Text>
+   <Text style={styles.para}>Yes, the entire app is free.</Text> 
+</View>
+
 {/*Question 6 */}
 <View style={styles.questionContainer}>
-   <Text style={styles.title}>6. Can I use the app offline?</Text>
-   <Text style={styles.para}>You can use the app offline, but changes made won't be saved untill online. </Text> 
-</View>
-
-{/*Question 7 */}
-<View style={styles.questionContainer}>
-   <Text style={styles.title}>7. Is the app free to you</Text>
-   <Text style={styles.para}>Yes, the core features are free.</Text> 
-</View>
-
-{/*Question 8 */}
-<View style={styles.questionContainer}>
-   <Text style={styles.title}>8. How can I report a bug or share feedback?</Text>
+   <Text style={styles.title}>6. How can I report a bug or share feedback?</Text>
    <Text style={styles.para}>You can reach out to us directly from the app by going to Customer Support.</Text> 
 </View>
 
