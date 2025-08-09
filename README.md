@@ -38,24 +38,23 @@ Week 6: : Habit & Goal and Self-care Features (1st July – 7th July) **(Complet
 ✅Add static notification page
 ✅Search for gamification element
 
-Week 7: Gamification, Meditation & Data Visualization  (8th July- 16th July) **(In Progress)**
+Week 7: Gamification, Meditation & Data Visualization  (8th July- 16th July) **(Completed)**
 ✅Add gamification element
 ✅Create Line chart
 ✅Build meditation page with custom record audio
-❌Mood-based motivational tips
+✅Mood-based motivational tips
 ✅Add profile page
 
-Week 8: Testing, Polish & Evaluation (17th July- 25th July) **(In Progress)**
+Week 8: Testing, Polish & Evaluation (17th July- 25th July) **(Completed)**
 ✅Testing all features
-Testing on different screen sizes
-Fix usability issues and ensure accessibility(readability)
-Polish UI
-Define and document evaluation metrics 
+✅Testing on different screen sizes
+✅Fix usability issues and ensure accessibility(readability)
+✅Polish UI
+✅Define and document evaluation metrics 
 
-**UP NEXT**
-Week 9 & 10: Final Report, Reflection & Submission (27th July- 13th Aug)
+Week 9 & 10: Final Report, Reflection & Submission (27th July- 13th Aug) **(In Progress)**
 Final Report writing
-Annotate screenshots for documentation
+✅Annotate screenshots for documentation
 Prepare for demo 
-Write 300-500 personal reflection 
 Review the final report and artefact
+Submission 
