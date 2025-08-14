@@ -8,63 +8,65 @@ const EntryPreviewScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { entry } = route.params;
-
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const formatTime = (duration) => {
-    if (!duration) return '';
-    const mins = Math.floor(duration / 60);
-    const secs = Math.floor(duration % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+{/* Converting sec into mm:ss format */}
+ const formatTime = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+ {/* Play Audio function */}
+ const playAudio = async () => {
+ try{
+  if (!entry.audioURL) return;
+
+  // Load audio if not loaded yet
+  let currentSound = sound;
+  if (!currentSound) {
+   const { sound: newSound } = await Audio.Sound.createAsync(
+    { uri: entry.audioURL}
+  );
+    
+  // Listener for audio stop/finish
+   newSound.setOnPlaybackStatusUpdate(status => {
+   if (status.didJustFinish || !status.isPlaying) {
+    setIsPlaying(false);
+    }
+  });
+   
+  //store loaded audio in state, no need to reload again
+  setSound(newSound);
+  currentSound = newSound;
+ }
+  
+ // Check if audio is playing/paused
+ const status = await currentSound.getStatusAsync();
+  if (status.isPlaying) {
+   await currentSound.pauseAsync();
+   setIsPlaying(false);
+  
+  } else {
+    await currentSound.playAsync();
+    setIsPlaying(true);
+  }
+    } catch (error) {
+      console.error('Playback error:', error);
+    }
   };
 
-  const playAudio = async () => {
-    if (!entry.audioURL) return;
-
-    if (sound) {
-     await sound.stopAsync();
-     await sound.unloadAsync();
-     setSound(null);
-     setIsPlaying(false);
-     return;
-    }
-
-    try {
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: entry.audioURL },
-        { shouldPlay: true }
-      );
-
-      setSound(newSound);
-      setIsPlaying(true);
-
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          setIsPlaying(false);
-          newSound.unloadAsync();
-          setSound(null);
-        }
-     });
-
-     await newSound.playAsync();
-    } catch (err) {
-      console.error('Audio play error:', err);
-    }
-  };
-
-useEffect(() => {
+  useEffect(() => {
   return () => {
     if (sound) {
       sound.unloadAsync();
     }
   };
- }, [sound]);
+}, [sound]);
 
 return (
   <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+  
   <View style={styles.topRow}>
   <Text style={styles.title}>{entry.title}</Text>
+  
   <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.goBack()}>
     <Ionicons name="close" size={24} color="black" />
   </TouchableOpacity>
@@ -76,25 +78,20 @@ return (
     <Text style={styles.moodText}>{entry.mood}</Text>
   </View>
 
-  <Text style={styles.description}>
-    {entry.description}
-  </Text>
+  <Text style={styles.description}>{entry.description}</Text>
 
   {/* Audio section */}
   {entry.audioURL && (
   <View style={styles.audioContainer}>
+  
   <TouchableOpacity onPress={playAudio}>
-  <Ionicons
-    name={isPlaying ? 'pause-circle' : 'play-circle'}
-    size={46}
-    color="#50483D"
-  />
+  <Ionicons name={isPlaying ? 'pause-circle' : 'play-circle'} size={46} color="#FF91A4" />
   </TouchableOpacity>
-  <Text style={styles.audioText}>
-  {isPlaying ? 'Playing...' : formatTime(entry.duration || 0)}
-  </Text>
+  
+  <Text style={styles.audioText}> {isPlaying ? 'Playing...' : formatTime(entry.duration || 0)} </Text>
   </View>
   )}
+
   </ScrollView>
  );
 };
@@ -167,35 +164,19 @@ description: {
   lineHeight: 24,
 },
 
-placeholder: {
-  fontSize: 16,
-  fontStyle: 'italic',
-  color: '#888',
-  marginBottom: 30,
-},
-
 audioContainer: {
   flexDirection: 'row',
   alignItems: 'center',
-  backgroundColor: '#fff',
   padding: 12,
-  borderRadius: 14,
-  borderWidth: 1,
-  borderColor: '#D8CAB8',
+  borderRadius: 35,
   marginTop: 5,
-},
-
-waveform: {
-  flex: 1,
-  height: 10,
-  backgroundColor: '#ccc',
-  borderRadius: 6,
-  marginHorizontal: 12,
+  borderColor: '#A8D5BA',
+  borderWidth: 2
 },
 
 durationText: {
   fontSize: 14,
   fontWeight: '500',
-  color: '#555',
+  color: '#000',
 },
 });

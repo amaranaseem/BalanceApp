@@ -11,7 +11,6 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassword,setShowPassword ]= useState(false);
 
-
 // References:
 // Login logic influenced by React Native Firebase and "Super Easy React Native Authentication with Firebase" youtube video. timestamp: 7:00 
 // Video Link: https://www.youtube.com/watch?v=ONAVmsGW6-M&t=439s 
@@ -23,8 +22,9 @@ const handleLogin = async () => {
     alert('All fields are required');
     return;
   }
+  // Fetching username from Firebase if avaliable
     try {
-	 const userCredential = await signInWithEmailAndPassword(auth, email, password);
+	  const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
   
     const userDocRef = doc(db, 'users', user.uid);
@@ -46,7 +46,8 @@ const handleLogin = async () => {
   } catch (error) {
     console.log('Login error:', error);
     console.log('Error code:', error.code);
-    
+  
+  // Error handling for wrong/invalid password, email  
   switch (error.code) {
     case 'auth/invalid-credential':
       alert('Email or password is incorrect.');
@@ -64,7 +65,6 @@ const handleLogin = async () => {
       alert('Error: ' + error.message);
   }
 }
-
 };
 
 return (

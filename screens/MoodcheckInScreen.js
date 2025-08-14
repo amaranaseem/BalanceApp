@@ -6,56 +6,16 @@ import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from 'fire
 import app from '../firebase'
 import { getAuth } from 'firebase/auth';
 
-
 const db = getFirestore(app);
 
 const motivationalMessages = {
-  joy: [
-    "You're doing great! Celebrate the little moments.",
-    "Keep shining — your positivity is powerful!",
-    "Savor this joy, and share your smile."
-  ],
-
-  sad: [
-    "It’s okay to feel sad — be gentle with yourself.",
-    "You’re not alone. Today’s mood doesn’t define you.",
-    "Small steps matter. Just showing up is enough."
-  ],
-
-  angry: [
-    "Pause. Breathe. Let yourself reset.",
-    "Anger is valid. Try journaling it out.",
-    "Channel your energy into something constructive."
-  ],
-
-  anxiety: [
-    "You’ve handled tough moments before — you’ve got this.",
-    "Try a deep breath or a short walk. It can help.",
-    "Let thoughts pass — like clouds in the sky."
-  ],
-
-  calm: [
-    "Protect your peace. You deserve it.",
-    "Enjoy this calm — it's a gift.",
-    "Anchor yourself in the present. You're safe here."
-  ],
-
-  neutral: [
-    "Neutral is okay. Not every day needs a highlight.",
-    "Use this space to recharge or reflect.",
-    "Even stillness can be a form of progress."
-  ]
+  joy: [ "You're doing great! Celebrate the little moments.","Savor this joy and share your smile."],
+  sad: [ "You’re not alone. Today’s mood doesn’t define you.", "Small steps matter. Just showing up is enough." ],
+  angry: [ "Pause. Breathe. Let yourself reset.", "Anger is valid. Try journaling it out.", ],
+  anxiety: ["You’ve handled tough moments before — you’ve got this.", "Try a deep breath or a short walk. It can help."],
+  calm: [ "Protect your peace. You deserve it.","Anchor yourself in the present. You're safe here."],
+  neutral: ["Neutral is okay. Not every day needs a highlight.", "Use this space to recharge or reflect."]
 };
-
-const alertTitles = {
-  joy: "😊 Keep Shining!",
-  sad: "💙 Take It Easy",
-  angry: "🔥 Pause and Reflect",
-  anxiety: "🌿 You Got This",
-  calm: "🕊️ Peaceful Moment",
-  neutral: "☁️ Steady and Strong"
-};
-
 
 const moods = [
   { emoji: '😁', label: 'joy', color: '#FFE38E'},
@@ -66,11 +26,8 @@ const moods = [
   { emoji: '😐', label: 'neutral', color: '#B7A282'},
 ];
 
-const defaultTags = [
-  'work', 'family', 'health', 'sleepy', 'friends', 'relaxed', 'love', 'school', 'tired','bored', 'stress', 'media'
-];
+const defaultTags = [ 'work', 'family', 'health', 'sleepy', 'friends', 'relaxed', 'love', 'school', 'tired','bored', 'stress', 'media'];
 
-{/*Mood checkin */}
 const MoodCheckInScreen = () => {
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -79,12 +36,10 @@ const MoodCheckInScreen = () => {
   const [saveError, setSaveError ] = useState('');
   const navigation = useNavigation();
 
-{/*Mood checkin */}
-const today = new Date().toLocaleDateString('en-GB', {
-  day: 'numeric', month: 'long', year: 'numeric'
-});
+{/*Date*/}
+const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric'});
 
-{/*Tags fxn */}
+{/*Tags fxn with error handling */}
 const handleTagPress = (tag) => {
   setTagError('');
     if (selectedTags.includes(tag)) {
@@ -104,7 +59,6 @@ const handleTagPress = (tag) => {
 const handleSave = async() => {
   const auth = getAuth();
   const user = auth.currentUser;
-  const title = alertTitles[selectedMood.label];
 
   if (!user) {
     Alert.alert('Authentication Error', 'You must be logged in to check-in mood.');
@@ -120,8 +74,7 @@ const handleSave = async() => {
 
  // mood check-in saved on firebase
   try {
-
-  // limiting mood check-in to one
+  // limiting mood check-in to one by checking today's date to see if its present in the collection. 
   const todayDate = new Date();
   todayDate.setHours(0,0,0,0); 
 
@@ -148,7 +101,7 @@ const handleSave = async() => {
   });
 
   const message = getMotivationalMessage(selectedMood.label);
-  Alert.alert(title, message, [
+  Alert.alert("🌟Mood Saved", message, [
   { text: "OK", onPress: () => navigation.navigate('HomeTabs') }
 ]);
   
@@ -191,7 +144,6 @@ return (
   <Text style={styles.dateText}>{today}</Text>
   </View>
 
-
   {/* Mood Selection */}
   <Text style={styles.heading}>How are you feeling?</Text>
   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodScroll}>
@@ -229,8 +181,7 @@ return (
 
   {/* Error on tags */}
   {tagError !== '' && <Text style={styles.errorText}>{tagError}</Text>}
-
-        
+    
   {/* Note Input */}
   <Text style={styles.heading}>Want to jot down what’s on your mind?</Text>
   <TextInput
@@ -242,7 +193,6 @@ return (
   onChangeText={setNote}
   />
   <Text style={styles.counter}>({note.length}/30)</Text>
-
 
   {/* Save Button */}
   <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
@@ -389,7 +339,7 @@ input: {
   opacity:0.9,
   borderColor: '#000', 
   borderWidth: 0.5, 
-  },
+},
 
 counter: {
   textAlign: 'right',

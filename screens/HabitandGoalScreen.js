@@ -8,12 +8,7 @@ import { Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
 
-
-const categoryColors = {
-  'self-care': '#20C997',
-  habit: '#2196F3',
-  goal: '#9C27B0',
-};
+const categoryColors = { 'self-care': '#20C997', habit: '#2196F3', goal: '#9C27B0', };
 
 // delete task
 const deleteTask = async (id) => {
@@ -40,13 +35,9 @@ const confirmDelete = (id) => {
 
 const HabitandGoalScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
-
-  const [checkedTasks, setCheckedTasks] = useState([]);
   const [tasks, setTasks] = useState([]);
   const user = getAuth().currentUser;
-
   const [shownGoalAlerts, setShownGoalAlerts] = useState([]);
-
 
 // get tasks from Firebase
 useEffect(() => {
@@ -80,7 +71,7 @@ return (
   {/* Task List */}
   <ScrollView style={styles.taskList}>
 
-  {/* tasks & habits */}
+  {/* self-care tasks & habits */}
   <Text style={styles.sectionHeader}>Habits & Self-care Tasks</Text>
   {tasks.filter(task => task.category === 'habit' || task.category === 'self-care'). length === 0 ? (
   <Text style={styles.placeholder}> No tasks added yet.</Text>
@@ -115,7 +106,7 @@ return (
   .map((task) => {
        
   const progress = task.progress || 0;
-  const target = task.target || 30;
+  const target =  30;
   const progressPercent = Math.min(progress / target, 1);
   if (progress >= target && !shownGoalAlerts.includes(task.id)) {
   Alert.alert('🎉 Goal Complete', `You completed: ${task.title}`);

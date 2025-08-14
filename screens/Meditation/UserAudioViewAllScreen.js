@@ -9,7 +9,6 @@ import {query, orderBy} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import AudioRecorderModal from './AudioRecorderModal';
 
-
 const db = getFirestore(app);
 
 const UserAudioViewAll = () => {

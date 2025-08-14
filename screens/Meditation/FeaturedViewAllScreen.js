@@ -9,6 +9,7 @@ export default function MeditationScreen({ navigation }) {
 const [featuredMeditation, setFeaturedMeditation] = useState([]); 
 const [loading, setLoading] = useState(true);
 
+{/*Getting featured recording from Firebase */}
 useFocusEffect(
   useCallback(() => {
   const fetchFeaturedMeditation = async () => {

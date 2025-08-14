@@ -5,20 +5,16 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
 
-const categoryColors = {
-  'self-care': '#20C997',
-  habit: '#2196F3',
-  goal: '#9C27B0',
-};
+const categoryColors = {'self-care': '#20C997', habit: '#2196F3', goal: '#9C27B0',};
 
 const AddTaskScreen = ({ closeModal }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
-
   const [trackNow, setTrackNow] = useState(false);
   const [target, setTarget] = useState('');
   const [saveError, setSaveError] = useState('');
 
+  //saving tasks to firebase
  const saveTask = async () => {
   const auth = getAuth();
   const user = auth.currentUser;
@@ -28,8 +24,7 @@ const AddTaskScreen = ({ closeModal }) => {
   return;
 
   if (!title.trim() || !category) {
-   setSaveError('Please write tasks name and select category.');
-   console.log('Field cannot be empty.')
+   setSaveError('Tasks name or category missing.');
   return;
   }
 
@@ -60,6 +55,7 @@ const AddTaskScreen = ({ closeModal }) => {
 
 return (
   <View style={styles.container}>
+  
   {/* Header */}
   <View style={styles.header}>
   <TouchableOpacity onPress={closeModal}>
@@ -70,10 +66,10 @@ return (
 
   {/* Input */}
   <TextInput
-  placeholder="Enter task title"
-  value={title}
-  onChangeText={setTitle}
-  style={styles.input}
+    placeholder="Enter task title"
+    value={title}
+    onChangeText={setTitle}
+    style={styles.input}
   />
 
   {/* Category */}
@@ -82,13 +78,10 @@ return (
   {Object.keys(categoryColors).map((cat) => (
   <TouchableOpacity
   key={cat}
-  style={[styles.tag, category === cat && { backgroundColor: categoryColors[cat] }, 
-  ]}
+  style={[styles.tag, category === cat && { backgroundColor: categoryColors[cat] }, ]}
   onPress={() => setCategory(cat)}
   >
-  <Text
-  style={[ styles.tagText, category === cat && { color: '#fff', fontWeight: 'bold' },
-  ]}>
+  <Text style={[ styles.tagText, category === cat && { color: '#fff', fontWeight: 'bold' },  ]}>
   {cat}
   </Text>
   </TouchableOpacity>
@@ -99,14 +92,19 @@ return (
   {/* Target input for goals */}
   {category === 'goal'}
 
+  {/* Error on save */}
+  {saveError !== '' && <Text style={styles.errorText}>{saveError}</Text>}
+
   {/* Track Now */}
   <View style={styles.trackRow}>
   <Text style={styles.subheading}>Track Now</Text>
+  
   <Switch
     value={trackNow}
     onValueChange={setTrackNow}
     thumbColor={trackNow ? '#3C4F46' : '#ccc'}
   />
+  
   <TouchableOpacity onPress={() => 
     Alert.alert("📌 Track Task", "You can select this option to view the task on your home screen and track it.")}>
     <Ionicons name="information-circle-outline" size={20} color="#3C4F46" />
@@ -198,6 +196,15 @@ fixedTargetText: {
   marginBottom: 10,
   fontWeight: 'bold',
   color: '#333',
+},
+
+errorText: {
+  color: '#E94F4F',
+  marginTop: 6,
+  marginBottom: 4,
+  fontSize: 13,
+  fontWeight: '500',
+  fontStyle: 'italic',
 },
 
 });

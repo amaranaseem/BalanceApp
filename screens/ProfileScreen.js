@@ -61,7 +61,9 @@ const ProfileScreen = ({ navigation }) => {
   Alert.alert( '⚠️ Delete Account','Are you sure you want to permanently delete your account and all your data?',
   [{ text: 'Cancel', style: 'cancel'},
   { text: 'Delete', style: 'destructive', onPress: async () => {
+
   try {
+
   if (user) {
   // Delete Firestore user data
    await deleteDoc(doc(db, 'users', user.uid));
@@ -73,6 +75,7 @@ const ProfileScreen = ({ navigation }) => {
 
    navigation.replace('Login');
    }
+   
   }catch (error) {
    console.error('Delete error:', error);
    Alert.alert('Error', 'Could not delete account. Try logging out and logging back in.');

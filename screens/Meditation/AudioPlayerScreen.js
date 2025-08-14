@@ -4,44 +4,39 @@ import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 
-
 const AudioPlayerScreen = ({ route, navigation }) => {
-  const { title, url, imgURL } = route.params;
-
+  const { title, url, imgURL } = route.params; //gets audio details
   const sound = useRef(new Audio.Sound());
   const [isPlaying, setIsPlaying] = useState(false);
-  const [durationMillis, setDurationMillis] = useState(0);
-  const [positionMillis, setPositionMillis] = useState(0);
 
   useEffect(() => {
     loadAudio();
 
     return () => {
-      sound.current.unloadAsync();
+      sound.current.unloadAsync(); //clean the audio player
     };
   }, []);
 
+  {/*Loads audio from URL*/}
   const loadAudio = async () => {
     try {
       await sound.current.loadAsync({ uri: url });
       const status = await sound.current.getStatusAsync();
       if (status.isLoaded) {
-        setDurationMillis(status.durationMillis);
         sound.current.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
       }
     } catch (err) {
       console.error('Audio load error:', err);
     }
   };
-
+  
   const onPlaybackStatusUpdate = (status) => {
     if (status.isLoaded) {
-      setPositionMillis(status.positionMillis);
-      setDurationMillis(status.durationMillis);
       setIsPlaying(status.isPlaying);
     }
   };
 
+ {/*Start and Stop the audio */}
   const togglePlay = async () => {
     const status = await sound.current.getStatusAsync();
     if (status.isPlaying) {
@@ -49,12 +44,6 @@ const AudioPlayerScreen = ({ route, navigation }) => {
     } else {
       await sound.current.playAsync();
     }
-  };
-
-  const millisToMinutes = (millis) => {
-    const minutes = Math.floor(millis / 60000);
-    const seconds = Math.floor((millis % 60000) / 1000);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
 return (
@@ -65,7 +54,7 @@ return (
     </TouchableOpacity>
   </View>
 
-  {/* Artwork */}
+  {/* Image */}
   {imgURL && (
     <Image source={{ uri: imgURL }} style={styles.artwork} resizeMode="cover" />
   )}
@@ -78,18 +67,11 @@ return (
   <Slider
     style={styles.slider}
     minimumValue={0}
-    maximumValue={durationMillis}
-    value={positionMillis}
     minimumTrackTintColor="#3C4F46"
     maximumTrackTintColor="#ccc"
     thumbTintColor="#3C4F46"
-    disabled={true} 
   />
-  <View style={styles.timeRow}>
-    <Text style={styles.timeText}>{millisToMinutes(positionMillis)}</Text>
-    <Text style={styles.timeText}>{millisToMinutes(durationMillis)}</Text>
-  </View>
-
+  
   {/* Controls */}
   <View style={styles.controls}>
    <TouchableOpacity>
@@ -165,19 +147,6 @@ artwork: {
 slider: {
   width: 320,
   height: 40,
-},
-
-timeRow: {
-  width: 320,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  paddingHorizontal: 4,
-  marginBottom: 20,
-},
-
-timeText: {
-  fontSize: 12,
-  color: '#666',
 },
 
 controls: {

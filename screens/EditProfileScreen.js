@@ -6,7 +6,6 @@ import { db } from '../firebase';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
-
 const EditProfileScreen = ({ userData, setUserData, closeModal }) => {
   const [image, setImage] = useState(null);
   const [newUsername, setNewUsername] = useState(userData?.username || '');
@@ -22,11 +21,12 @@ const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 }
 
 const result = await ImagePicker.launchImageLibraryAsync({mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7,});
-  if (!result.cancelled) {
+  if (!result.canceled) {
     setImage(result.assets?.[0]?.uri || result.uri);
   }
 };
 
+// uploading the profile image to Cloudinary
 const handleSubmit = async () => {
   if (!user) return;
   try {
@@ -56,7 +56,7 @@ const handleSubmit = async () => {
       throw new Error('Image upload failed');
    }
   }
-
+  //updating the user info
   const userRef = doc(db, 'users', user.uid);
   await updateDoc(userRef, {
   profileImage: imageUrl,

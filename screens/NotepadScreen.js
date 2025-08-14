@@ -1,12 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, KeyboardAvoidingView, TextInput, Alert } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Audio } from 'expo-av';
 import {  collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
-
 
 const moods = [
   { label: 'joy', color: '#FFE38E' },
@@ -26,111 +25,131 @@ const NotepadScreen = () => {
   const [recording, setRecording] = useState(null);
   const [audioURI, setAudioURI] = useState(null);
   const [recordingTime, setRecordingTime] = useState(0);
-  const timerRef = useRef(null);
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [autoStopTimeout, setAutoStopTimeout] = useState(null);
 
-  {/* Timer function */}
-  useEffect(() => {
-    let timer;
-    if (recording) {
-     timer = setInterval(() => {
-      setRecordingTime((prev) => prev + 1);
-    }, 1000);
-   } else {
+{/* Timer function ()*/}
+ useEffect(() => {
+  let timer;
+  
+  if (recording) {
+    timer = setInterval(() => {
+      setRecordingTime((prev) => prev + 1); //increment the timer once recording start
+  }, 1000);
+   
+} else {
     clearInterval(timer);
-   }
-    return () => clearInterval(timer);
-  }, [recording]);
+  }
+   return () => clearInterval(timer); //clears the timer
+  }, 
+  
+  [recording]
+);
 
-  {/* Formatting Time */}
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
+{/* Converting sec into mm:ss format */}
+ const formatTime = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
-  {/* Play Audio function */}
-  const playRecording = async () => {
-   try {
-    if (!audioURI) return;
+{/* Play Audio function */}
+const playRecording = async () => {
+ try {
+  if (!audioURI) return; 
 
-    if (sound) {
-     const status = await sound.getStatusAsync();
-    if (status.isPlaying) {
-     await sound.pauseAsync();
-     setIsPlaying(false);
-    } else {
-     await sound.playAsync();
-     setIsPlaying(true);
-    }
-  return;
- }
-
-  const { sound: newSound } = await Audio.Sound.createAsync(
-  { uri: audioURI },
-  { shouldPlay: true }
+  // Load audio if not loaded yet
+  let currentSound = sound;
+  if (!currentSound) {
+   const { sound: newSound } = await Audio.Sound.createAsync(
+   { uri: audioURI }
   );
-    setSound(newSound);
-    setIsPlaying(true);
-
+  
+  // Listener for audio stop/finish
   newSound.setOnPlaybackStatusUpdate(status => {
   if (status.didJustFinish || !status.isPlaying) {
-  setIsPlaying(false);
-   }
-    });
+   setIsPlaying(false);
+  }
+  });
+  //store loaded audio in state, no need to reload again
+   setSound(newSound);
+   currentSound = newSound;
+  }
+
+  // Check if audio is playing/paused
+  const status = await currentSound.getStatusAsync();
+   if (status.isPlaying) {
+    await currentSound.pauseAsync();
+    setIsPlaying(false);
+  
+  } else {
+    await currentSound.playAsync();
+    setIsPlaying(true);
+  }
+    
   } catch (error) {
     console.error('Playback error:', error);
-   }
-  };
+  }
+};
 
-  {/* Start Audio function */}
-  const startRecording = async () => {
-   try {
-    // Stop existing recording if still active
-    if (recording) {
+{/* Start Audio function */}
+ const startRecording = async () => {
+  try {
+   //check if recorder is already working or not 
+   if (recording) {
     await recording.stopAndUnloadAsync();
     setRecording(null);
-    }
-
+  }
+  //permission to access microphone
   const { status } = await Audio.requestPermissionsAsync();
-    if (status !== 'granted') {
-    alert('Permission to access microphone is required!');
-     return;
-    }
-    setRecordingTime(0); 
+  if (status !== 'granted') {
+      alert('Permission to access microphone is required!');
+      return;
+ }
+  setRecordingTime(0); //reset the recorder
 
+  //create, stores and save audio in HQ
   const newRecording = new Audio.Recording();
-   await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-   await newRecording.startAsync();
+  await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+  await newRecording.startAsync();
 
-   setRecording(newRecording);
-
+  setRecording(newRecording);
+  
   // Auto stop after 60 seconds
-   const timeout = setTimeout(() => stopRecording(), 60000);
-    setAutoStopTimeout(timeout);
+  setTimeout(async () => {
+   try {
+    await newRecording.stopAndUnloadAsync();
+    const uri = newRecording.getURI();
+    setAudioURI(uri);
+    setRecording(null);
+  
+  } catch (err) {
+      console.error('Error auto-stopping recording:', err);
+     }
+   }, 60000);
+
   } catch (err) {
     console.error('Error starting recording', err);
-   }
- };
+  }
+};
 
-  {/* Stop Audio function */}
-  const stopRecording = async () => {
-   try {
-     if (!recording) return;
-     await recording.stopAndUnloadAsync();
-     const uri = recording.getURI();
-     setAudioURI(uri);
-     setRecording(null);
-   } catch (err) {
-     console.error('Error stopping recording', err);
-   }
- };
+{/* Stop Audio function */}
+const stopRecording = async () => {
+ try {
+  if (!recording) return;
 
-  {/*Function to store audio on Cloundinary */}
+  await recording.stopAndUnloadAsync();
+  const uri = recording.getURI(); //get file path
+  setAudioURI(uri); //save URI
+  setRecording(null);
+    
+  console.log('Stopped recording at:', uri);
+  
+ } catch (err) {
+    console.error('Error stopping recording', err);
+ }
+};
+
+{/*Function to store audio on Cloundinary */}
   const uploadToCloudinary = async (audioURI) => {
   const data = new FormData();
+  //metadata of the audio for storing  
   data.append('file', {
     uri: audioURI,
     type: 'audio/m4a',
@@ -138,14 +157,15 @@ const NotepadScreen = () => {
   });
   data.append('upload_preset', 'journal_audio');
   data.append('cloud_name', 'dstxsoomq');
-
+  
+  //requesting cloudiary to upload the audio
   try {
     const response = await fetch('https://api.cloudinary.com/v1_1/dstxsoomq/auto/upload', {
       method: 'POST',
       body: data,
     });
 
-    const result = await response.json();
+    const result = await response.json(); //stores cloudinary sent data
     return result.secure_url; 
   } catch (error) {
     console.error('Cloudinary upload failed:', error);
@@ -153,7 +173,7 @@ const NotepadScreen = () => {
   }
  };
 
-  {/* Save function */}
+{/* Save function */}
   const handleSave = async () => {
   setSaveError('');
 
@@ -172,16 +192,17 @@ const NotepadScreen = () => {
 
   //Cloundinary for audio saving
   let audioURL = null;
+    
     if (audioURI) {
      console.log('Uploading audio to Cloudinary...');
      audioURL = await uploadToCloudinary(audioURI);
+     
      if (!audioURL) {
       setSaveError('Audio upload failed.');
       return;
     }
     console.log('Audio uploaded:', audioURL);
    }
-
   //User based 
   try {
     const user = getAuth().currentUser;
@@ -215,13 +236,14 @@ const NotepadScreen = () => {
       },
     },
     ]);
+  
   } catch (error) {
     console.error("Firestore save error:", error);
     setSaveError('Failed to save. Try again.');
   }
 };
 
-  {/* Date */}
+{/* Date */}
   const today = new Date().toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
@@ -234,6 +256,7 @@ return (
 
   {/* Header */}
   <View style={styles.topRow}>
+  
   <TextInput
     value={title}
     onChangeText={setTitle}
@@ -241,23 +264,25 @@ return (
     placeholderTextColor="#999"
     style={styles.headerTextInput}
   />
+
   <TouchableOpacity style={styles.closeCircle} onPress={() => navigation.navigate('BottomNavTab', { screen: 'Journal' })} >
-  <Ionicons name="close" size={22} color="black" />
+    <Ionicons name="close" size={22} color="black" />
   </TouchableOpacity>
   </View>
       
   {/*Date */}
   <View style={styles.dateRow}>
-  <Ionicons name="calendar-outline" size={20} color="#A58E74" />
-  <Text style={styles.dateText}>{today}</Text>
+    <Ionicons name="calendar-outline" size={20} color="#A58E74" />
+    <Text style={styles.dateText}>{today}</Text>
   </View>
 
   <Text style={styles.heading}>How are you feeling?</Text>
+
   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodScroll}>
   {moods.map((mood, index) => (
   <TouchableOpacity key={index} style={[styles.moodItem, selectedMood?.label === mood.label && { backgroundColor: mood.color },]}
-  onPress={() => setSelectedMood(mood)}>
-  <Text style={styles.moodLabelOnly}>{mood.label}</Text>
+    onPress={() => setSelectedMood(mood)}>
+    <Text style={styles.moodLabelOnly}>{mood.label}</Text>
   </TouchableOpacity>
   ))}
   </ScrollView>
@@ -276,32 +301,35 @@ return (
   {audioURI && (
   <View style={styles.audioContainer}>
   <View style={styles.audioBar}>
-  <TouchableOpacity onPress={playRecording}>
-    <Ionicons name={isPlaying ? "pause" : "play"} size={24} color="black" />
-  </TouchableOpacity>
-  <View style={styles.waveform} />
-  <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
-  <TouchableOpacity onPress={() => setAudioURI(null)} style={{ marginLeft: 10 }}>
-  <Ionicons name="trash" size={20} color="#E94F4F" />
-  </TouchableOpacity>
+   <TouchableOpacity onPress={playRecording}>
+     <Ionicons name={isPlaying ? "pause" : "play"} size={24} color="black" />
+   </TouchableOpacity>
+
+   <View style={styles.waveform} />
+    <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
+    <TouchableOpacity onPress={() => setAudioURI(null)} style={{ marginLeft: 10 }}>
+      <Ionicons name="trash" size={20} color="#E94F4F" />
+    </TouchableOpacity>
   </View>
   </View>
   )}
 
   {/* Buttons */}
   <View style={styles.footerRow}>
-  <View style={styles.recordingRow}>
-  <TouchableOpacity
-  style={styles.iconBtn}
-  onPress={recording ? stopRecording : startRecording} >
-   <Ionicons name={recording ? "stop" : "mic-outline"} size={24} color="black" />
-  </TouchableOpacity>
-  {recording && <Text style={styles.inlineTimer}>{formatTime(recordingTime)}</Text>}
-  </View>
-  <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-  <Text style={styles.saveText}>Save</Text>
-  </TouchableOpacity>
-  </View>
+    <View style={styles.recordingRow}>
+    <TouchableOpacity
+      style={styles.iconBtn}
+      onPress={recording ? stopRecording : startRecording} 
+    >
+      <Ionicons name={recording ? "stop" : "mic-outline"} size={24} color="black" />
+    </TouchableOpacity>
+    
+    {recording && <Text style={styles.inlineTimer}>{formatTime(recordingTime)}</Text>}
+    </View>
+      <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+      <Text style={styles.saveText}>Save</Text>
+      </TouchableOpacity>
+    </View>
   </ScrollView>
   </KeyboardAvoidingView>
   

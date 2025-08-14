@@ -49,9 +49,7 @@ export default function App() {
       <Stack.Screen name="EditProfile" component={EditProfileScreen}/>
       <Stack.Screen name="ContactSupportScreen" component={ContactSupportScreen}/>
       <Stack.Screen name="FAQsScreen" component={FAQsScreen}/>
-
-    
-
+      
       </Stack.Navigator>
       <Toast/>
     </NavigationContainer>

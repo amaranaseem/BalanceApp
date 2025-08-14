@@ -5,32 +5,18 @@ import { auth } from '../firebase';
 import { db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import Toast from 'react-native-toast-message';
-import DateTimePicker from '@react-native-community/datetimepicker'; 
 import { Ionicons } from '@expo/vector-icons';
-
 
 const CLOUDINARY_UPLOAD_PRESET = "profile_image";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dstxsoomq/image/upload";
 
-const genders = ['Male', 'Female']
-
 const OnboardingScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
-  const [dob, setDob] = useState('');
-  const [gender, setGender] = useState('');
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const handleDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-     const dateStr = selectedDate.toISOString().split('T')[0];
-     setDob(dateStr);
-    }
-  };
-
+  //Setting profile Picture
   const pickImage = async () => {
    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
@@ -38,13 +24,15 @@ const OnboardingScreen = ({ navigation }) => {
      return;
    }
 
-  const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
+  const result = await ImagePicker.launchImageLibraryAsync({ 
+    mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 }); //opens image picker, compress quality 
 
-  if (!result.cancelled) {
-    setImage(result.assets[0].uri || result.uri);
+  if (!result.canceled) {
+    setImage(result.assets[0].uri || result.uri); //stores img URI
   }
   };
 
+  //saving img to cloudinary 
  const handleSubmit = async () => {
   const user = auth.currentUser;
   if (!user) return;
@@ -55,6 +43,7 @@ const OnboardingScreen = ({ navigation }) => {
 
    if (image) {
     const formData = new FormData();
+    //metadata of the img for storing  
     formData.append("file", {
     uri: image,
     type: "image/jpeg",
@@ -83,8 +72,6 @@ const OnboardingScreen = ({ navigation }) => {
     uid: user.uid,
     name,
     username,
-    dob,
-    gender,
     profileImage: imageUrl || null,
     createdAt: new Date(),
     email: user.email
@@ -145,37 +132,10 @@ return (
   </View>
   </View>
 
-  {/* DOB Selection */}
-  <View style={styles.inputWrapper}>
-  <TouchableOpacity style={styles.inputContainer} onPress={() => setShowDatePicker(true)}>
-  <Ionicons name="calendar-outline" size={20} color="#A58E74" style={styles.icon} />
-  <Text style={[styles.inputText, !dob && { color: '#000' }]}> {dob || 'Select Date of Birth'} </Text>
-  </TouchableOpacity>
-  {showDatePicker && (
-  <DateTimePicker 
-    value={new Date()}
-    mode="date"
-    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-    onChange={handleDateChange}
-    maximumDate={new Date()}
-  />
-  )}
-  </View>
-
-  {/* Gender Selection */}
-  <Text style={styles.label}>Gender</Text>
-  <View style={styles.genderContainer}>
-  {genders.map((g) => (
-  <TouchableOpacity key={g} style={[styles.genderOption, gender === g && styles.selectedGender]} onPress={() => setGender(g)}>
-  <Text style={[styles.genderText, gender === g && styles.selectedGenderText]}>{g}</Text>
-  </TouchableOpacity>
-  ))}
-  </View>
-
   {/* Submit Button */}
   <View style={styles.buttoncontainer}>
   <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={uploading}>
-   <Text style={styles.buttonText}>Continue</Text>
+   <Text style={styles.buttonText}>{uploading ? 'Welcome' : 'Save'}</Text>
   </TouchableOpacity>
   </View>
  
@@ -276,44 +236,6 @@ buttoncontainer:{
   justifyContent: 'center',
   alignItems: 'center',
   marginTop: 30,
-},
-
-genderContainer: {
-  flexDirection: 'row',
-  alignSelf: 'flex-start',
-  marginBottom: 30,
-},
-
-genderOption: {
-  marginRight: 10,
-  paddingVertical: 8,
-  paddingHorizontal: 16,
-  borderRadius: 20,
-  borderWidth: 1,
-  borderColor: '#ccc',
-},
-
-selectedGender: {
-  backgroundColor: '#A58E74',
-},
-
-selectedGenderText: {
-  color: 'white',
-  fontStyle: 'italic',
-  fontWeight: 'bold',
-},
-
-genderText: {
-  color: '#000',
-},
-
-label: {
-  marginBottom: 10,
-  fontWeight: 'bold',
-  color: '#50483D',
-  marginTop: 20,
-  fontSize: 14,
-  alignSelf: 'flex-start',
 },
 
 });

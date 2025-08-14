@@ -25,31 +25,33 @@ const InsightScreen = () => {
   const [loading, setLoading] = useState(true);
   const [topEmotion, setTopEmotion] = useState(null);
   const [loggedDaysCount, setLoggedDaysCount] = useState(0);
-  const [moodConsistency, setMoodConsistency] = useState(0);
-
+  const [moodConsistency, setMoodConsistency] = useState(0)
   const [allCheckins, setAllCheckins] = useState([]);
   const [weekOffset, setWeekOffset] = useState(0);
 
   {/*Setting up the weekdays */}
-  const getWeekRange = (offset)=> {
+  const getWeekRange = (offset) => {
     const today = new Date();
     const start = new Date(today);
+
     start.setDate(today.getDate() - start.getDay() + 1 + offset * 7 ); 
     start.setHours(0,0,0,0);
 
     const end = new Date(start);
+
     end.setDate(start.getDate() + 6); 
     end.setHours(23,59,59,999);
     return {start, end};
   };
 
+  //display date in DAY:DATE:MONTH format
   const formatDateRange = (start, end) => {
     const format = (d) =>
-    `${d.toLocaleString('default', { weekday: 'short', day: 'numeric', month: 'short'  })}`;
-  return `${format(start)} - ${format(end)}`;
+    `${d.toLocaleString('default', { weekday: 'short', day: 'numeric', month: 'short'})}`;
+     return `${format(start)} - ${format(end)}`;  
   };
 
-  {/*MoodData */}
+  {/*getting Mood Data from firebase */}
   useEffect(() => {
   const fetchMoodData = async () => {
    try {
@@ -65,95 +67,115 @@ const InsightScreen = () => {
     const moodEntries = snapshot.docs.map(doc => doc.data());
     setAllCheckins(moodEntries);
     setLoading(false);
-  } catch (error) {
-    console.error('Error fetching mood data:', error);
-    setLoading(false);
-  }
+  
+    } catch (error) {
+      console.error('Error fetching mood data:', error);
+      setLoading(false);
+    }
    }; 
     fetchMoodData();
   }, []);
 
   //Ensure only the present week moods are displayed
   useEffect(() => {
-    if(!allCheckins.length) return;
+    if(!allCheckins.length) return; //if no moodcheck-ins
 
-    const {start, end} = getWeekRange(weekOffset);
-    const thisWeek = allCheckins.filter(entry => {
-      const date = entry.createdAt?.toDate?.();
-      return date >= start && date <= end;
-    });
-
-    const moodTrends = {};
-    moods.forEach(m => {
-    moodTrends[m.label] = Array(7).fill(null);
-    });
+    //get date range for the current week
+    const {start: weekStartDate, end: weekEndDate} = getWeekRange(weekOffset);
     
-    thisWeek.forEach(entry => {
-      const date = entry.createdAt?.toDate();
-      const day = date?.getDay(); 
-      const adjustedDay = day === 0 ? 6 : day - 1; // Mon=0, Sun=6
-      const moodLabel = entry.mood;
+    //filter all moods to display current week mood 
+    const checkinsThisWeek = allCheckins.filter(checkin => {
+      const checkinDate = checkin.createdAt?.toDate?.();
+      return checkinDate >= weekStartDate && checkinDate <= weekEndDate;
+    });
 
-    if (moodLabel && moodTrends[moodLabel]) {
-      const score = 7 - moods.findIndex(m => m.label === moodLabel);
-      moodTrends[moodLabel][adjustedDay] = score;
+    //Creating a blank mood trends
+    const moodTrends = {};
+    moods.forEach(moodItem => { 
+    moodTrends[moodItem.label] = Array(7).fill(null);
+    });
+
+    //filling moodtrend with actual mood score 
+    checkinsThisWeek.forEach(checkin => {
+      const date = checkin.createdAt?.toDate();
+      const dayofWeek = date?.getDay();  
+      const adjustedDayIndex = (dayofWeek === 0) ? 6: dayofWeek - 1; //shift to monday = 0
+      const moodLabel = checkin.mood;
+    
+      if (moodLabel && moodTrends[moodLabel]) {
+        //higher number to "better" mood
+      const moodScore = 7 - moods.findIndex(m => m.label === moodLabel);
+      moodTrends[moodLabel][adjustedDayIndex] = moodScore;
     }
-  });
-
-    setMoodData(moodTrends);
-
-  const daySet = new Set();
-    Object.values(moodTrends).forEach(arr => {
-    arr.forEach((v, i) => {
-    if (v !== null) daySet.add(i);
-    });
-  });
-    setLoggedDaysCount(daySet.size);
-
-  // Determine top mood
-    const flat = Object.entries(moodTrends).flatMap(([label, values]) =>
-     values.map(v => (v !== null ? label : null)).filter(Boolean)
-   );
-
-    const moodCounts = {};
-    flat.forEach(m => {
-    moodCounts[m] = (moodCounts[m] || 0) + 1;
     });
 
-    const top = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-    setTopEmotion(top);
+    setMoodData(moodTrends); //save filled-in mood trends
 
-  // Mood consistency score
-    const total = Object.values(moodCounts).reduce((a, b) => a + b, 0);
-    const avg = total / Object.keys(moodCounts).length || 0;
-    let variation = 0;
-    Object.values(moodCounts).forEach(count => {
-    variation += Math.abs(count - avg);
+    //checking mood logged in the week
+    const dayWithMood = new Set();
+     Object.values(moodTrends).forEach(moodArray => {
+      moodArray.forEach((score, dayIndex) => {
+      if (score !== null) dayWithMood.add(dayIndex);
+        });
     });
-    const consistency = total ? Math.max(0, 100 - Math.floor((variation / total) * 100)) : 0;
-    setMoodConsistency(consistency);
-  }, [allCheckins, weekOffset]);
+    setLoggedDaysCount(dayWithMood.size);
 
-  if (loading || !moodData) {
+    // Find Top mood
+    let moodFrequency = {}; 
+    let topMood = null;
+    let highestCount = 0;
+
+    Object.entries(moodTrends).forEach(([label, values]) => {
+    values.forEach(v => { if (v !== null) { 
+    moodFrequency[label] = (moodFrequency[label] || 0) + 1;
+      
+    //update top mood if mood passes the highest count
+    if (moodFrequency[label] > highestCount) {
+    highestCount = moodFrequency[label];
+    topMood = label;}
+     }
+     });
+   });
+
+    setTopEmotion(topMood);
+
+    //Mood consistency score
+    const totalMoodEntries = Object.values(moodFrequency).reduce((sum, count) => sum + count, 0);
+    const avgMoodCount = totalMoodEntries / Object.keys(moodFrequency).length || 0;
+    
+    let variationFromAverage = 0;
+    Object.values(moodFrequency).forEach(count => {
+    variationFromAverage += Math.abs(count - avgMoodCount);
+    });
+
+    const moodConsistencyScore = totalMoodEntries ? Math.max(0, 100 - Math.floor((variationFromAverage / totalMoodEntries) * 100)) : 0;
+    setMoodConsistency(moodConsistencyScore);
+  
+    }, [allCheckins, weekOffset]);
+
+    if (loading || !moodData) {
     return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
-  }
+   }
 
-  const datasets = moods.map(m => ({
+   //prepare data for chart 
+   const datasets = moods.map(m => ({
     data: moodData[m.label].map(v => (v === null ? 0 : v)),
     color: () => m.color,
     strokeWidth: 2,
   }));
 
+  //format the week data range for display
   const { start, end } = getWeekRange(weekOffset);
   const formattedRange = formatDateRange(start, end);
 
 return (
   <View style={styles.container}>
   <View style={styles.topRow}>
-  <Text style={styles.headerText}>My Mood Story</Text>
+    <Text style={styles.headerText}>My Mood Story</Text>
   </View>
 
   <ScrollView style={styles.scrollList}>
+
   <View style={styles.insightRow}>
   <Text style={styles.sectionHeader}>Insights</Text>
    <TouchableOpacity onPress={() => 
@@ -169,7 +191,7 @@ return (
   </TouchableOpacity>
 
   <View style={styles.spacer} />
-  <Text style={styles.subHeading}>{formattedRange}</Text>
+    <Text style={styles.subHeading}>{formattedRange}</Text>
   <View style={styles.spacer} />
 
   <TouchableOpacity onPress={() => setWeekOffset(weekOffset + 1)} style={{ paddingHorizontal: 10 }}>
@@ -183,7 +205,7 @@ return (
   {moods.map(mood => (
   <View key={mood.label} style={styles.legendItem}>
   <View style={[styles.legendDot, { backgroundColor: mood.color }]} />
-  <Text style={styles.legendText}>{mood.label}</Text>
+    <Text style={styles.legendText}>{mood.label}</Text>
   </View>
       ))}
   </View>
@@ -228,6 +250,7 @@ return (
     <Text style={styles.cardLabel}>Consistency</Text>
     <Text style={styles.cardValue}>{moodConsistency}%</Text>
   </View>
+  
   </View>
   </ScrollView>
   </View>
@@ -329,7 +352,6 @@ card: {
   justifyContent: 'center',
   borderColor: '#50483D', 
   borderWidth: 0.5,
-
 },
 
 cardLabel: {
@@ -366,6 +388,5 @@ insightRow: {
   alignItems: 'center',
   marginBottom: 10,
 },
-
 
 });

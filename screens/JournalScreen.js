@@ -9,7 +9,6 @@ import {query, orderBy} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import EntryPreviewScreen from './EntryPreviewScreen'; 
 
-
 const db = getFirestore(app);
 
 const JournalScreen = () => {
@@ -50,7 +49,6 @@ const JournalScreen = () => {
    } 
   };
 
-    
   // delete entry
   const deleteEntry = async (id) => {
   try {
@@ -110,7 +108,7 @@ const JournalScreen = () => {
 
   {/* Description */}
   {item.description && (
-  <Text style={styles.cardText} numberOfLines={5}>
+  <Text style={styles.cardText} numberOfLines={3}>
     {item.description}
   </Text>
   )}
@@ -122,7 +120,7 @@ const JournalScreen = () => {
  <Ionicons name="play" size={20} color="black" />
  <Text style={styles.audioText}>{item.duration < 60 
   ? `${item.duration.toFixed(1)}s` 
-  : `${(item.duration / 60).toFixed(1)}m`}
+  : `${(item.duration / 60).toFixed(1)}m`} {/*rouding audio min */}
  </Text>
   </View>
   )}
@@ -138,7 +136,7 @@ const JournalScreen = () => {
 return (
   <View style={styles.container}>
 
-  {/* Header */}
+ {/* Header */}
  <View style={styles.topRow}>
  <Text style={styles.headerText}>My Journal</Text>
  </View>

@@ -8,7 +8,8 @@ import { useFocusEffect } from '@react-navigation/native';
 const MeditationScreen = ({ navigation }) => {
 const [featuredMeditation, setFeaturedMeditation] = useState([]); 
 const [loading, setLoading] = useState(true);
-const [meditationSessions, setMeditationSessions] = useState([]);
+const [meditationSessions, setMeditationSessions] = useState([]); 
+const [userMeditations, setUserMeditations]= useState([]);
 
 {/*Featured Meditations*/}
 useFocusEffect(
@@ -69,8 +70,6 @@ useFocusEffect(
 );
 
 {/*User Meditations Audio */}
- const [userMeditations, setUserMeditations]= useState([]);
-
  useFocusEffect(
   useCallback(() => {
   const fetchUserMeditations = async () => {
@@ -87,6 +86,7 @@ useFocusEffect(
       ...doc.data()
     }));
     setUserMeditations(fetched);
+    
     } catch (error) {
       console.error("Error fetching user meditations:", error);
     }
@@ -123,8 +123,8 @@ return (
     )}
     >
     <View>
-    <Text style={styles.title}>{item.title}</Text>
-    <Text style={styles.subtitle}>{item.duration}</Text>
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.subtitle}>{item.duration}</Text>
     </View>
     <View style={styles.featurePlayBtn}>
      <Ionicons name="play" size={22} color="#fff" />
@@ -136,12 +136,12 @@ return (
     <Text style={styles.sectionTitle}>Meditation Sessions</Text>
     {meditationSessions.map((session, index) => (
     <TouchableOpacity
-    key={session.id}
-    style={styles.sessionCard} onPress={() => navigation.navigate('MeditationSessionDetail', {
-    sessionId: session.id,
-    title: session.title,
-    url: session.url,
-    sessions: session.session
+      key={session.id}
+      style={styles.sessionCard} onPress={() => navigation.navigate('MeditationSessionDetail', {
+      sessionId: session.id,
+      title: session.title,
+      url: session.url,
+      sessions: session.session
     })
     }
   >
@@ -150,10 +150,10 @@ return (
     <Image source={{ uri: session.imgURL }} style={styles.sessionImage} />
     )}
     <View>
-    <Text style={styles.title}>{session.title}</Text>
-    {session.description ? (
-    <Text style={styles.subtitle}>{session.description}</Text>
-    ) : null}
+      <Text style={styles.title}>{session.title}</Text>
+      {session.description ? (
+      <Text style={styles.subtitle}>{session.description}</Text>
+      ) : null}
     </View>
     </View>
     <View style={styles.sessionBtn}>
@@ -165,10 +165,10 @@ return (
 
   {/* Your Audio Section */}
     <View style={styles.sectionHeader}>
-    <Text style={styles.sectionTitle}>Your Audio</Text>
-    <TouchableOpacity onPress={() => navigation.navigate('UserAudioViewAllScreen')}>
-    <Text style={styles.viewAll}>View all</Text>
-    </TouchableOpacity>
+      <Text style={styles.sectionTitle}>Your Audio</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('UserAudioViewAllScreen')}>
+      <Text style={styles.viewAll}>View all</Text>
+      </TouchableOpacity>
     </View>
 
     {userMeditations.length === 0 ? (
@@ -178,7 +178,7 @@ return (
     <TouchableOpacity key={item.id || index} style={styles.userCard} onPress={() => navigation.navigate('AudioPlayerScreen', { 
       title: item.title,
       url: item.audioURL, 
-      imgURL: 'https://res.cloudinary.com/dstxsoomq/image/upload/v1752538325/audioplaceholder_tqxloj.jpg',
+      imgURL: 'https://res.cloudinary.com/dstxsoomq/image/upload/v1752538325/audioplaceholder_tqxloj.jpg', 
       }
      )}
     >
