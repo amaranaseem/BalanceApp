@@ -12,7 +12,7 @@ const RegisterScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
 
 // References:
-// Login logic influenced by React Native Firebase 
+// Registration logic influenced by React Native Firebase 
 // Link: https://rnfirebase.io/auth/usage#emailpassword-sign-in 
 
  {/*User Authentication with error handling*/}
