@@ -52,9 +52,9 @@ Week 8: Testing, Polish & Evaluation (17th July- 25th July) **(Completed)**
 ✅Polish UI
 ✅Define and document evaluation metrics 
 
-Week 9 & 10: Final Report, Reflection & Submission (27th July- 13th Aug) **(In Progress)**
-Final Report writing
+Week 9 & 10: Final Report, Reflection & Submission (27th July- 13th Aug) **(Completed)**
+✅Final Report writing
 ✅Annotate screenshots for documentation
-Prepare for demo 
-Review the final report and artefact
+✅Prepare for demo 
+✅Review the final report and artefact
 Submission 
